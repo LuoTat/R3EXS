@@ -6,8 +6,9 @@ def in_strings_EventCommand(eventcommand)
     case eventcommand.code
     when 102 # 显示选项
         eventcommand.parameters[0].map! do |string|
+            next string if string.empty?
             new_string = $all_ex_strings[string]
-            string = new_string unless new_string.nil? || new_string.empty?
+            string = (new_string.nil? || new_string.empty?) ? string : new_string
         end
     when 108 # 注释
         new_string = $all_ex_strings[eventcommand.parameters[0]]
@@ -131,6 +132,8 @@ def in_strings_Map(map)
     new_display_name = $all_ex_strings[map.display_name]
     map.display_name = new_display_name unless new_display_name.nil? || new_display_name.empty?
     map.events.values.each do |event|
+        new_name = $all_ex_strings[event.name]
+        event.name = new_name unless new_name.nil? || new_name.empty?
         event.pages.each do |page|
             page.list.each do |eventcommand|
                 in_strings_EventCommand(eventcommand)
