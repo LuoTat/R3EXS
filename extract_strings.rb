@@ -117,6 +117,8 @@ def ex_strings_Map(map)
     display_name = map.display_name
     $all_ex_strings[display_name] = display_name unless display_name.empty?
     map.events.values.each do |event|
+        name = event.name
+        $all_ex_strings[name] = name unless name.empty?
         event.pages.each do |page|
             page.list.each do |eventcommand|
                 get_strings_EventCommand(eventcommand).each do |string|
@@ -158,6 +160,7 @@ def ex_strings_States(states)
         $all_ex_strings[message1] = message1 unless message1.empty?
         $all_ex_strings[message2] = message2 unless message2.empty?
         $all_ex_strings[message3] = message3 unless message3.empty?
+        $all_ex_strings[message4] = message4 unless message4.empty?
     end
 end
 
