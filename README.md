@@ -4,6 +4,8 @@ RGSS3_Extract_Strings_Tool
 
 <p align="center">一个用来提取和翻译RGSS3游戏引擎的字符串的工具</p>
 
+[**简体中文**](README.md)&nbsp;&nbsp;&nbsp;[**English**](README_EN.md)
+
 ## 目录
 
 -   [简介](#简介)
