@@ -1,4 +1,6 @@
 require 'oj'
+require 'zlib'
+require 'json'
 require 'fileutils'
 require_relative 'RGSS3'
 
@@ -126,6 +128,16 @@ def to_json_MapInfos(mapinfos)
     File.open("JSON/MapInfos.json", 'w') { |file| file.write(Oj.dump(mapinfos_array, :indent => 4)) }
 end
 
+def to_json_Scripts(scripts)
+    FileUtils.mkdir_p('JSON/Scripts') unless Dir.exist?('JSON/Scripts')
+    scripts_info = {}
+    scripts.each_with_index do |script, index|
+        scripts_info[index] = script[1]
+        File.open("JSON/Scripts/#{sprintf('%03d', index)}.rb", 'w') { |file| file.write(Zlib::Inflate.inflate(script[2]).force_encoding('UTF-8')) }
+    end
+    File.open("JSON/Scripts/Scripts_info.json", 'w') { |file| file.write(Oj.dump(scripts_info, :indent => 4)) }
+end
+
 def to_json_Skills(skills)
     skills_array = []
     skills[1..-1].each do |skill|
@@ -194,6 +206,7 @@ FileUtils.mkdir_p('JSON') unless Dir.exist?('JSON')
     'Data/Items.rvdata2',
     *Dir.glob('Data/Map[0-9][0-9][0-9].rvdata2'),
     'Data/MapInfos.rvdata2',
+    'Data/Scripts.rvdata2',
     'Data/Skills.rvdata2',
     'Data/States.rvdata2',
     'Data/System.rvdata2',
@@ -202,8 +215,9 @@ FileUtils.mkdir_p('JSON') unless Dir.exist?('JSON')
     'Data/Weapons.rvdata2'
 ].each do |rvdata2path|
     rvdata2basename = File.basename(rvdata2path, '.*')
-    print "\e[32m#{rvdata2path}\e[0m -> \e[33mJSON/#{rvdata2basename}.json\e[0m\n"
+    print "\e[33mReading \e[37m#{rvdata2path}\e[0m..."
     File.open(rvdata2path, 'rb') do |rvdata2file|
+        print "\r\e[2K\e[34mSerializing \e[37m#{rvdata2path}\e[0m..."
         object = Marshal.load(rvdata2file.read)
         case rvdata2basename
         when 'Actors'
@@ -224,6 +238,8 @@ FileUtils.mkdir_p('JSON') unless Dir.exist?('JSON')
             to_json_Map(object, rvdata2basename)
         when 'MapInfos'
             to_json_MapInfos(object)
+        when 'Scripts'
+            to_json_Scripts(object)
         when 'Skills'
             to_json_Skills(object)
         when 'States'
@@ -238,4 +254,5 @@ FileUtils.mkdir_p('JSON') unless Dir.exist?('JSON')
             to_json_Weapons(object)
         end
     end
+    print "\r\e[2K\e[32mSerialized \e[37m#{rvdata2path}\e[0m.\n"
 end
