@@ -1,4 +1,5 @@
 require 'oj'
+require 'zlib'
 require 'fileutils'
 require_relative 'RGSS3'
 
@@ -45,224 +46,240 @@ def to_rvdata2_EventCommandList(list_object, list_array)
 end
 
 def to_rvdata2_Actors(actors)
-    File.open("Data/Actors.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        actors.each do |actor|
+    File.open("JSON/Actors.json", 'r') do |file|
+        actors_array = Oj.load(file.read)
+        actors_array.each do |actor|
             index = actor[:id]
-            object[index].name = actor[:name]
-            object[index].nickname = actor[:nickname]
-            object[index].note = actor[:note]
+            actors[index].name = actor[:name]
+            actors[index].nickname = actor[:nickname]
+            actors[index].note = actor[:note]
         end
-        File.open("Data_New/Actors.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/Actors.rvdata2", 'wb') { |file| file.write(Marshal.dump(actors)) }
     end
 end
 
 def to_rvdata2_Animations(animations)
-    File.open("Data/Animations.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        animations.each do |animation|
-            object[animation[:id]].name = animation[:name]
+    File.open("JSON/Animations.json", 'r') do |file|
+        animations_array = Oj.load(file.read)
+        animations_array.each do |animation|
+            animations[animation[:id]].name = animation[:name]
         end
-        File.open("Data_New/Animations.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/Animations.rvdata2", 'wb') { |file| file.write(Marshal.dump(animations)) }
     end
 end
 
 def to_rvdata2_Armors(armors)
-    File.open("Data/Armors.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        armors.each do |armor|
+    File.open("JSON/Armors.json", 'r') do |file|
+        armors_array = Oj.load(file.read)
+        armors_array.each do |armor|
             index = armor[:id]
-            object[index].name = armor[:name]
-            object[index].description = armor[:description]
-            object[index].note = armor[:note]
+            armors[index].name = armor[:name]
+            armors[index].description = armor[:description]
+            armors[index].note = armor[:note]
         end
-        File.open("Data_New/Armors.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/Armors.rvdata2", 'wb') { |file| file.write(Marshal.dump(armors)) }
     end
 end
 
 def to_rvdata2_Classes(klasses)
-    File.open("Data/Classes.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        klasses.each do |klasse|
+    File.open("JSON/Classes.json", 'r') do |file|
+        klasses_array = Oj.load(file.read)
+        klasses_array.each do |klasse|
             index = klasse[:id]
-            object[index].name = klasse[:name]
-            object[index].note = klasse[:note]
+            klasses[index].name = klasse[:name]
+            klasses[index].note = klasse[:note]
         end
-        File.open("Data_New/Classes.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/Classes.rvdata2", 'wb') { |file| file.write(Marshal.dump(klasses)) }
     end
 end
 
 def to_rvdata2_CommonEvents(commonEvents)
-    File.open("Data/CommonEvents.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        commonEvents.each do |commonEvent|
+    File.open("JSON/CommonEvents.json", 'r') do |file|
+        commonEvents_array = Oj.load(file.read)
+        commonEvents_array.each do |commonEvent|
             index = commonEvent[:id]
-            object[index].name = commonEvent[:name]
-            to_rvdata2_EventCommandList(object[index].list, commonEvent[:list])
+            commonEvents[index].name = commonEvent[:name]
+            to_rvdata2_EventCommandList(commonEvents[index].list, commonEvent[:list])
         end
-        File.open("Data_New/CommonEvents.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/CommonEvents.rvdata2", 'wb') { |file| file.write(Marshal.dump(commonEvents)) }
     end
 end
 
 def to_rvdata2_Enemies(enemies)
-    File.open("Data/Enemies.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        enemies.each do |enemy|
+    File.open("JSON/Enemies.json", 'r') do |file|
+        enemies_array = Oj.load(file.read)
+        enemies_array.each do |enemy|
             index = enemy[:id]
-            object[index].name = enemy[:name]
-            object[index].note = enemy[:note]
+            enemies[index].name = enemy[:name]
+            enemies[index].note = enemy[:note]
         end
-        File.open("Data_New/Enemies.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/Enemies.rvdata2", 'wb') { |file| file.write(Marshal.dump(enemies)) }
     end
 end
 
 def to_rvdata2_Items(items)
-    File.open("Data/Items.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        items.each do |item|
+    File.open("JSON/Items.json", 'r') do |file|
+        items_array = Oj.load(file.read)
+        items_array.each do |item|
             index = item[:id]
-            object[index].name = item[:name]
-            object[index].description = item[:description]
-            object[index].note = item[:note]
+            items[index].name = item[:name]
+            items[index].description = item[:description]
+            items[index].note = item[:note]
         end
-        File.open("Data_New/Items.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/Items.rvdata2", 'wb') { |file| file.write(Marshal.dump(items)) }
     end
 end
 
 def to_rvdata2_Map(map, mapname)
-    File.open("Data/#{mapname}.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        object.display_name = map[:display_name]
-        map[:events].each do |event|
+    File.open("JSON/#{mapname}.json", 'r') do |file|
+        map_hash = Oj.load(file.read)
+        map.display_name = map_hash[:display_name]
+        map_hash[:events].each do |event|
             event_index = event[:id]
-            object.events[event_index].name = event[:name]
+            map.events[event_index].name = event[:name]
             event[:pages].each do |page|
-                to_rvdata2_EventCommandList(object.events[event_index].pages[page[:id]].list, page[:list])
+                to_rvdata2_EventCommandList(map.events[event_index].pages[page[:id]].list, page[:list])
             end
         end
-        File.open("Data_New/#{mapname}.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/#{mapname}.rvdata2", 'wb') { |file| file.write(Marshal.dump(map)) }
     end
 end
 
 def to_rvdata2_MapInfos(mapinfos)
-    File.open("Data/MapInfos.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        mapinfos.each do |mapinfo|
-            object[mapinfo[:id]].name = mapinfo[:name]
+    File.open("JSON/MapInfos.json", 'r') do |file|
+        mapinfos_array = Oj.load(file.read)
+        mapinfos_array.each do |mapinfo|
+            mapinfos[mapinfo[:id]].name = mapinfo[:name]
         end
-        File.open("Data_New/MapInfos.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/MapInfos.rvdata2", 'wb') { |file| file.write(Marshal.dump(mapinfos)) }
     end
 end
 
-def to_rvdata2_Skills(skills)
-    File.open("Data/Skills.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        skills.each do |skill|
-            index = skill[:id]
-            object[index].name = skill[:name]
-            object[index].description = skill[:description]
-            object[index].message1 = skill[:message1]
-            object[index].message2 = skill[:message2]
-            object[index].note = skill[:note]
+def to_rvdata2_Scripts(scripts)
+    scripts_array = []
+    [*Dir.glob("JSON/Scripts/*.rb")].each do |script|
+        script_basename = File.basename(script, '.*')
+        File.open(script, 'r') do |file|
+            scripts_array[script_basename.to_i] = file.read
         end
-        File.open("Data_New/Skills.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+    end
+    scripts_array.each_with_index do |script, index|
+        scripts[index][2] = Zlib::Deflate.deflate(script).force_encoding('UTF-8')
+    end
+    File.open("Data_New/Scripts.rvdata2", 'wb') { |file| file.write(Marshal.dump(scripts)) }
+end
+
+def to_rvdata2_Skills(skills)
+    File.open("JSON/Skills.json", 'r') do |file|
+        skills_array = Oj.load(file.read)
+        skills_array.each do |skill|
+            index = skill[:id]
+            skills[index].name = skill[:name]
+            skills[index].description = skill[:description]
+            skills[index].message1 = skill[:message1]
+            skills[index].message2 = skill[:message2]
+            skills[index].note = skill[:note]
+        end
+        File.open("Data_New/Skills.rvdata2", 'wb') { |file| file.write(Marshal.dump(skills)) }
     end
 end
 
 def to_rvdata2_States(states)
-    File.open("Data/States.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        states.each do |state|
+    File.open("JSON/States.json", 'r') do |file|
+        states_array = Oj.load(file.read)
+        states_array.each do |state|
             index = state[:id]
-            object[index].name = state[:name]
-            object[index].message1 = state[:message1]
-            object[index].message2 = state[:message2]
-            object[index].message3 = state[:message3]
-            object[index].message4 = state[:message4]
-            object[index].note = state[:note]
+            states[index].name = state[:name]
+            states[index].message1 = state[:message1]
+            states[index].message2 = state[:message2]
+            states[index].message3 = state[:message3]
+            states[index].message4 = state[:message4]
+            states[index].note = state[:note]
         end
-        File.open("Data_New/States.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/States.rvdata2", 'wb') { |file| file.write(Marshal.dump(states)) }
     end
 end
 
 def to_rvdata2_System(system)
-    File.open("Data/System.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        object.armor_types = system[:armor_types]
-        object.currency_unit = system[:currency_unit]
-        object.elements = system[:elements]
-        object.game_title = system[:game_title]
-        object.skill_types = system[:skill_types]
-        object.switches = system[:switches]
-        object.terms.basic = system[:basic]
-        object.terms.commands = system[:commands]
-        object.terms.etypes = system[:etypes]
-        object.terms.params = system[:params]
-        object.variables = system[:variables]
-        object.weapon_types = system[:weapon_types]
-        File.open("Data_New/System.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+    File.open("JSON/System.json", 'r') do |file|
+        system_hash = Oj.load(file.read)
+        system.armor_types = system_hash[:armor_types]
+        system.currency_unit = system_hash[:currency_unit]
+        system.elements = system_hash[:elements]
+        system.game_title = system_hash[:game_title]
+        system.skill_types = system_hash[:skill_types]
+        system.switches = system_hash[:switches]
+        system.terms.basic = system_hash[:basic]
+        system.terms.commands = system_hash[:commands]
+        system.terms.etypes = system_hash[:etypes]
+        system.terms.params = system_hash[:params]
+        system.variables = system_hash[:variables]
+        system.weapon_types = system_hash[:weapon_types]
+        File.open("Data_New/System.rvdata2", 'wb') { |file| file.write(Marshal.dump(system)) }
     end
 end
 
 def to_rvdata2_Tilesets(tilesets)
-    File.open("Data/Tilesets.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        tilesets.each do |tileset|
+    File.open("JSON/Tilesets.json", 'r') do |file|
+        tilesets_array = Oj.load(file.read)
+        tilesets_array.each do |tileset|
             index = tileset[:id]
-            object[index].name = tileset[:name]
-            object[index].note = tileset[:note]
+            tilesets[index].name = tileset[:name]
+            tilesets[index].note = tileset[:note]
         end
-        File.open("Data_New/Tilesets.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/Tilesets.rvdata2", 'wb') { |file| file.write(Marshal.dump(tilesets)) }
     end
 end
 
 def to_rvdata2_Troops(troops)
-    File.open("Data/Troops.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        troops.each do |troop|
+    File.open("JSON/Troops.json", 'r') do |file|
+        troops_array = Oj.load(file.read)
+        troops_array.each do |troop|
             index = troop[:id]
-            object[index].name = troop[:name]
+            troops[index].name = troop[:name]
         end
-        File.open("Data_New/Troops.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/Troops.rvdata2", 'wb') { |file| file.write(Marshal.dump(troops)) }
     end
 end
 
 def to_rvdata2_Weapons(weapons)
-    File.open("Data/Weapons.rvdata2", 'rb') do |file|
-        object = Marshal.load(file.read)
-        weapons.each do |weapon|
+    File.open("JSON/Weapons.json", 'r') do |file|
+        weapons_array = Oj.load(file.read)
+        weapons_array.each do |weapon|
             index = weapon[:id]
-            object[index].name = weapon[:name]
-            object[index].description = weapon[:description]
-            object[index].note = weapon[:note]
+            weapons[index].name = weapon[:name]
+            weapons[index].description = weapon[:description]
+            weapons[index].note = weapon[:note]
         end
-        File.open("Data_New/Weapons.rvdata2", 'wb') { |file| file.write(Marshal.dump(object)) }
+        File.open("Data_New/Weapons.rvdata2", 'wb') { |file| file.write(Marshal.dump(weapons)) }
     end
 end
 
 FileUtils.mkdir_p('Data_New') unless Dir.exist?('Data_New')
 [
-    'JSON/Actors.json',
-    'JSON/Animations.json',
-    'JSON/Armors.json',
-    'JSON/Classes.json',
-    'JSON/CommonEvents.json',
-    'JSON/Enemies.json',
-    'JSON/Items.json',
-    *Dir.glob('JSON/Map[0-9][0-9][0-9].json'),
-    'JSON/MapInfos.json',
-    'JSON/Skills.json',
-    'JSON/States.json',
-    'JSON/System.json',
-    'JSON/Tilesets.json',
-    'JSON/Troops.json',
-    'JSON/Weapons.json'
-].each do |jsonpath|
-    jsonbasename = File.basename(jsonpath, '.*')
-    print "\e[33m#{jsonpath}\e[0m -> \e[32mData_New/#{jsonbasename}.rvdata2\e[0m\n"
-    File.open(jsonpath, 'r') do |jsonfile|
-        object = Oj.load(jsonfile.read)
-        case jsonbasename
+    'Data/Actors.rvdata2',
+    'Data/Animations.rvdata2',
+    'Data/Armors.rvdata2',
+    'Data/Classes.rvdata2',
+    'Data/CommonEvents.rvdata2',
+    'Data/Enemies.rvdata2',
+    'Data/Items.rvdata2',
+    *Dir.glob('Data/Map[0-9][0-9][0-9].rvdata2'),
+    'Data/MapInfos.rvdata2',
+    'Data/Scripts.rvdata2',
+    'Data/Skills.rvdata2',
+    'Data/States.rvdata2',
+    'Data/System.rvdata2',
+    'Data/Tilesets.rvdata2',
+    'Data/Troops.rvdata2',
+    'Data/Weapons.rvdata2'
+].each do |rvdata2path|
+    rvdata2basename = File.basename(rvdata2path, '.*')
+    print "\e[33mReading \e[37m#{rvdata2path}\e[0m..."
+    File.open(rvdata2path, 'r') do |rvdata2file|
+        print "\r\e[2K\e[34mUnserializing \e[37m#{rvdata2path}\e[0m..."
+        object = Marshal.load(rvdata2file)
+        case rvdata2basename
         when 'Actors'
             to_rvdata2_Actors(object)
         when 'Animations'
@@ -278,9 +295,11 @@ FileUtils.mkdir_p('Data_New') unless Dir.exist?('Data_New')
         when 'Items'
             to_rvdata2_Items(object)
         when /\AMap\d+\z/
-            to_rvdata2_Map(object, jsonbasename)
+            to_rvdata2_Map(object, rvdata2basename)
         when 'MapInfos'
             to_rvdata2_MapInfos(object)
+        when 'Scripts'
+            to_rvdata2_Scripts(object)
         when 'Skills'
             to_rvdata2_Skills(object)
         when 'States'
@@ -295,4 +314,5 @@ FileUtils.mkdir_p('Data_New') unless Dir.exist?('Data_New')
             to_rvdata2_Weapons(object)
         end
     end
+    print "\r\e[2K\e[32mUnserialized \e[37m#{rvdata2path}\e[0m.\n"
 end
