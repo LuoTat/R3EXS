@@ -1,17 +1,24 @@
 require 'fileutils'
 
+MOD_4_MASK = 0b11
+MASK_LOW = 0xFF
+
 def decrypt_file_name!(file_name, magicKey)
-    # 将 magicKey 转换为字节数组
-    magicKey_bytes = [magicKey].pack('L').bytes
     # 将 file_name 转换为字节数组
     file_name_bytes = file_name.bytes
-
-    index = -1
-    file_name_bytes.map! do |byte|
-        if (index += 1) == 4
-            index = 0
+    
+    file_name_bytes.map!.each_with_index do |byte, index|
+        case index & MOD_4_MASK
+        when 0
+            temp_key = magicKey & MASK_LOW
+        when 1
+            temp_key = magicKey >> 8 & MASK_LOW
+        when 2
+            temp_key = magicKey >> 16 & MASK_LOW
+        when 3
+            temp_key = magicKey >> 24 & MASK_LOW
         end
-        byte ^ magicKey_bytes[index]
+        byte ^ temp_key
     end
 
     # 将解密后的字节数组转换回原字符串, 并替换所有的反斜杠为正斜杠
@@ -19,21 +26,24 @@ def decrypt_file_name!(file_name, magicKey)
 end
 
 def decrypt_data!(data, magicKey)
-    # 将 magicKey 转换为字节数组
-    magicKey_bytes = [magicKey].pack('L').bytes
     # 将 data 转换为字节数组
     data_bytes = data.bytes
     size = data_bytes.size
 
-    index = -1
-    data_bytes.map!.each_with_index do |byte, i|
-        print("\r\e[2K\e[33mDecrypting \e[37m#{i}/#{size}\e[0m...")
-        if (index += 1) == 4
-            index = 0
+    data_bytes.map!.each_with_index do |byte, index|
+        print("\r\e[2K\e[33mDecrypting \e[37m#{index}/#{size}\e[0m...")
+        case index & MOD_4_MASK
+        when 0
+            temp_key = magicKey & MASK_LOW
+        when 1
+            temp_key = magicKey >> 8 & MASK_LOW
+        when 2
+            temp_key = magicKey >> 16 & MASK_LOW
+        when 3
+            temp_key = magicKey >> 24 & MASK_LOW
             magicKey = magicKey * 7 + 3
-            magicKey_bytes = [magicKey].pack('L').bytes
         end
-        byte ^ magicKey_bytes[index]
+        byte ^ temp_key
     end
 
     # 将解密后的字节数组转换回原字符串
