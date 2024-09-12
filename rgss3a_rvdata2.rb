@@ -52,10 +52,10 @@ end
 
 # 读取文件
 filePath = "Game.rgss3a"
-print "\e[33mReading \e[37m#{filePath}\e[0m..."
+print "\e[33mReading \e[37m#{filePath}\e[0m...\r"
 rgss3afile = File.open(filePath, 'rb')
 rgss3afile_data = rgss3afile.read
-print "\r\e[2K\e[32mReaded \e[37m#{filePath}\e[0m.\n"
+print "\e[2K\e[32mReaded \e[37m#{filePath}\e[0m.\n"
 # 文件索引
 index = 0
 
@@ -77,29 +77,29 @@ while (file_offset = rgss3afile_data[index, 4].unpack1('L') ^ magicKey) != 0 # �
     filename = rgss3afile_data[index += 4, filename_size]
     # 解密文件名
     decrypt_file_name!(filename, magicKey)
-    print "\r\e[2K\e[34mDecrypting \e[37m#{filename} \e[37moffset: \e[35m#{file_offset} \e[37msize: \e[35m#{file_size} \e[37mmagicKey: \e[35m#{file_magicKey}\e[0m..."
+    print "\e[34mDecrypting \e[37m#{filename} \e[37mOffset: \e[35m#{file_offset} \e[37mSize: \e[35m#{file_size} \e[37mMagicKey: \e[35m#{file_magicKey}\e[0m...\r"
 
     # 读取数据段
     file_data = rgss3afile_data[file_offset, file_size]
     # 解密数据段
     file_data = decrypt_data!(file_data, file_magicKey)
-    print "\r\e[2K\e[32mDecrypted \e[37m#{filename} \e[37moffset: \e[35m#{file_offset} \e[37msize: \e[35m#{file_size} \e[37mmagicKey: \e[35m#{file_magicKey}\e[0m.\n"
+    print "\e[2K\e[32mDecrypted \e[37m#{filename} \e[37mOffset: \e[35m#{file_offset} \e[37mSize: \e[35m#{file_size} \e[37mMagicKey: \e[35m#{file_magicKey}\e[0m.\n"
 
     # 确保目录结构存在
     file_dir = File.dirname(filename)
     FileUtils.mkdir_p(file_dir) unless File.directory?(file_dir)
-    print "\r\e[2K\e[34mWriting \e[37m#{filename}\e[0m..."
+    print "\e[2K\e[34mWriting \e[37m#{filename}\e[0m...\r"
 
     # 写入解密后的数据到文件
     File.open(filename, 'wb') do |output_file|
         output_file.write(file_data)
     end
-    print "\r\e[2K\e[32mWrited \e[37m#{filename}\e[0m.\n"
+    print "\e[2K\e[32mWrited \e[37m#{filename}\e[0m.\n"
 
     # 更新index
     index += filename_size
 end
 # 关闭文件
-print "\r\e[2K\e[32mFinished.\e[0m\n"
+print "\e[32mFinished.\e[0m\n"
 
 rgss3afile.close

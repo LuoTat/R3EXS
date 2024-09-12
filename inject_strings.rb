@@ -285,10 +285,10 @@ $all_ex_strings = Oj.load(File.read('ManualTransFile.json'))
     'Data/Troops.rvdata2',
     'Data/Weapons.rvdata2'
 ].each do |rvdata2path|
-    print "\e[33mReading \e[37m#{rvdata2path}\e[0m..."
+    print "\e[33mReading \e[37m#{rvdata2path}\e[0m...\r"
     rvdata2basename = File.basename(rvdata2path, '.*')
     File.open(rvdata2path, 'rb') do |rvdata2file|
-        print "\r\e[2K\e[34mInjecting strings to \e[37m#{rvdata2path}\e[0m..."
+        print "\e[2K\e[34mInjecting strings to \e[37m#{rvdata2path}\e[0m...\r"
         object = Marshal.load(rvdata2file.read)
         case rvdata2basename
         when 'Actors'
@@ -328,5 +328,5 @@ $all_ex_strings = Oj.load(File.read('ManualTransFile.json'))
             rvdata2file.write(Marshal.dump(object))
         end
     end
-    print "\r\e[2K\e[32mInjected strings to \e[37m#{rvdata2path}\e[0m.\n"
+    print "\e[2K\e[32mInjected strings to \e[37m#{rvdata2path}\e[0m.\n"
 end

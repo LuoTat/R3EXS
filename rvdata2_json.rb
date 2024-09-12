@@ -215,9 +215,9 @@ FileUtils.mkdir_p('JSON') unless Dir.exist?('JSON')
     'Data/Weapons.rvdata2'
 ].each do |rvdata2path|
     rvdata2basename = File.basename(rvdata2path, '.*')
-    print "\e[33mReading \e[37m#{rvdata2path}\e[0m..."
+    print "\e[33mReading \e[37m#{rvdata2path}\e[0m...\r"
     File.open(rvdata2path, 'rb') do |rvdata2file|
-        print "\r\e[2K\e[34mSerializing \e[37m#{rvdata2path}\e[0m..."
+        print "\e[2K\e[34mSerializing \e[37m#{rvdata2path}\e[0m...\r"
         object = Marshal.load(rvdata2file.read)
         case rvdata2basename
         when 'Actors'
@@ -254,5 +254,5 @@ FileUtils.mkdir_p('JSON') unless Dir.exist?('JSON')
             to_json_Weapons(object)
         end
     end
-    print "\r\e[2K\e[32mSerialized \e[37m#{rvdata2path}\e[0m.\n"
+    print "\e[2K\e[32mSerialized \e[37m#{rvdata2path}\e[0m.\n"
 end
