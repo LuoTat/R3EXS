@@ -4,7 +4,10 @@
 #include <sys/stat.h>    // mkdir
 
 #define MOD_4_MASK 0b11
-#define MASK_LOW   0xFF
+#define MASK_KEY_1 0x000000FF
+#define MASK_KEY_2 0x0000FFFF
+#define MASK_KEY_3 0x00FFFFFF
+
 
 // 解包文件路径
 const char* Rgss3aPath = "Game.rgss3a";
@@ -33,39 +36,34 @@ void CreateDirectories(char* Dir, size_t Size)
 // 解密文件名
 void DecryptDataName(unsigned char* Data, size_t Size, unsigned int MagicKey)
 {
-    for (size_t i = 0; i < Size; ++i)
+    size_t        q      = Size >> 2;
+    char          r      = Size & MOD_4_MASK;
+    unsigned int* Data_p = (unsigned int*)Data;
+    for (; Data_p < (unsigned int*)(Data + q * 4); ++Data_p) *Data_p ^= MagicKey;
+    switch (r)
     {
-        unsigned char temp_key;
-        switch (i & MOD_4_MASK)
-        {
-            case 0 : temp_key = MagicKey & MASK_LOW; break;
-            case 1 : temp_key = (MagicKey >> 8) & MASK_LOW; break;
-            case 2 : temp_key = (MagicKey >> 16) & MASK_LOW; break;
-            case 3 : temp_key = (MagicKey >> 24) & MASK_LOW; break;
-        }
-        Data[i] ^= temp_key;
+        case 1 : *Data_p ^= (MagicKey & MASK_KEY_1); break;
+        case 2 : *Data_p ^= (MagicKey & MASK_KEY_2); break;
+        case 3 : *Data_p ^= (MagicKey & MASK_KEY_3); break;
     }
 }
 
 // 解密数据段
 void DecryptData(unsigned char* Data, size_t Size, unsigned int MagicKey)
 {
-    for (size_t i = 0; i < Size; ++i)
+    size_t        q      = Size >> 2;
+    char          r      = Size & MOD_4_MASK;
+    unsigned int* Data_p = (unsigned int*)Data;
+    for (; Data_p < (unsigned int*)(Data + q * 4); ++Data_p)
     {
-        unsigned char temp_key;
-        switch (i & MOD_4_MASK)
-        {
-            case 0 : temp_key = MagicKey & MASK_LOW; break;
-            case 1 : temp_key = (MagicKey >> 8) & MASK_LOW; break;
-            case 2 : temp_key = (MagicKey >> 16) & MASK_LOW; break;
-            case 3 :
-            {
-                temp_key = (MagicKey >> 24) & MASK_LOW;
-                MagicKey = MagicKey * 7 + 3;
-                break;
-            }
-        }
-        Data[i] ^= temp_key;
+        *Data_p  ^= MagicKey;
+        MagicKey  = MagicKey * 7 + 3;
+    }
+    switch (r)
+    {
+        case 1 : *Data_p ^= (MagicKey & MASK_KEY_1); break;
+        case 2 : *Data_p ^= (MagicKey & MASK_KEY_2); break;
+        case 3 : *Data_p ^= (MagicKey & MASK_KEY_3); break;
     }
 }
 
