@@ -15,7 +15,21 @@ RGSS3_Extract_Strings_Tool
 
 ## [Introduction](#table-of-contents)
 
-R3EXS is a Ruby-based project designed to extract strings from RGSS3 games. It primarily offers two functions: extracting all strings and injecting the translated strings back into the game, as well as serializing `rvdata2` files into JSON format for manual translation to achieve more precise results.
+R3EXS is a Ruby-based project designed to extract strings from RGSS3 games. Currently, it provides the following features:
+
+1. [Unpack the Game.rgss3a file](#unpack-the-game.rgss3a-file)
+
+2. [Extract all strings](#extract-all-strings)
+
+3. [Inject translated strings](#inject-translated-strings)
+
+4. [Serialize rvdata2 files into JSON format (strings only)](#serialize-rvdata2-files-into-json-format-strings-only)
+
+5. [Deserialize JSON files back to rvdata2 format (for use with the above feature)](#deserialize-json-files-back-to-rvdata2-format-strings-only)
+
+6. [Serialize rvdata2 files into JSON format (complete serialization)](#serialize-rvdata2-files-into-json-format-complete)
+
+7. [Deserialize JSON files back to rvdata2 format (for use with the above feature)](#deserialize-json-files-back-to-rvdata2-format-complete)
 
 ## [Installation](#table-of-contents)
 
@@ -26,25 +40,43 @@ R3EXS is a Ruby-based project designed to extract strings from RGSS3 games. It p
 gem install oj
 ```
 
+3. Compile `rgss3a_rvdata2.c` (you'll need `gcc` and `make`)
+
+```bash
+make
+```
+
 ## [Usage](#table-of-contents)
 
-First, unpack the `Game.rgss3a` file from the root directory of the game to obtain the `Data` folder. Then, place the `Data` folder in the same directory as the Ruby scripts.
+First, unpack the Game.rgss3a file from the game's root directory to get the Data folder, and place the Data folder in the same directory as the Ruby scripts.
 
-### Extract All Strings
+### Unpack the Game.rgss3a file
 
-Run `extract_strings.rb`, and all strings will be extracted into the `ManualTransFile.json` file.
+Run `rgss3a_rvdata2` directly.
 
-### Inject All Strings
+### Extract all strings
 
-Run `inject_strings.rb`, and all the translated strings from the `ManualTransFile.json` file will be injected back into the `rvdata2` files. The new `rvdata2` files will be placed in the `Data_New` folder.
+Run `extract_strings.rb`. All extracted strings will be saved in the `ManualTransFile.json` file.
 
-### Serialize `rvdata2` Files into JSON Format
+### Inject translated strings
 
-Run `rvdata2_json.rb`, and all `rvdata2` files will be serialized into JSON format (only attributes in string format will be serialized, essentially tagging all extracted strings with their source). The JSON files will be placed in the `JSON` folder.
+Run `inject_strings.rb`. All translated strings in the `ManualTransFile.json` file will be injected into the rvdata2 files. The new rvdata2 files will be placed in the Data_New folder.
 
-### Deserialize JSON Files Back into `rvdata2` Format
+### Serialize rvdata2 files into JSON format (partial)
 
-Run `json_rvdata2.rb`, and all JSON files will be deserialized back into `rvdata2` files. The new `rvdata2` files will be placed in the `Data_New` folder.
+Run `rvdata2_json_part.rb`. All rvdata2 files will be serialized into JSON files (only string properties will be serialized, essentially giving extracted strings a source). The JSON files will be placed in the JSON_Part folder.
+
+### Deserialize JSON files back to rvdata2 format (partial)
+
+Run `json_rvdata2_part.rb`. All JSON files will be deserialized back into rvdata2 format. The new rvdata2 files will be placed in the Data_New folder.
+
+### Serialize rvdata2 files into JSON format (complete)
+
+Run `rvdata2_json_all.rb`. All rvdata2 files will be completely serialized into JSON format. The JSON files will be placed in the JSON folder.
+
+### Deserialize JSON files back to rvdata2 format (complete)
+
+Run `json_rvdata2_all.rb`. All JSON files will be deserialized back into rvdata2 format. The new rvdata2 files will be placed in the Data_New folder.
 
 ## [Related Links](#table-of-contents)
 
