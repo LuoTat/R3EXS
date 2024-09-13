@@ -27,8 +27,8 @@ void UTF_8ToUTF_16(wchar_t* UTF16_str, const char* UTF8_str, size_t UTF16_str_le
 }
 #endif
 
-#ifdef __linux__    // Linux 下创建目录使用 mkdir
-    #include <sys/stat.h>
+#ifdef __linux__
+    #include <sys/stat.h>    // Linux 下创建目录使用 mkdir
 #endif
 
 #define MOD_4_MASK 0b11
