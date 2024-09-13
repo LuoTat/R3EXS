@@ -1,7 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>    // mkdir
+
+#ifdef _WIN32
+    #include <direct.h>                     // Windows 下创建目录使用 _mkdir
+    #include <wchar.h>                      // Windows 下的 wchar_t
+    #include <windows.h>                    // Windows 下的 API 函数
+    #define mkdir(dir, mode) _mkdir(dir)    // Windows 下的 _mkdir 只有一个参数
+
+// 用于存储转换后的 UTF_16 编码的文件名
+wchar_t DataName_UTF_16[2048];
+
+// 将 UTF-8 转换为 UTF-16 的函数
+void UTF_8ToUTF_16(wchar_t* UTF16_str, const char* UTF8_str, size_t UTF16_str_len)
+{
+    // 计算转换为 UTF-16 所需的缓冲区大小
+    size_t wideCharLen = MultiByteToWideChar(CP_UTF8, 0, UTF8_str, -1, NULL, 0);
+    if (wideCharLen > UTF16_str_len)
+    {
+        perror("The buffer is too small");
+        exit(1);
+    }
+
+    // 执行从 UTF-8 到 UTF-16 的转换
+    MultiByteToWideChar(CP_UTF8, 0, UTF8_str, -1, UTF16_str, wideCharLen);
+}
+#endif
+
+#ifdef __linux__    // Linux 下创建目录使用 mkdir
+    #include <sys/stat.h>
+#endif
 
 #define MOD_4_MASK 0b11
 #define MASK_KEY_1 0x000000FF
@@ -93,7 +121,7 @@ int main()
 
     // 把整个文件读到内存中
     size_t result = fread(Rgss3aData, sizeof(unsigned char), Rgss3aSize, Rgss3aFile);
-    if (result != Rgss3aSize)
+    if (result != (size_t)Rgss3aSize)
     {
         // 处理错误，可能是文件读取失败，或读取到的字节数与预期不符
         perror("File read error\n");
@@ -102,6 +130,8 @@ int main()
         return 1;
     }
     printf("\e[2K\e[32mReaded \e[37m%s\e[0m\n", Rgss3aPath);
+    // 关闭文件
+    fclose(Rgss3aFile);
 
     // 文件指针索引
     unsigned char* Rgss3a_P = Rgss3aData;
@@ -150,26 +180,52 @@ int main()
         memcpy(DataName, Rgss3a_P, DataNameSize);
         DataName[DataNameSize] = '\0';
 
-        // 解码数据段
+#ifdef _WIN32
+        // 转换文件名为 UTF-16 编码
+        UTF_8ToUTF_16(DataName_UTF_16, DataName, sizeof(DataName_UTF_16));
+#endif
+
+#ifdef _WIN32
+        wprintf(L"\e[2K\e[32mDecrypting \e[37m%s \e[37mOffset: \e[35m%u \e[37mSize: \e[35m%u \e[37mMagicKey: \e[35m%u\e[0m...\r", DataName_UTF_16, DataOffset, DataSize, DataMagicKey);
+#endif
+#ifdef __linux__
         printf("\e[2K\e[32mDecrypting \e[37m%s \e[37mOffset: \e[35m%u \e[37mSize: \e[35m%u \e[37mMagicKey: \e[35m%u\e[0m...\r", DataName, DataOffset, DataSize, DataMagicKey);
+#endif
+        // 解码数据段
         DecryptData(Rgss3aData + DataOffset, DataSize, DataMagicKey);
+#ifdef _WIN32
+        wprintf(L"\e[2K\e[32mDecrypted \e[37m%s \e[37mOffset: \e[35m%u \e[37mSize: \e[35m%u \e[37mMagicKey: \e[35m%u\e[0m\n", DataName_UTF_16, DataOffset, DataSize, DataMagicKey);
+#endif
+#ifdef __linux__
         printf("\e[2K\e[32mDecrypted \e[37m%s \e[37mOffset: \e[35m%u \e[37mSize: \e[35m%u \e[37mMagicKey: \e[35m%u\e[0m\n", DataName, DataOffset, DataSize, DataMagicKey);
+#endif
 
         // 写入解密后的数据到文件
+#ifdef _WIN32
+        wprintf(L"\e[34mWriting \e[37m%s\e[0m...\r", DataName_UTF_16);
+        FILE* OutputFile = _wfopen(DataName_UTF_16, L"wb");
+#endif
+#ifdef __linux__
         printf("\e[34mWriting \e[37m%s\e[0m...\r", DataName);
         FILE* OutputFile = fopen(DataName, "wb");
+#endif
+        // 写入文件
         if (OutputFile)
         {
             fwrite(Rgss3aData + DataOffset, sizeof(unsigned char), DataSize, OutputFile);
             fclose(OutputFile);
         }
+#ifdef _WIN32
+        wprintf(L"\e[2K\e[32mWrited \e[37m%s\e[0m\n", DataName_UTF_16);
+#endif
+#ifdef __linux__
         printf("\e[2K\e[32mWrited \e[37m%s\e[0m\n", DataName);
+#endif
 
         Rgss3a_P += DataNameSize;
     }
 
     free(Rgss3aData);
-    fclose(Rgss3aFile);
     printf("\e[32mFinished\e[0m\n");
     return 0;
 }
