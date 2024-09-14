@@ -98,17 +98,6 @@ def ex_strings_Enemies(enemies)
         note = enemy.note
         $all_ex_strings[name] = name unless name.empty?
         $all_ex_strings[note] = note unless note.empty?
-        # if enemy.instance_variable_defined?(:@data_ex) # 判断是否存在@data_ex实例变量
-        #     ex_data = enemy.instance_variable_get(:@data_ex)
-        #     if ex_data.key?(:lib_name) # 判断是否存在lib_name键
-        #         lib_name = ex_data[:lib_name]
-        #         $all_ex_strings[lib_name] = lib_name unless lib_name.empty?
-        #     end
-        #     if ex_data.key?(:lib_category) # 判断是否存在lib_category键
-        #         lib_category = ex_data[:lib_category]
-        #         $all_ex_strings[lib_category] = lib_category unless lib_category.empty?
-        #     end
-        # end
     end
 end
 
@@ -262,7 +251,7 @@ $all_ex_strings = {}
     rvdata2basename = File.basename(rvdata2path, '.*')
     File.open(rvdata2path, 'rb') do |rvdata2file|
         print "\e[2K\e[34mExtracting strings from \e[37m#{rvdata2path}\e[0m...\r"
-        object = Marshal.load(rvdata2file.read)
+        object = Marshal.load(rvdata2file)
         case rvdata2basename
         when 'Actors'
             ex_strings_Actors(object)

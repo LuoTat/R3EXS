@@ -47,7 +47,7 @@ end
 
 def to_rvdata2_Actors(actors)
     File.open("JSON_part/Actors.json", 'r') do |file|
-        actors_array = Oj.load(file.read)
+        actors_array = Oj.load(file)
         actors_array.each do |actor|
             index = actor[:id]
             actors[index].name = actor[:name]
@@ -60,7 +60,7 @@ end
 
 def to_rvdata2_Animations(animations)
     File.open("JSON_part/Animations.json", 'r') do |file|
-        animations_array = Oj.load(file.read)
+        animations_array = Oj.load(file)
         animations_array.each do |animation|
             animations[animation[:id]].name = animation[:name]
         end
@@ -70,7 +70,7 @@ end
 
 def to_rvdata2_Armors(armors)
     File.open("JSON_part/Armors.json", 'r') do |file|
-        armors_array = Oj.load(file.read)
+        armors_array = Oj.load(file)
         armors_array.each do |armor|
             index = armor[:id]
             armors[index].name = armor[:name]
@@ -83,7 +83,7 @@ end
 
 def to_rvdata2_Classes(klasses)
     File.open("JSON_part/Classes.json", 'r') do |file|
-        klasses_array = Oj.load(file.read)
+        klasses_array = Oj.load(file)
         klasses_array.each do |klasse|
             index = klasse[:id]
             klasses[index].name = klasse[:name]
@@ -95,7 +95,7 @@ end
 
 def to_rvdata2_CommonEvents(commonEvents)
     File.open("JSON_part/CommonEvents.json", 'r') do |file|
-        commonEvents_array = Oj.load(file.read)
+        commonEvents_array = Oj.load(file)
         commonEvents_array.each do |commonEvent|
             index = commonEvent[:id]
             commonEvents[index].name = commonEvent[:name]
@@ -107,7 +107,7 @@ end
 
 def to_rvdata2_Enemies(enemies)
     File.open("JSON_part/Enemies.json", 'r') do |file|
-        enemies_array = Oj.load(file.read)
+        enemies_array = Oj.load(file)
         enemies_array.each do |enemy|
             index = enemy[:id]
             enemies[index].name = enemy[:name]
@@ -119,7 +119,7 @@ end
 
 def to_rvdata2_Items(items)
     File.open("JSON_part/Items.json", 'r') do |file|
-        items_array = Oj.load(file.read)
+        items_array = Oj.load(file)
         items_array.each do |item|
             index = item[:id]
             items[index].name = item[:name]
@@ -132,7 +132,7 @@ end
 
 def to_rvdata2_Map(map, mapname)
     File.open("JSON_part/#{mapname}.json", 'r') do |file|
-        map_hash = Oj.load(file.read)
+        map_hash = Oj.load(file)
         map.display_name = map_hash[:display_name]
         map_hash[:events].each do |event|
             event_index = event[:id]
@@ -147,7 +147,7 @@ end
 
 def to_rvdata2_MapInfos(mapinfos)
     File.open("JSON_part/MapInfos.json", 'r') do |file|
-        mapinfos_array = Oj.load(file.read)
+        mapinfos_array = Oj.load(file)
         mapinfos_array.each do |mapinfo|
             mapinfos[mapinfo[:id]].name = mapinfo[:name]
         end
@@ -157,10 +157,10 @@ end
 
 def to_rvdata2_Scripts(scripts)
     scripts_array = []
-    [*Dir.glob("JSON_part/Scripts/*.rb")].each do |script|
-        script_basename = File.basename(script, '.*')
+    # 读取所有脚本文件, 并且是按照数字顺序排列的，故可以直接<<入数组
+    [*Dir.glob("JSON_part/Scripts/[0-9][0-9][0-9].rb")].each do |script|
         File.open(script, 'r') do |file|
-            scripts_array[script_basename.to_i] = file.read
+            scripts_array << file.read
         end
     end
     scripts_array.each_with_index do |script, index|
@@ -171,7 +171,7 @@ end
 
 def to_rvdata2_Skills(skills)
     File.open("JSON_part/Skills.json", 'r') do |file|
-        skills_array = Oj.load(file.read)
+        skills_array = Oj.load(file)
         skills_array.each do |skill|
             index = skill[:id]
             skills[index].name = skill[:name]
@@ -186,7 +186,7 @@ end
 
 def to_rvdata2_States(states)
     File.open("JSON_part/States.json", 'r') do |file|
-        states_array = Oj.load(file.read)
+        states_array = Oj.load(file)
         states_array.each do |state|
             index = state[:id]
             states[index].name = state[:name]
@@ -202,7 +202,7 @@ end
 
 def to_rvdata2_System(system)
     File.open("JSON_part/System.json", 'r') do |file|
-        system_hash = Oj.load(file.read)
+        system_hash = Oj.load(file)
         system.armor_types = system_hash[:armor_types]
         system.currency_unit = system_hash[:currency_unit]
         system.elements = system_hash[:elements]
@@ -221,7 +221,7 @@ end
 
 def to_rvdata2_Tilesets(tilesets)
     File.open("JSON_part/Tilesets.json", 'r') do |file|
-        tilesets_array = Oj.load(file.read)
+        tilesets_array = Oj.load(file)
         tilesets_array.each do |tileset|
             index = tileset[:id]
             tilesets[index].name = tileset[:name]
@@ -233,7 +233,7 @@ end
 
 def to_rvdata2_Troops(troops)
     File.open("JSON_part/Troops.json", 'r') do |file|
-        troops_array = Oj.load(file.read)
+        troops_array = Oj.load(file)
         troops_array.each do |troop|
             index = troop[:id]
             troops[index].name = troop[:name]
@@ -244,7 +244,7 @@ end
 
 def to_rvdata2_Weapons(weapons)
     File.open("JSON_part/Weapons.json", 'r') do |file|
-        weapons_array = Oj.load(file.read)
+        weapons_array = Oj.load(file)
         weapons_array.each do |weapon|
             index = weapon[:id]
             weapons[index].name = weapon[:name]

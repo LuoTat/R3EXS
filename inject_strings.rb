@@ -113,17 +113,6 @@ def in_strings_Enemies(enemies)
         new_note = $all_ex_strings[enemy.note]
         enemy.name = new_name unless new_name.nil? || new_name.empty?
         enemy.note = new_note unless new_note.nil? || new_note.empty?
-        # if enemy.instance_variable_defined?(:@data_ex) # 判断是否存在@data_ex实例变量
-        #     ex_data = enemy.instance_variable_get(:@data_ex)
-        #     if ex_data.key?(:lib_name) # 判断是否存在lib_name键
-        #         new_lib_name = $all_ex_strings[ex_data[:lib_name]]
-        #         ex_data[:lib_name] = new_lib_name unless new_lib_name.nil? || new_lib_name.empty?
-        #     end
-        #     if ex_data.key?(:lib_category) # 判断是否存在lib_category键
-        #         new_lib_category = $all_ex_strings[ex_data[:lib_category]]
-        #         ex_data[:lib_category] = new_lib_category unless new_lib_category.nil? || new_lib_category.empty?
-        #     end
-        # end
     end
 end
 
@@ -265,7 +254,8 @@ end
 
 FileUtils.mkdir_p('Data_New') unless Dir.exist?('Data_New')
 # 全局哈希表，存储所有的字符串映射
-$all_ex_strings = Oj.load(File.read('ManualTransFile.json'))
+$all_ex_strings = nil
+File.open('ManualTransFile.json', 'r') { file | $all_ex_strings = Oj.load(file) }
 
 [
     'Data/Actors.rvdata2',
@@ -289,7 +279,7 @@ $all_ex_strings = Oj.load(File.read('ManualTransFile.json'))
     rvdata2basename = File.basename(rvdata2path, '.*')
     File.open(rvdata2path, 'rb') do |rvdata2file|
         print "\e[2K\e[34mInjecting strings to \e[37m#{rvdata2path}\e[0m...\r"
-        object = Marshal.load(rvdata2file.read)
+        object = Marshal.load(rvdata2file)
         case rvdata2basename
         when 'Actors'
             in_strings_Actors(object)
@@ -324,9 +314,8 @@ $all_ex_strings = Oj.load(File.read('ManualTransFile.json'))
         end
 
         # 将替换后的object序列化到新的rvdata2文件中
-        File.open('Data_New/' + rvdata2basename + '.rvdata2', 'wb') do |rvdata2file|
-            rvdata2file.write(Marshal.dump(object))
-        end
+        File.open('Data_New/' + rvdata2basename + '.rvdata2', 'wb') { |rvdata2file| Marshal.dump(object, rvdata2file) }
+
     end
     print "\e[2K\e[32mInjected strings to \e[37m#{rvdata2path}\e[0m.\n"
 end

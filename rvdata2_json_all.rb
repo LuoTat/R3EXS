@@ -40,9 +40,9 @@ FileUtils.mkdir_p('JSON_all') unless Dir.exist?('JSON_all')
         object = Marshal.load(rvdata2file)
         if rvdata2basename == 'Scripts'
             to_json_Scripts(object)
+        else
+            File.open("JSON_all/#{rvdata2basename}.json", 'w') { |file| file.write(Oj.dump(object, :indent => 2)) }
         end
-        json = Oj.dump(object, :indent => 2)
-        File.open("JSON_all/#{rvdata2basename}.json", 'w') { |file| file.write(json) }
     end
     print "\e[2K\e[32mSerialized \e[37m#{rvdata2path}\e[0m.\n"
 end
