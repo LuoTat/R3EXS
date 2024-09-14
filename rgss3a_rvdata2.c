@@ -99,6 +99,7 @@ int main()
 {
     printf("\e[33mReading \e[37m%s\e[0m...\r", Rgss3aPath);
 
+    // 打开文件
     FILE* Rgss3aFile = fopen(Rgss3aPath, "rb");
     if (!Rgss3aFile)
     {
@@ -130,8 +131,6 @@ int main()
         return 1;
     }
     printf("\e[2K\e[32mReaded \e[37m%s\e[0m\n", Rgss3aPath);
-    // 关闭文件
-    fclose(Rgss3aFile);
 
     // 文件指针索引
     unsigned char* Rgss3a_P = Rgss3aData;
@@ -144,6 +143,9 @@ int main()
         fclose(Rgss3aFile);
         return 1;
     }
+
+    // 关闭文件
+    fclose(Rgss3aFile);
     Rgss3a_P              += 8;
 
     // 读取 MagicKey
