@@ -3,18 +3,15 @@ require 'zlib'
 require 'fileutils'
 require_relative 'RGSS3'
 
-def to_rvdata2_Scripts(scripts)
+def to_rvdata2_Scripts
     scripts_array = []
-    [*Dir.glob("JSON/Scripts/*.rb")].each do |script|
-        script_basename = File.basename(script, '.*')
-        File.open(script, 'r') do |file|
-            scripts_array[script_basename.to_i] = file.read
-        end
+    scripts_info = nil
+    File.open("JSON_all/Scripts/Scripts_info.json") { |file| scripts_info = Oj.load(file) }
+
+    [*Dir.glob("JSON_all/Scripts/[0-9][0-9][0-9].rb")].each_with_index do |scriptpath, index|
+        File.open(scriptpath, 'r') { |scriptfile| scripts_array << [0, scripts_info[index], Zlib::Deflate.deflate(scriptfile.read).force_encoding('UTF-8')] }
     end
-    scripts_array.each_with_index do |script, index|
-        scripts[index][2] = Zlib::Deflate.deflate(script).force_encoding('UTF-8')
-    end
-    File.open("Data_New/Scripts.rvdata2", 'wb') { |file| file.write(Marshal.dump(scripts)) }
+    File.open("Data_New/Scripts.rvdata2", 'wb') { |file| Marshal.dump(scripts_array, file) }
 end
 
 FileUtils.mkdir_p('Data_New') unless Dir.exist?('Data_New')
@@ -46,12 +43,7 @@ FileUtils.mkdir_p('Data_New') unless Dir.exist?('Data_New')
 end
 
 # 单独处理Scripts
-rvdata2path = 'Data/Scripts.rvdata2'
-rvdata2basename = File.basename(rvdata2path, '.*')
-print "\e[33mReading \e[37m#{rvdata2path}\e[0m...\r"
-File.open(rvdata2path, 'r') do |rvdata2file|
-    print "\e[2K\e[34mUnserializing \e[37m#{rvdata2path}\e[0m...\r"
-    object = Marshal.load(rvdata2file)
-    to_rvdata2_Scripts(object)
-end
-print "\e[2K\e[32mUnserialized \e[37m#{rvdata2path}\e[0m.\n"
+scriptspath = 'JSON_all/Scripts/*.rb'
+print "\e[33mReading \e[37m#{scriptspath}\e[0m...\r"
+to_rvdata2_Scripts
+print "\e[2K\e[32mUnserialized \e[37m#{scriptspath}\e[0m.\n"
