@@ -31,6 +31,8 @@ R3EXS is a Ruby-based project designed to extract strings from RGSS3 games. Curr
 
 7. [Deserialize JSON files back to rvdata2 format (for use with the above feature)](#deserialize-json-files-back-to-rvdata2-format-complete)
 
+**Note**: Except for functions 6 and 7, please do not delete the Data folder when using other functions.
+
 ## [Installation](#table-of-contents)
 
 1. Install [Ruby](https://www.ruby-lang.org/en/)
@@ -85,3 +87,4 @@ Run `json_rvdata2_all.rb`. All JSON files will be deserialized back into rvdata2
 -   [rvdata2json](https://github.com/DICE2000/rvdata2json)
 -   [VX-Ace-Translator](https://github.com/AhmedAhmedEG/VX-Ace-Translator)
 -   [RPGMakerDecrypter](https://github.com/uuksu/RPGMakerDecrypter)
+-   [RPGMaker VX Ace F1-Manual](https://miaowm5.github.io/RMVA-F1/)

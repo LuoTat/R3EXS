@@ -31,6 +31,8 @@ R3EXS 是一个基于 Ruby 语言用来提取 RGSS3 游戏里字符串的项目�
 
 7.[反序列化 json 文件为 rvdata2 格式(配套上述功能使用)](#反序列化-json-文件为-rvdata2-格式全部)
 
+**注意**:除了功能 6,7,其他功能使用时请勿删除 Data 文件夹
+
 ## [安装方法](#目录)
 
 1. 安装[Ruby](https://www.ruby-lang.org/zh_cn/)
@@ -85,3 +87,4 @@ make
 -   [rvdata2json](https://github.com/DICE2000/rvdata2json)
 -   [VX-Ace-Translator](https://github.com/AhmedAhmedEG/VX-Ace-Translator)
 -   [RPGMakerDecrypter](https://github.com/uuksu/RPGMakerDecrypter)
+-   [RPGMaker VX Ace F1-Manual](https://miaowm5.github.io/RMVA-F1/)
