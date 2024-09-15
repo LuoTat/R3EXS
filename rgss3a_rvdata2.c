@@ -103,7 +103,7 @@ int main()
     FILE* Rgss3aFile = fopen(Rgss3aPath, "rb");
     if (!Rgss3aFile)
     {
-        perror("Failed to open file\n");
+        perror("Failed to open Game.rgss3a file\n");
         return 1;
     }
 
@@ -112,6 +112,7 @@ int main()
     long int Rgss3aSize = ftell(Rgss3aFile);
     fseek(Rgss3aFile, 0, SEEK_SET);
 
+    // 分配内存
     unsigned char* Rgss3aData = (unsigned char*)malloc(sizeof(unsigned char) * Rgss3aSize);
     if (!Rgss3aData)
     {
@@ -125,7 +126,7 @@ int main()
     if (result != (size_t)Rgss3aSize)
     {
         // 处理错误，可能是文件读取失败，或读取到的字节数与预期不符
-        perror("File read error\n");
+        perror("Game.rgss3a file read error\n");
         free(Rgss3aData);
         fclose(Rgss3aFile);
         return 1;
@@ -146,9 +147,9 @@ int main()
 
     // 关闭文件
     fclose(Rgss3aFile);
-    Rgss3a_P              += 8;
 
     // 读取 MagicKey
+    Rgss3a_P              += 8;
     unsigned int MagicKey  = *(unsigned int*)Rgss3a_P * 9 + 3;
     Rgss3a_P              += 4;
 
@@ -212,22 +213,35 @@ int main()
         FILE* OutputFile = fopen(DataName, "wb");
 #endif
         // 写入文件
-        if (OutputFile)
+        if (!OutputFile)
         {
-            fwrite(Rgss3aData + DataOffset, sizeof(unsigned char), DataSize, OutputFile);
-            fclose(OutputFile);
+            perror("Failed to create file\n");
+            free(Rgss3aData);
+            return 1;
         }
+        fwrite(Rgss3aData + DataOffset, sizeof(unsigned char), DataSize, OutputFile);
+        fclose(OutputFile);
 #ifdef _WIN32
         wprintf(L"\e[2K\e[32mWrited \e[37m%s\e[0m\n", DataName_UTF_16);
 #endif
 #ifdef __linux__
         printf("\e[2K\e[32mWrited \e[37m%s\e[0m\n", DataName);
 #endif
-
         Rgss3a_P += DataNameSize;
     }
 
     free(Rgss3aData);
+
+    // 创建 RPGVXAce 1.02 项目文件
+    printf("\e[32mCreating \e[37mGame.rvproj2\e[0m...\r");
+    FILE* OutputFile = fopen("Game.rvproj2", "w");
+    if (!OutputFile)
+    {
+        perror("Failed to create Game.rvproj2 file\n");
+        return 1;
+    }
+    fwrite("RPGVXAce 1.02", sizeof(char), 13, OutputFile);
+    printf("\e[2K\e[32mCreated \e[37mGame.rvproj2\e[0m\n");
     printf("\e[32mFinished\e[0m\n");
     return 0;
 }
