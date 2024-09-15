@@ -97,7 +97,7 @@ void DecryptData(unsigned char* Data, size_t Size, unsigned int MagicKey)
 
 int main()
 {
-    printf("\e[33mReading \e[37m%s\e[0m...\r", Rgss3aPath);
+    printf("\e[33mReading \e[0m%s...\r", Rgss3aPath);
 
     // 打开文件
     FILE* Rgss3aFile = fopen(Rgss3aPath, "rb");
@@ -131,7 +131,7 @@ int main()
         fclose(Rgss3aFile);
         return 1;
     }
-    printf("\e[2K\e[32mReaded \e[37m%s\e[0m\n", Rgss3aPath);
+    printf("\e[2K\e[32mReaded \e[0m%s\n", Rgss3aPath);
 
     // 文件指针索引
     unsigned char* Rgss3a_P = Rgss3aData;
@@ -189,27 +189,27 @@ int main()
 #endif
 
 #ifdef _WIN32
-        wprintf(L"\e[2K\e[32mDecrypting \e[37m%s \e[37mOffset: \e[35m%u \e[37mSize: \e[35m%u \e[37mMagicKey: \e[35m%u\e[0m...\r", DataName_UTF_16, DataOffset, DataSize, DataMagicKey);
+        wprintf(L"\e[2K\e[32mDecrypting \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m...\r", DataName_UTF_16, DataOffset, DataSize, DataMagicKey);
 #endif
 #ifdef __linux__
-        printf("\e[2K\e[32mDecrypting \e[37m%s \e[37mOffset: \e[35m%u \e[37mSize: \e[35m%u \e[37mMagicKey: \e[35m%u\e[0m...\r", DataName, DataOffset, DataSize, DataMagicKey);
+        printf("\e[2K\e[32mDecrypting \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m...\r", DataName, DataOffset, DataSize, DataMagicKey);
 #endif
         // 解码数据段
         DecryptData(Rgss3aData + DataOffset, DataSize, DataMagicKey);
 #ifdef _WIN32
-        wprintf(L"\e[2K\e[32mDecrypted \e[37m%s \e[37mOffset: \e[35m%u \e[37mSize: \e[35m%u \e[37mMagicKey: \e[35m%u\e[0m\n", DataName_UTF_16, DataOffset, DataSize, DataMagicKey);
+        wprintf(L"\e[2K\e[32mDecrypted \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m\n", DataName_UTF_16, DataOffset, DataSize, DataMagicKey);
 #endif
 #ifdef __linux__
-        printf("\e[2K\e[32mDecrypted \e[37m%s \e[37mOffset: \e[35m%u \e[37mSize: \e[35m%u \e[37mMagicKey: \e[35m%u\e[0m\n", DataName, DataOffset, DataSize, DataMagicKey);
+        printf("\e[2K\e[32mDecrypted \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m\n", DataName, DataOffset, DataSize, DataMagicKey);
 #endif
 
         // 写入解密后的数据到文件
 #ifdef _WIN32
-        wprintf(L"\e[34mWriting \e[37m%s\e[0m...\r", DataName_UTF_16);
+        wprintf(L"\e[34mWriting \e[0m%s...\r", DataName_UTF_16);
         FILE* OutputFile = _wfopen(DataName_UTF_16, L"wb");
 #endif
 #ifdef __linux__
-        printf("\e[34mWriting \e[37m%s\e[0m...\r", DataName);
+        printf("\e[34mWriting \e[0m%s...\r", DataName);
         FILE* OutputFile = fopen(DataName, "wb");
 #endif
         // 写入文件
@@ -222,10 +222,10 @@ int main()
         fwrite(Rgss3aData + DataOffset, sizeof(unsigned char), DataSize, OutputFile);
         fclose(OutputFile);
 #ifdef _WIN32
-        wprintf(L"\e[2K\e[32mWrited \e[37m%s\e[0m\n", DataName_UTF_16);
+        wprintf(L"\e[2K\e[32mWrited \e[0m%s\n", DataName_UTF_16);
 #endif
 #ifdef __linux__
-        printf("\e[2K\e[32mWrited \e[37m%s\e[0m\n", DataName);
+        printf("\e[2K\e[32mWrited \e[0m%s\n", DataName);
 #endif
         Rgss3a_P += DataNameSize;
     }
@@ -241,7 +241,7 @@ int main()
         return 1;
     }
     fwrite("RPGVXAce 1.02", sizeof(char), 13, OutputFile);
-    printf("\e[2K\e[32mCreated \e[37mGame.rvproj2\e[0m\n");
+    printf("\e[2K\e[32mCreated \e[0mGame.rvproj2\n");
     printf("\e[32mFinished\e[0m\n");
     return 0;
 }

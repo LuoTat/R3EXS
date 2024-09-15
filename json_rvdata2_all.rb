@@ -34,17 +34,17 @@ FileUtils.mkdir_p('Data_New') unless Dir.exist?('Data_New')
     'JSON_all/Weapons.json'
 ].each do |jsonpath|
     jsonbasename = File.basename(jsonpath, '.*')
-    print "\e[33mReading \e[37m#{jsonpath}\e[0m...\r"
+    print "\e[33mReading \e[0m#{jsonpath}...\r"
     File.open(jsonpath, 'r') do |jsonfile|
-        print "\e[2K\e[34mUnserializing \e[37m#{jsonpath}\e[0m...\r"
+        print "\e[2K\e[34mUnserializing \e[0m#{jsonpath}...\r"
         object = Oj.load(jsonfile)
         File.open("Data_New/#{jsonbasename}.rvdata2", 'wb') { |file| Marshal.dump(object, file) }
     end
-    print "\e[2K\e[32mUnserialized \e[37m#{jsonpath}\e[0m.\n"
+    print "\e[2K\e[32mUnserialized \e[0m#{jsonpath}\n"
 end
 
 # 单独处理Scripts
 scriptspath = 'JSON_all/Scripts/*.rb'
-print "\e[33mReading \e[37m#{scriptspath}\e[0m...\r"
+print "\e[33mReading \e[0m#{scriptspath}...\r"
 to_rvdata2_Scripts
-print "\e[2K\e[32mUnserialized \e[37m#{scriptspath}\e[0m.\n"
+print "\e[2K\e[32mUnserialized \e[0m#{scriptspath}\n"

@@ -35,9 +35,9 @@ FileUtils.mkdir_p('JSON_all') unless Dir.exist?('JSON_all')
     'Data/Weapons.rvdata2'
 ].each do |rvdata2path|
     rvdata2basename = File.basename(rvdata2path, '.*')
-    print "\e[33mReading \e[37m#{rvdata2path}\e[0m...\r"
+    print "\e[33mReading \e[0m#{rvdata2path}...\r"
     File.open(rvdata2path, 'rb') do |rvdata2file|
-        print "\e[2K\e[34mSerializing \e[37m#{rvdata2path}\e[0m...\r"
+        print "\e[2K\e[34mSerializing \e[0m#{rvdata2path}...\r"
         object = Marshal.load(rvdata2file)
         if rvdata2basename == 'Scripts'
             to_json_Scripts(object)
@@ -45,5 +45,5 @@ FileUtils.mkdir_p('JSON_all') unless Dir.exist?('JSON_all')
             File.open("JSON_all/#{rvdata2basename}.json", 'w') { |file| file.write(Oj.dump(object, :indent => 2)) }
         end
     end
-    print "\e[2K\e[32mSerialized \e[37m#{rvdata2path}\e[0m.\n"
+    print "\e[2K\e[32mSerialized \e[0m#{rvdata2path}\n"
 end

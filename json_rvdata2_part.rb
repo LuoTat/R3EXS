@@ -276,9 +276,9 @@ FileUtils.mkdir_p('Data_New') unless Dir.exist?('Data_New')
     'Data/Weapons.rvdata2'
 ].each do |rvdata2path|
     rvdata2basename = File.basename(rvdata2path, '.*')
-    print "\e[33mReading \e[37m#{rvdata2path}\e[0m...\r"
+    print "\e[33mReading \e[0m#{rvdata2path}...\r"
     File.open(rvdata2path, 'r') do |rvdata2file|
-        print "\e[2K\e[34mUnserializing \e[37m#{rvdata2path}\e[0m...\r"
+        print "\e[2K\e[34mUnserializing \e[0m#{rvdata2path}...\r"
         object = Marshal.load(rvdata2file)
         case rvdata2basename
         when 'Actors'
@@ -315,5 +315,5 @@ FileUtils.mkdir_p('Data_New') unless Dir.exist?('Data_New')
             to_rvdata2_Weapons(object)
         end
     end
-    print "\e[2K\e[32mUnserialized \e[37m#{rvdata2path}\e[0m.\n"
+    print "\e[2K\e[32mUnserialized \e[0m#{rvdata2path}\n"
 end

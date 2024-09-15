@@ -250,10 +250,10 @@ $all_ex_strings = {}
     'Data/Troops.rvdata2',
     'Data/Weapons.rvdata2'
 ].each do |rvdata2path|
-    print "\e[33mReading \e[37m#{rvdata2path}\e[0m...\r"
+    print "\e[33mReading \e[0m#{rvdata2path}...\r"
     rvdata2basename = File.basename(rvdata2path, '.*')
     File.open(rvdata2path, 'rb') do |rvdata2file|
-        print "\e[2K\e[34mExtracting strings from \e[37m#{rvdata2path}\e[0m...\r"
+        print "\e[2K\e[34mExtracting strings from \e[0m#{rvdata2path}...\r"
         object = Marshal.load(rvdata2file)
         case rvdata2basename
         when 'Actors'
@@ -290,7 +290,7 @@ $all_ex_strings = {}
             ex_strings_Weapons(object)
         end
     end
-    print "\e[2K\e[32mExtracted strings from \e[37m#{rvdata2path}\e[0m.\n"
+    print "\e[2K\e[32mExtracted strings from \e[0m#{rvdata2path}\n"
 end
 # 将结果转换为 JSON 格式并输出
 all_ex_strings_json = Oj.dump($all_ex_strings, :indent => 4)
