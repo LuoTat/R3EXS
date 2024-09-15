@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require 'oj'
 require 'fileutils'
 require_relative 'RGSS3'
@@ -253,9 +254,10 @@ def in_strings_Weapons(weapons)
 end
 
 FileUtils.mkdir_p('Data_New') unless Dir.exist?('Data_New')
+
 # 全局哈希表，存储所有的字符串映射
 $all_ex_strings = nil
-File.open('ManualTransFile.json', 'r') { file | $all_ex_strings = Oj.load(file) }
+File.open('ManualTransFile.json', 'r') { |file| $all_ex_strings = Oj.load(file) }
 
 [
     'Data/Actors.rvdata2',

@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require 'oj'
 require_relative 'RGSS3'
 
@@ -229,7 +230,9 @@ def ex_strings_Weapons(weapons)
     end
 end
 
+# 全局哈希表，存储所有的字符串映射
 $all_ex_strings = {}
+
 [
     'Data/Actors.rvdata2',
     'Data/Animations.rvdata2',
