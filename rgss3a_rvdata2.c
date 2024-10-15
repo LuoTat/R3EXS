@@ -3,10 +3,8 @@
 #include <string.h>
 
 #ifdef _WIN32
-    #include <direct.h>                     // Windows 下创建目录使用 _mkdir
-    #include <wchar.h>                      // Windows 下的 wchar_t
-    #include <windows.h>                    // Windows 下的 API 函数
-    #define mkdir(dir, mode) _mkdir(dir)    // Windows 下的 _mkdir 只有一个参数
+    #include <fileapi.h>    // Windows 下创建目录使用 CreateDirectoryA
+    #include <windows.h>    // Windows 下的字符编码转换函数MultiByteToWideChar
 
 // 用于存储转换后的 UTF_16 编码的文件名
 wchar_t DataName_UTF_16[2048];
@@ -28,6 +26,7 @@ void UTF_8ToUTF_16(wchar_t* UTF16_str, const char* UTF8_str, size_t UTF16_str_le
 #endif
 
 #ifdef __linux__
+    #include <errno.h>       // Linux 下的错误码
     #include <sys/stat.h>    // Linux 下创建目录使用 mkdir
 #endif
 
@@ -43,19 +42,45 @@ const char* Rgss3aPath = "Game.rgss3a";
 // 文件名
 char DataName[1024];
 
+// 解码文件类型
+enum RGSSAD_DECRIPT_TYPE
+{
+    RGSSAD,
+    Fux2Pack2
+};
+
 // 创建目录（支持递归创建）
 void CreateDirectories(char* Dir, size_t Size)
 {
     // 遍历路径字符串
     for (size_t i = 0; i < Size; ++i)
     {
-        if (Dir[i] == '\\')
+        if (Dir[i] == '\\' || Dir[i] == '/')    // 遇到路径分隔符
         {
-            // 暂时把 '\\' 替换为字符串结束符 '\0'
+            // 暂时把路径分隔符替换为 '\0'
             Dir[i] = '\0';
-            // 创建目录，忽略目录已经存在的情况
-            mkdir(Dir, 0777);
-            // 把'\\'换为 '/'
+// 创建目录，如果目录已存在则忽略
+#ifdef _WIN32
+            if (!CreateDirectoryA(Dir, NULL))
+            {
+                if (GetLastError() != ERROR_ALREADY_EXISTS)
+                {
+                    perror("Failed to create directory\n");
+                    exit(1);
+                }
+            }
+#endif
+#ifdef __linux__
+            if (mkdir(Dir, 0777))
+            {
+                if (errno != EEXIST)
+                {
+                    perror("Failed to create directory\n");
+                    exit(1);
+                }
+            }
+#endif
+            // 恢复路径分隔符为 '/'
             Dir[i] = '/';
         }
     }
@@ -136,8 +161,17 @@ int main()
     // 文件指针索引
     unsigned char* Rgss3a_P = Rgss3aData;
 
-    // 前8字节为 "RGSSAD\x00\x03"
-    if (memcmp(Rgss3a_P, "RGSSAD\x00\x03", 8) != 0)
+    // 判断加密类型
+    enum RGSSAD_DECRIPT_TYPE DecrptType;
+    if (memcmp(Rgss3a_P, "RGSSAD\x00\x03", 8) == 0)
+    {
+        DecrptType = RGSSAD;
+    }
+    else if (memcmp(Rgss3a_P, "Fux2Pack", 8) == 0)
+    {
+        DecrptType = Fux2Pack2;
+    }
+    else
     {
         printf("Invalid RGSSAD file\n");
         free(Rgss3aData);
@@ -149,9 +183,18 @@ int main()
     fclose(Rgss3aFile);
 
     // 读取 MagicKey
-    Rgss3a_P              += 8;
-    unsigned int MagicKey  = *(unsigned int*)Rgss3a_P * 9 + 3;
-    Rgss3a_P              += 4;
+    Rgss3a_P += 8;
+    unsigned int MagicKey;
+    switch (DecrptType)
+    {
+        case RGSSAD :
+            MagicKey = *(unsigned int*)Rgss3a_P * 9 + 3;
+            break;
+        case Fux2Pack2 :
+            MagicKey = *(unsigned int*)Rgss3a_P;
+            break;
+    }
+    Rgss3a_P += 4;
 
     while (1)
     {
