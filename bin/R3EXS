@@ -1,0 +1,146 @@
+#!/usr/bin/env ruby
+require 'gli'
+require 'R3EXS'
+
+# 保存全局选项
+$global_options = {}
+
+class App
+    extend GLI::App
+
+    program_desc 'A tool for extracting and translating strings from the RGSS3 game engine'
+
+    version R3EXS::VERSION
+
+    subcommand_option_handling :normal
+    arguments :strict
+
+    desc 'Enable verbose mode'
+    switch [:v, :verbose]
+
+    desc 'Unpack the Game.rgss3a file'
+    arg_name '<Game.rgss3a file dir>'
+    command :decompiler do |c|
+        c.desc 'The *.rvdata2 output dir'
+        c.default_value './'
+        c.flag [:o, :output_dir]
+
+        c.action do |global_options, options, args|
+            R3EXS.rgss3a_rvdata2(args[0], options[:output_dir], global_options[:verbose])
+            puts "All rvdata2 files have been written to #{options[:output_dir]}"
+        end
+    end
+
+    desc 'Serialize rvdata2 files into JSON'
+    arg_name '<the *.rvdata2 dir>'
+    command :rvdata2_json do |c|
+        c.desc 'Enable complete serialization'
+        c.switch [:c, :complete]
+
+        c.desc 'Enable Scripts.rvdata2 serialization'
+        c.switch [:s, :with_scripts]
+
+        c.desc 'Enable notes attribute serialization'
+        c.switch [:n, :with_notes]
+
+        c.desc 'The *.json output dir'
+        c.default_value './JSON'
+        c.arg_name 'DIRECTORY'
+        c.flag [:o, :output_dir]
+
+        c.action do |global_options, options, args|
+            R3EXS.rvdata2_json(args[0], options[:output_dir], options[:complete], options[:with_scripts], options[:with_notes])
+            puts "All JSON files have been written to #{options[:output_dir]}"
+        end
+    end
+
+    desc 'Deserialize JSON files back into rvdata2'
+    arg_name '<the *.json dir>'
+    command :json_rvdata2 do |c|
+        c.desc 'Enable complete deserialization'
+        c.switch [:c, :complete]
+
+        c.desc 'Enable Scripts JSON deserialization'
+        c.switch [:s, :with_scripts]
+
+        c.desc 'The NEW *.rvdata2 output dir'
+        c.default_value './Data_NEW'
+        c.arg_name 'DIRECTORY'
+        c.flag [:o, :output_dir]
+
+        c.desc 'The ORIGINAL *.rvdata2 dir'
+        c.default_value './Data'
+        c.arg_name 'DIRECTORY'
+        c.flag [:r, :original_dir]
+
+        c.action do |global_options, options, args|
+            R3EXS::GLOBAL_OPTIONS = global_options
+            R3EXS.json_rvdata2(args[0], options[:output_dir], options[:original_dir], options[:complete], options[:with_scripts])
+            puts "All new rvdata2 files have been written to #{options[:output_dir]}"
+        end
+    end
+
+    desc 'Extract all strings'
+    arg_name '<the *.json dir>'
+    command :ex_strings do |c|
+        c.desc 'Enable Scripts extraction'
+        c.switch [:s, :with_scripts]
+
+        c.desc 'Enable Symbol etraction in Scripts JSON files'
+        c.switch [:y, :with_symbol]
+
+        c.desc 'The ManualTransFile.json output dir'
+        c.default_value './'
+        c.arg_name 'DIRECTORY'
+        c.flag [:o, :output_dir]
+
+        c.action do |global_options, options, args|
+            R3EXS.ex_strings(args[0], options[:output_dir], options[:with_scripts], options[:with_symbol])
+            puts "All strings have been extracted to #{File.join(options[:output_dir], 'ManualTransFile.json')}"
+        end
+    end
+
+    desc 'Inject all strings'
+    arg_name '<the *.json dir>'
+    command :in_strings do |c|
+        c.desc 'Enable Scripts Injection'
+        c.switch [:s, :with_scripts]
+
+        c.desc 'The ManualTransFile.json dir'
+        c.default_value './ManualTransFile.json'
+        c.arg_name 'DIRECTORY'
+        c.flag [:m, :manualtransfile_dir]
+
+        c.desc 'The NEW *.json output dir'
+        c.default_value './JSON_NEW'
+        c.arg_name 'DIRECTORY'
+        c.flag [:o, :output_dir]
+
+        c.action do |global_options, options, args|
+            R3EXS.in_strings(args[0], options[:output_dir], options[:manualtransfile_dir], options[:with_scripts])
+            puts "All new JSON files have been written to #{options[:output_dir]}"
+        end
+    end
+
+    pre do |global, command, options, args|
+        $global_options = global
+        # Pre logic here
+        # Return true to proceed; false to abort and not call the
+        # chosen command
+        # Use skips_pre before a command to skip this block
+        # on that command only
+        true
+    end
+
+    post do |global, command, options, args|
+        # Post logic here
+        # Use skips_post before a command to skip this
+        # block on that command only
+    end
+
+    on_error do |exception|
+        $stderr.puts exception.full_message
+    end
+end
+
+exit App.run(ARGV)

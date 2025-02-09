@@ -1,0 +1,5 @@
+= R3EXS
+
+Generate this with
+    R3EXS _doc
+After you have described your command line interface

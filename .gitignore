@@ -1,1 +1,15 @@
 /.idea
+
+/lib/R3EXS/Makefile
+/lib/R3EXS/rgss3a_rvdata2.o
+/lib/R3EXS/rgss3a_rvdata2.so
+/lib/R3EXS/rgss3a_rvdata2-x64-mingw-ucrt.def
+
+/Data
+/Graphics
+/Data_NEW
+/JSON
+/JSON_NEW
+
+Game.rgss3a
+ManualTransFile.json

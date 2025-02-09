@@ -1,0 +1,6 @@
+require 'R3EXS/version'
+require 'R3EXS/rgss3a_rvdata2'
+require 'R3EXS/rvdata2_json'
+require 'R3EXS/json_rvdata2'
+require 'R3EXS/extract_strings'
+require 'R3EXS/inject_strings'
