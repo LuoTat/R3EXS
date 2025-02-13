@@ -1,5 +1,9 @@
 # [R3EXS]
 
+## [1.0.2] - 2025-02-14
+
+-   将 .yardopts 文件添加到 gem 文件里面以支持 https://rubydoc.info/ 的文档自动生成
+
 ## [1.0.1] - 2025-02-14
 
 -   添加了 gemspec 文件里面的 metadata 信息
