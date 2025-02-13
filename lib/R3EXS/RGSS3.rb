@@ -1,13 +1,23 @@
 # frozen_string_literal: true
 
+# RPG Maker VX Ace Color 类
 class Color
-    # 生成 Color 对象. alpha 值省略时使用 255
-    # 如果没有指定参数, 默认为(0, 0, 0, 0)
-    # Color.new(red, green, blue[, alpha])
+
+    # 初始化时接受以下几种参数情况：
+    # - 无参数时，默认 (0, 0, 0, 0)
+    # - 3 个参数时，默认为 (red, green, blue, 255)
+    # - 4 个参数时，指定 (red, green, blue, alpha)
+    #
+    # @param args [Array<Integer>] red, green, blue, alpha
+    #        - red: 红色通道的值 (0-255)
+    #        - green: 绿色通道的值 (0-255)
+    #        - blue: 蓝色通道的值 (0-255)
+    #        - alpha: 可选，透明度通道的值 (0-255)，默认为 255
+    # @return [Color]
     def initialize(*args)
         case args.length
         when 0 # 无参数
-            set(0.0, 0.0, 0.0, 0.0)
+            set(0, 0, 0, 0)
         when 3 # 3 个参数, alpha 默认为 255
             set(*args)
         when 4 # 4 个参数, 分别为 red, green, blue, alpha
@@ -17,8 +27,17 @@ class Color
         end
     end
 
-    # set(red, green, blue[, alpha])
-    # set(color)
+    # 设置 Color 对象的值
+    # - 无参数时，默认 (0, 0, 0, 0)
+    # - 3 个参数时，默认为 (red, green, blue, 255)
+    # - 4 个参数时，指定 (red, green, blue, alpha)
+    #
+    # @param args [Array<Integer>] red, green, blue, alpha
+    #        - red: 红色通道的值 (0-255)
+    #        - green: 绿色通道的值 (0-255)
+    #        - blue: 蓝色通道的值 (0-255)
+    #        - alpha: 可选，透明度通道的值 (0-255)，默认为 255
+    # @return [void]
     def set(*args)
         case args.length
         when 1 # 一个参数, 为 Color 对象
@@ -46,47 +65,93 @@ class Color
         end
     end
 
-    # 序列化对象
+    # 序列化 Color 对象
+    #
+    # @param level [Integer] 序列化的级别
+    # @return [String]
     def _dump(level)
         [@red, @green, @blue, @alpha].pack('D4')
     end
 
-    # 反序列化对象
-    def self._load(obj)
+    # 反序列化 Color 对象
+    #
+    # @param obj [String] 序列化后的字符串
+    # @return [Color]
+    def Color._load(obj)
         new(*obj.unpack('D4'))
     end
 
-    # 限制 red, green, blue, alpha 的值在 0 到 255 之间
+    # 设置 red 通道的值，限制在 0 到 255 之间
+    #
+    # @param value [Float] 新的 red 通道值
+    # @return [void]
     def red=(value)
-        @red = [[value, 0.0].max, 255.0].min
+        @red = [[value, 0.0].max, 255.0].min.to_i
     end
 
+    # 设置 green 通道的值，限制在 0 到 255 之间
+    #
+    # @param value [Float] 新的 green 通道值
+    # @return [void]
     def green=(value)
-        @green = [[value, 0.0].max, 255.0].min
+        @green = [[value, 0.0].max, 255.0].min.to_i
     end
 
+    # 设置 blue 通道的值，限制在 0 到 255 之间
+    #
+    # @param value [Float] 新的 blue 通道值
+    # @return [void]
     def blue=(value)
-        @blue = [[value, 0.0].max, 255.0].min
+        @blue = [[value, 0.0].max, 255.0].min.to_i
     end
 
+    # 设置 alpha 通道的值，限制在 0 到 255 之间
+    #
+    # @param value [Float] 新的 alpha 通道值
+    # @return [void]
     def alpha=(value)
         @alpha = [[value, 0.0].max, 255.0].min
     end
 
+    # red 通道的值
+    #
+    # @return [Integer]
     attr_reader :red
+
+    # green 通道的值
+    #
+    # @return [Integer]
     attr_reader :green
+
+    # blue 通道的值
+    #
+    # @return [Integer]
     attr_reader :blue
+
+    # alpha 通道的值
+    #
+    # @return [Integer]
     attr_reader :alpha
 end
 
+# RPG Maker VX Ace Tone 类
 class Tone
-    # 生成 Tone 对象. gray 值省略时使用 0
-    # 若没有指定参数, 默认值为 (0, 0, 0, 0)
-    # Tone.new(red, green, blue[, gray])
+
+    # 初始化时接受以下几种参数情况：
+    # - 无参数时，默认 (0, 0, 0, 0)
+    # - 3 个参数时，默认为 (red, green, blue, 0)
+    # - 4 个参数时，指定 (red, green, blue, gray)
+    #
+    # @param args [Array<Integer>] red, green, blue, gray
+    #        - red: 红色通道的值 (-255-255)
+    #        - green: 绿色通道的值 (-255-255)
+    #        - blue: 蓝色通道的值 (-255-255)
+    #        - gray: 可选，灰度通道的值 (0-255)，默认为 0
+    # @return [Tone]
     def initialize(*args)
         case args.length
         when 0 # 无参数
-            set(0.0, 0.0, 0.0, 0.0)
+            set(0, 0, 0, 0)
         when 3 # 3 个参数, gray 默认为 0
             set(*args)
         when 4 # 4 个参数, 分别为 red, green, blue, gray
@@ -96,8 +161,17 @@ class Tone
         end
     end
 
-    # set(red, green, blue[, gray])
-    # set(tone)
+    # 设置 Tone 对象的值
+    # - 无参数时，默认 (0, 0, 0, 0)
+    # - 3 个参数时，默认为 (red, green, blue, 0)
+    # - 4 个参数时，指定 (red, green, blue, gray)
+    #
+    # @param args [Array<Integer>] red, green, blue, gray
+    #        - red: 红色通道的值 (-255-255)
+    #        - green: 绿色通道的值 (-255-255)
+    #        - blue: 蓝色通道的值 (-255-255)
+    #        - gray: 可选，透明度通道的值 (0-255)，默认为 0
+    # @return [void]
     def set(*args)
         case args.length
         when 1 # 一个参数, 为 Tone 对象
@@ -124,58 +198,131 @@ class Tone
         end
     end
 
-    # 序列化对象
+    # 序列化 Tone 对象
+    #
+    # @param level [Integer] 序列化的级别
+    # @return [String]
     def _dump(level)
         [@red, @green, @blue, @gray].pack('D4')
     end
 
-    # 反序列化对象
-    def self._load(obj)
+    # 反序列化 Tone 对象
+    #
+    # @param obj [String] 序列化后的字符串
+    # @return [Tone]
+    def Tone._load(obj)
         new(*obj.unpack('D4'))
     end
 
-    # 限制 red, green, blue的值在 -255 到 255 之间
-    # 限制 gray 的值在 0 到 255 之间
+    # 设置 red 通道的值，限制在 -255 到 255 之间
+    #
+    # @param value [Float] 新的 red 通道值
+    # @return [void]
     def red=(value)
-        @red = [[value, -255.0].max, 255.0].min
+        @red = [[value, -255.0].max, 255.0].min.to_i
     end
 
+    # 设置 green 通道的值，限制在 -255 到 255 之间
+    #
+    # @param value [Float] 新的 green 通道值
+    # @return [void]
     def green=(value)
-        @green = [[value, -255.0].max, 255.0].min
+        @green = [[value, -255.0].max, 255.0].min.to_i
     end
 
+    # 设置 blue 通道的值，限制在 -255 到 255 之间
+    #
+    # @param value [Float] 新的 blue 通道值
+    # @return [void]
     def blue=(value)
-        @blue = [[value, -255.0].max, 255.0].min
+        @blue = [[value, -255.0].max, 255.0].min.to_i
     end
 
+    # 设置 alpha 通道的值，限制在 0 到 255 之间
+    #
+    # @param value [Float] 新的 alpha 通道值
+    # @return [void]
     def gray=(value)
-        @gray = [[value, 0.0].max, 255.0].min
+        @gray = [[value, 0.0].max, 255.0].min.to_i
     end
 
+    # red 通道的值
+    #
+    # @return [Integer]
     attr_reader :red
+
+    # green 通道的值
+    #
+    # @return [Integer]
     attr_reader :green
+
+    # blue 通道的值
+    #
+    # @return [Integer]
     attr_reader :blue
+
+    # gray 通道的值
+    #
+    # @return [Integer]
     attr_reader :gray
 
 end
 
-# 多维数组的类. 每个元素都是带符号的两字节整数(int16_t), 也就是 -32,768~32,767 之间的整数
+# RPG Maker VX Ace Table 类
+#
+# Table 是一个多维数组，每个元素都是带符号的两字节整数(int16_t), 也就是 -32,768~32,767 之间的整数
+#
 # Ruby Array 类在处理大量信息时效率很差，因此使用了此类。
-
 class Table
-    # 生成 Table 对象. 指定多维数组各维的长度. 生成的数组可以是 1~3 维. 生成没有元素的数组也可以
-    # Table.new(xsize[, ysize[, zsize]])
-    # 注意这个Table初始化时传入的参数个数就是数组的维数, 最少1维, 最多3维
-    # ysize 和 zsize 省略时默认为 1
-    # 该类没有参数检查, 请确保传入yszie和zsize属于[0,uint_32_max]范围
+
+    # 初始化 Table 对象，指定多维数组各维的长度。生成的数组可以是 1~3 维，甚至是没有元素的数组。
+    #
+    # 初始化时传入的参数个数决定了生成的数组维度：
+    # - 最少 1 维，最多 3 维。
+    # - `ysize` 和 `zsize` 参数可以省略，默认值为 1。
+    #
+    # 注意：该类没有参数检查，请确保 `ysize` 和 `zsize` 的值在 `[-32768, 32767]` 范围内。
+    #
+    # @param xsize [Integer] 第一维的长度（必需）
+    # @param ysize [Integer, nil] 第二维的长度（可选，默认值为 nil)
+    # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
+    # @return [Table]
     def initialize(xsize, ysize = nil, zsize = nil)
         init_attr(xsize, ysize, zsize)
     end
 
+    # 设置各维的长度
+    #
+    # @param xsize [Integer] 第一维的长度
+    # @param ysize [Integer, nil] 第二维的长度（如果为 nil，则默认为 1）
+    # @param zsize [Integer, nil] 第三维的长度（如果为 nil，则默认为 1）
+    # @return [void]
+    def init_attr(xsize, ysize, zsize)
+        @dim = 1 + (ysize.nil? ? 0 : 1) + (zsize.nil? ? 0 : 1)
+        @xsize = xsize
+        @ysize = ysize.nil? ? 1 : ysize
+        @zsize = zsize.nil? ? 1 : zsize
+        @data = Array.new(@xsize * @ysize * @zsize, 0)
+    end
+
+    # 获取指定位置的元素值
+    #
+    # @param x [Integer] 第一维的长度（必需）
+    # @param y [Integer] 第二维的长度（可选，默认值为 0)
+    # @param z [Integer] 第三维的长度（可选，默认值为 0)
+    # @return [Integer]
     def [](x, y = 0, z = 0)
         @data[x + y * @xsize + z * @xsize * @ysize]
     end
 
+    # 设置指定位置的元素值
+    #
+    # @param args [Array<Integer>] x, y, z, v
+    #   - x: 第一维的长度（必需）
+    #   - y: 第二维的长度（可选，默认值为 nil)
+    #   - z: 第三维的长度（可选，默认值为 nil)
+    #   - v: 新的元素值
+    # @return [void]
     def []=(*args)
         v = args.pop
         x, y, z = args
@@ -184,6 +331,12 @@ class Table
         @data[x + y * @xsize + z * @xsize * @ysize] = v
     end
 
+    # 扩容 Table 对象，保留原有数据
+    #
+    # @param xsize [Integer] 第一维的长度（必需）
+    # @param ysize [Integer, nil] 第二维的长度（可选，默认值为 nil)
+    # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
+    # @return [void]
     def resize(xsize, ysize = nil, zsize = nil)
         old_data = @data.dup
         old_xsize, old_ysize, old_zsize = @xsize, @ysize, @zsize
@@ -197,6 +350,10 @@ class Table
         }
     end
 
+    # 序列化 Table 对象
+    #
+    # @param level [Integer] 序列化的级别
+    # @return [String]
     def _dump(level)
         s = [@dim, @xsize, @ysize, @zsize, @xsize * @ysize * @zsize].pack('LLLLL')
         @data.each do |d|
@@ -205,7 +362,11 @@ class Table
         s
     end
 
-    def self._load(obj)
+    # 反序列化 Table 对象
+    #
+    # @param obj [String] 序列化后的字符串
+    # @return [Table]
+    def Table._load(obj)
         # 从序列化字符串中解包维度信息
         dim, xsize, ysize, zsize, total_size = *obj[0, 20].unpack('LLLLL')
         # 初始化 Table 对象
@@ -215,21 +376,33 @@ class Table
         table
     end
 
-    def init_attr(xsize, ysize, zsize)
-        @dim = 1 + (ysize.nil? ? 0 : 1) + (zsize.nil? ? 0 : 1)
-        @xsize = xsize
-        @ysize = ysize.nil? ? 1 : ysize
-        @zsize = zsize.nil? ? 1 : zsize
-        @data = Array.new(@xsize * @ysize * @zsize, 0)
-    end
-
+    # 数据数组
+    #
+    # @return [Array<Integer>]
     attr_accessor :data
+
+    # 维度
+    #
+    # @return [Integer]
     attr_accessor :dim
+
+    # 第一维的长度
+    #
+    # @return [Integer]
     attr_accessor :xsize
+
+    # 第二维的长度
+    #
+    # @return [Integer]
     attr_accessor :ysize
+
+    # 第三维的长度
+    #
+    # @return [Integer]
     attr_accessor :zsize
 end
 
+# RPG Maker VX Ace 的RPG 模块
 module RPG
     class Map
         def initialize(width, height)

@@ -1,15 +1,18 @@
 /.idea
+/.yardoc
 
-/lib/R3EXS/Makefile
-/lib/R3EXS/rgss3a_rvdata2.o
-/lib/R3EXS/rgss3a_rvdata2.so
-/lib/R3EXS/rgss3a_rvdata2-x64-mingw-ucrt.def
-
+# 解包提取时生成的文件
 /Data
-/Graphics
 /Data_NEW
+/Graphics
 /JSON
 /JSON_NEW
-
 Game.rgss3a
 ManualTransFile.json
+ManualTransFile_scripts.json
+
+# rake 任务生成的文件夹
+/doc
+/pkg
+/tmp
+/lib/R3EXS/rgss3a_rvdata2.so

@@ -1,0 +1,5 @@
+options:
+    Ruby: 3.4.1
+    root: ./
+    entry-point: R3EXS
+    output: R3EXS_Tebako

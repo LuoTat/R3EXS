@@ -1,0 +1,12 @@
+--title R3EXS
+--readme README_EN.md
+--markup markdown
+--charset utf-8
+lib/**/*.rb
+ext/**/*.c
+-
+LICENSE
+README.md
+README_EN.md
+CHANGELOG.md
+--list-undoc

@@ -1,23 +1,14 @@
-require 'rake/clean'
-require 'rubygems'
-require 'rdoc/task'
-require 'rubygems/package_task'
+require 'bundler/gem_tasks'
 require 'rake/extensiontask'
 
-# 生成 RDoc 文档
-Rake::RDocTask.new do |rd|
-    rd.main = "README.rdoc"
-    rd.rdoc_files.include("README.rdoc", "lib/**/*.rb", "bin/**/*")
-    rd.title = 'R3EXS Documentation'
-end
-
-# 加载 gemspec 文件
-spec = Gem::Specification.load("R3EXS.gemspec")
-
-# 任务：创建 .gem 文件
-Gem::PackageTask.new(spec) do |pkg|
-end
-
-Rake::ExtensionTask.new("R3EXS", spec) do |ext|
+# 添加 C 扩展构建任务
+Rake::ExtensionTask.new('rgss3a_rvdata2') do |ext|
     ext.lib_dir = "lib/R3EXS"
+end
+
+# 添加 ocran 打包任务
+desc "Run ocran to package the application"
+task :ocran do
+    # 这里使用 --no-autoload 主要是 prism gem 会自动加载 ruby_parser，导致不必要的依赖
+    sh 'ocran --no-autoload --output R3EXS_Ocran.exe .\bin\R3EXS'
 end
