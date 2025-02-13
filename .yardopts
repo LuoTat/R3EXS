@@ -4,9 +4,9 @@
 --charset utf-8
 lib/**/*.rb
 ext/**/*.c
+--list-undoc
 -
 LICENSE
 README.md
 README_EN.md
 CHANGELOG.md
---list-undoc
