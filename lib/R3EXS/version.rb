@@ -3,5 +3,5 @@
 module R3EXS
 
     # 版本号
-    VERSION = '1.0.0'
+    VERSION = '1.0.1'
 end
