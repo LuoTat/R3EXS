@@ -7,8 +7,15 @@ spec = Gem::Specification.new do |s|
     s.license = 'MIT'
     s.author = 'LuoTat'
     s.email = 'LuoTat.s@gmail.com'
-    s.homepage = 'https://github.com/LuoTat'
-    s.files = Dir['bin/R3EXS', 'ext/rgss3a_rvdata2/*', 'lib/**/*.rb', 'LICENSE', 'README.md', 'README_EN.md']
+    s.homepage = 'https://github.com/LuoTat/R3EXS'
+    s.metadata = {
+        'bug_tracker_uri' => 'https://github.com/LuoTat/R3EXS/issues',
+        'changelog_uri' => 'https://github.com/LuoTat/R3EXS/blob/main/CHANGELOG.md',
+        'documentation_uri' => 'https://rubydoc.info/gems/R3EXS',
+        'homepage_uri' => 'https://github.com/LuoTat/R3EXS',
+        'source_code_uri' => 'https://github.com/LuoTat/R3EXS',
+    }
+    s.files = Dir['bin/R3EXS', 'ext/rgss3a_rvdata2/*', 'lib/**/*.rb', 'CHANGELOG.md', 'LICENSE', 'README.md', 'README_EN.md']
     s.bindir = 'bin'
     s.executables << 'R3EXS'
     s.platform = Gem::Platform::RUBY
