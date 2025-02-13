@@ -50,9 +50,9 @@ Click to download [R3EXS.exe](https://github.com/LuoTat/R3EXS/releases)
 
 Since the R3EXS.exe file is packaged using [Ocran](https://github.com/Largo/ocran) and [Tebako](https://github.com/tamatebako/tebako)
 
-The `Windows` environment provides `R3EXS_Ocran` and `R3EXS_Tebako`
+The `Windows` environment provides `R3EXS-windows_Ocran` and `R3EXS-windows_Tebako`
 
-The `Linux (GLIBC >= 2.31)` environment provides `R3EXS_Tebako`
+The `Linux (GLIBC >= 2.31)` environment provides `R3EXS-linux_Tebako`
 
 it will extract the Ruby environment the first time it runs, so the first run may be slower.
 

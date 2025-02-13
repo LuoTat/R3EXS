@@ -50,9 +50,9 @@ gem install R3EXS
 
 使用 [Ocran](https://github.com/Largo/ocran) 和 [Tebako](https://github.com/tamatebako/tebako) 两个打包工具
 
-`Windows` 环境提供 `R3EXS_Ocran` 和 `R3EXS_Tebako`
+`Windows` 环境提供 `R3EXS-windows-Ocran` 和 `R3EXS-windows-Tebako`
 
-`Linux (GLIBC>=2.31)` 环境提供 `R3EXS_Tebako`
+`Linux (GLIBC>=2.31)` 环境提供 `R3EXS-linux-Tebako`
 
 在首次运行时会解压 Ruby 环境，所以首次运行会比较慢
 
