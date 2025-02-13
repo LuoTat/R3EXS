@@ -38,7 +38,7 @@ It uses [Prism](https://github.com/ruby/prism) to accurately extract strings and
 ### Install using RubyGems
 
 1. Install [Ruby](https://www.ruby-lang.org/en/) (make sure to install Devkit to support compiling C extensions)
-2. Install the [R3EXS](https://rubygems.org/gems/r3exs) gem
+2. Install the [R3EXS](https://rubygems.org/gems/R3EXS) gem
 
 ```bash
 gem install R3EXS

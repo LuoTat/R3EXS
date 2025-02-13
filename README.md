@@ -38,7 +38,7 @@ R3EXS 是一个基于 Ruby 语言，用来提取和翻译 RGSS3 游戏里字符�
 ### 使用 RubyGems 安装
 
 1. 安装 [Ruby](https://www.ruby-lang.org/zh_cn/) (要附带安装 Devkit 来支持编译 C 扩展)
-2. 安装 [R3EXS](https://rubygems.org/gems/r3exs) gem
+2. 安装 [R3EXS](https://rubygems.org/gems/R3EXS) gem
 
 ```bash
 gem install R3EXS
