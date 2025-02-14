@@ -1,23 +1,23 @@
-# Ensure we require the local version and not one we might have installed already
+# Ensure we require the local version and not one we might have installed already.
 require File.join([File.dirname(__FILE__), 'lib', 'R3EXS', 'version.rb'])
 spec = Gem::Specification.new do |s|
-    s.name = 'R3EXS'
-    s.version = R3EXS::VERSION
-    s.summary = 'A tool for extracting and translating strings from the RGSS3 game engine'
-    s.license = 'MIT'
-    s.author = 'LuoTat'
-    s.email = 'LuoTat.s@gmail.com'
+    s.name     = 'R3EXS'
+    s.version  = R3EXS::VERSION
+    s.summary  = 'A tool for extracting and translating strings from the RGSS3 game engine'
+    s.license  = 'MIT'
+    s.author   = 'LuoTat'
+    s.email    = 'LuoTat.s@gmail.com'
     s.homepage = 'https://github.com/LuoTat/R3EXS'
     s.metadata = {
-        'bug_tracker_uri' => 'https://github.com/LuoTat/R3EXS/issues',
-        'changelog_uri' => 'https://github.com/LuoTat/R3EXS/blob/main/CHANGELOG.md',
-        'documentation_uri' => 'https://rubydoc.info/gems/R3EXS',
-        'source_code_uri' => 'https://github.com/LuoTat/R3EXS',
+      'bug_tracker_uri'   => 'https://github.com/LuoTat/R3EXS/issues',
+      'changelog_uri'     => 'https://github.com/LuoTat/R3EXS/blob/main/CHANGELOG.md',
+      'documentation_uri' => 'https://rubydoc.info/gems/R3EXS',
+      'source_code_uri'   => 'https://github.com/LuoTat/R3EXS',
     }
-    s.files = Dir['bin/R3EXS', 'ext/rgss3a_rvdata2/*', 'lib/**/*.rb', '.yardopts', 'CHANGELOG.md', 'LICENSE', 'README.md', 'README_EN.md']
-    s.bindir = 'bin'
+    s.files    = Dir['bin/R3EXS', 'ext/rgss3a_rvdata2/*', 'lib/**/*.rb', '.yardopts', 'CHANGELOG.md', 'LICENSE', 'README.md', 'README_EN.md']
+    s.bindir   = 'bin'
     s.executables << 'R3EXS'
-    s.platform = Gem::Platform::RUBY
+    s.platform              = Gem::Platform::RUBY
     s.required_ruby_version = '>= 3.4.1'
     s.require_paths << 'lib'
     s.add_development_dependency('rake', '~> 13.2.1')

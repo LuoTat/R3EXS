@@ -17,8 +17,8 @@ module R3EXS
     # @return [void]
     def R3EXS.rb_scripts(target_dir, output_dir)
         FileUtils.mkdir(output_dir) unless Dir.exist?(output_dir)
-        scripts_array = []
-        full_dir = File.join(target_dir, 'Scripts')
+        scripts_array         = []
+        full_dir              = File.join(target_dir, 'Scripts')
         script_info_file_path = File.join(full_dir, 'Scripts_info.json')
 
         Dir.exist?(full_dir) or raise ScriptsDirError.new(full_dir), "Scripts directory not found: #{full_dir}"
@@ -28,7 +28,7 @@ module R3EXS
         scripts_info_array = Oj.load_file(script_info_file_path)
 
         scripts_info_array.each do |script_info|
-            index = script_info[:index]
+            index            = script_info[:index]
             script_file_path = File.join(full_dir, "#{format('%03d', index)}.rb")
             print "#{Utils::ESCAPE}#{Utils::YELLOW_COLOR}Reading from #{Utils::RESET_COLOR}#{script_file_path}...\r" if $global_options[:verbose]
             scripts_array << [114514, script_info[:name], Zlib::Deflate.deflate(File.read(script_file_path, mode: "r"))]

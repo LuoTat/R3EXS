@@ -14,10 +14,10 @@ module R3EXS
         # @param with_note [Boolean] 是否处理 note 字段
         # @return [R3EXS::BaseItem]
         def initialize(baseitem, index, with_note)
-            @index = index
-            @name = baseitem.name
+            @index       = index
+            @name        = baseitem.name
             @description = baseitem.description
-            @note = baseitem.note
+            @note        = baseitem.note
             self.remove_instance_variable(:@note) unless with_note
         end
 
@@ -26,9 +26,9 @@ module R3EXS
         # @param baseitem [RPG::BaseItem] 待注入的 RPG::BaseItem 对象
         # @return [void]
         def inject_to(baseitem)
-            baseitem.name = @name
+            baseitem.name        = @name
             baseitem.description = @description if self.instance_variable_defined?(:@description)
-            baseitem.note = @note if self.instance_variable_defined?(:@note)
+            baseitem.note        = @note if self.instance_variable_defined?(:@note)
         end
 
         # 提取所有的字符串
@@ -47,9 +47,9 @@ module R3EXS
         # @param hash [Hash<String, String>] 字符串翻译表
         # @return [void]
         def in_strings(hash)
-            @name = hash[@name] || @name
+            @name        = hash[@name] || @name
             @description = hash[@description] || @description if self.instance_variable_defined?(:@description)
-            @note = hash[@note] || @note if self.instance_variable_defined?(:@note)
+            @note        = hash[@note] || @note if self.instance_variable_defined?(:@note)
         end
 
         # 判断是否为空
@@ -144,7 +144,7 @@ module R3EXS
         # @return [R3EXS::Animation]
         def initialize(animation, index, _unused = nil)
             @index = index
-            @name = animation.name
+            @name  = animation.name
         end
 
         # 注入到 RPG::Animation 对象
@@ -291,7 +291,7 @@ module R3EXS
             # @return [R3EXS::Class::Learning]
             def initialize(learning, index)
                 @index = index
-                @note = learning.note
+                @note  = learning.note
             end
 
             # 注入到 RPG::Class::Learning 对象
@@ -412,9 +412,9 @@ module R3EXS
         # @return [R3EXS::MoveCommand]
         def initialize(movecommand, index)
             if movecommand.code == 45
-                @index = index
-                @code = 45
-                @usage = 'MoveCommandScript'
+                @index     = index
+                @code      = 45
+                @usage     = 'MoveCommandScript'
                 @parameter = movecommand.parameters[0]
             else
                 @index = -1
@@ -543,18 +543,18 @@ module R3EXS
         def initialize(eventcommand, index)
             case eventcommand.code
             when 102 # ShowChoices
-                @index = index
-                @code = 102
-                @usage = Utils::EVENT_COMMANDS[102]
+                @index     = index
+                @code      = 102
+                @usage     = Utils::EVENT_COMMANDS[102]
                 @parameter = eventcommand.parameters[0]
             when 108 # Comment
-                @index = index
-                @code = 108
-                @usage = Utils::EVENT_COMMANDS[108]
+                @index     = index
+                @code      = 108
+                @usage     = Utils::EVENT_COMMANDS[108]
                 @parameter = eventcommand.parameters[0]
             when 111 # ConditionalBranch
                 @index = index
-                @code = 111
+                @code  = 111
                 @usage = Utils::EVENT_COMMANDS[111]
                 if eventcommand.parameters[0] == 4 && eventcommand.parameters[2] == 1
                     @parameter = eventcommand.parameters[3]
@@ -564,81 +564,81 @@ module R3EXS
                     @index = -1
                 end
             when 118 # Label
-                @index = index
-                @code = 118
-                @usage = Utils::EVENT_COMMANDS[118]
+                @index     = index
+                @code      = 118
+                @usage     = Utils::EVENT_COMMANDS[118]
                 @parameter = eventcommand.parameters[0]
             when 119 # JumpToLabel
-                @index = index
-                @code = 119
-                @usage = Utils::EVENT_COMMANDS[119]
+                @index     = index
+                @code      = 119
+                @usage     = Utils::EVENT_COMMANDS[119]
                 @parameter = eventcommand.parameters[0]
             when 122 # ControlVariables
                 if eventcommand.parameters[3] == 4
-                    @index = index
-                    @code = 122
-                    @usage = Utils::EVENT_COMMANDS[122]
+                    @index     = index
+                    @code      = 122
+                    @usage     = Utils::EVENT_COMMANDS[122]
                     @parameter = eventcommand.parameters[4]
                 else
                     @index = -1
                 end
             when 205 # SetMoveRoute
-                @index = index
-                @code = 205
-                @usage = Utils::EVENT_COMMANDS[205]
+                @index          = index
+                @code           = 205
+                @usage          = Utils::EVENT_COMMANDS[205]
                 moveroute_r3exs = R3EXS::MoveRoute.new(eventcommand.parameters[1])
-                @parameter = moveroute_r3exs.list unless moveroute_r3exs.empty?
+                @parameter      = moveroute_r3exs.list unless moveroute_r3exs.empty?
                 if @parameter.nil?
                     @index = -1 # 如果没有可提取的 MoveCommand ，就将索引设为-1，empty? 将据此判断是否为空
                 end
             when 320 # ChangeActorName
-                @index = index
-                @code = 320
-                @usage = Utils::EVENT_COMMANDS[320]
+                @index     = index
+                @code      = 320
+                @usage     = Utils::EVENT_COMMANDS[320]
                 @parameter = eventcommand.parameters[1]
             when 324 # ChangeActorNickname
-                @index = index
-                @code = 324
-                @usage = Utils::EVENT_COMMANDS[324]
+                @index     = index
+                @code      = 324
+                @usage     = Utils::EVENT_COMMANDS[324]
                 @parameter = eventcommand.parameters[1]
             when 355 # Script
-                @index = index
-                @code = 355
-                @usage = Utils::EVENT_COMMANDS[355]
+                @index     = index
+                @code      = 355
+                @usage     = Utils::EVENT_COMMANDS[355]
                 @parameter = eventcommand.parameters[0]
             when 401 # ShowText
-                @index = index
-                @code = 401
-                @usage = Utils::EVENT_COMMANDS[401]
+                @index     = index
+                @code      = 401
+                @usage     = Utils::EVENT_COMMANDS[401]
                 @parameter = eventcommand.parameters[0]
             when 402 # When
-                @index = index
-                @code = 402
-                @usage = Utils::EVENT_COMMANDS[402]
+                @index     = index
+                @code      = 402
+                @usage     = Utils::EVENT_COMMANDS[402]
                 @parameter = eventcommand.parameters[1]
             when 405 # ShowScrollingText
-                @index = index
-                @code = 405
-                @usage = Utils::EVENT_COMMANDS[405]
+                @index     = index
+                @code      = 405
+                @usage     = Utils::EVENT_COMMANDS[405]
                 @parameter = eventcommand.parameters[0]
             when 408 # CommentMore
-                @index = index
-                @code = 408
-                @usage = Utils::EVENT_COMMANDS[408]
+                @index     = index
+                @code      = 408
+                @usage     = Utils::EVENT_COMMANDS[408]
                 @parameter = eventcommand.parameters[0]
             when 505 # MoveRoute
                 if eventcommand.parameters[0].code == 45
-                    @index = index
-                    @code = 505
-                    @usage = Utils::EVENT_COMMANDS[505]
+                    @index     = index
+                    @code      = 505
+                    @usage     = Utils::EVENT_COMMANDS[505]
                     @parameter = eventcommand.parameters[0].parameters[0]
                 else
                     @index = -1
                 end
             when 655 # ScriptMore
-                @index = index
-                @code = 655
-                @usage = Utils::EVENT_COMMANDS[655]
+                @index     = index
+                @code      = 655
+                @usage     = Utils::EVENT_COMMANDS[655]
                 @parameter = eventcommand.parameters[0]
             else
                 @index = -1 # 如果不是以上的事件指令，就将索引设为-1，empty? 将据此判断是否为空
@@ -750,7 +750,7 @@ module R3EXS
 
         # 事件指令参数
         #
-        # @note 当 '@code' 为 102 时，parameter 是一个字符串数组
+        # @note 当 '@code' 为 102 时, parameter 是一个字符串数组
         # @return [String] if @code != 102
         # @return [Array<String>] if @code == 102
         attr_accessor :parameter
@@ -766,8 +766,8 @@ module R3EXS
         # @return [R3EXS::CommonEvent]
         def initialize(commonevent, index, _unused = nil)
             @index = index
-            @name = commonevent.name
-            @list = []
+            @name  = commonevent.name
+            @list  = []
             commonevent.list.each_with_index do |eventcommand, eventcommand_index|
                 next if eventcommand == nil
                 eventcommand_r3exs = R3EXS::EventCommand.new(eventcommand, eventcommand_index)
@@ -976,7 +976,7 @@ module R3EXS
             # @return [R3EXS::Event::Page]
             def initialize(page, index)
                 @index = index
-                @list = []
+                @list  = []
                 page.list.each_with_index do |eventcommand, eventcommand_index|
                     next if eventcommand == nil
                     eventcommand_r3exs = R3EXS::EventCommand.new(eventcommand, eventcommand_index)
@@ -1040,7 +1040,7 @@ module R3EXS
         # @return [R3EXS::Event]
         def initialize(event, index)
             @index = index
-            @name = event.name
+            @name  = event.name
             @pages = []
             event.pages.each_with_index do |page, page_index|
                 next if page == nil
@@ -1114,8 +1114,8 @@ module R3EXS
         # @return [R3EXS::Map]
         def initialize(map, with_note)
             @display_name = map.display_name
-            @note = map.note
-            @events = []
+            @note         = map.note
+            @events       = []
             map.events.each do |key, event|
                 next if event == nil
                 event_r3exs = R3EXS::Event.new(event, key)
@@ -1130,7 +1130,7 @@ module R3EXS
         # @return [void]
         def inject_to(map)
             map.display_name = @display_name
-            map.note = @note if self.instance_variable_defined?(:@note)
+            map.note         = @note if self.instance_variable_defined?(:@note)
             @events.each do |event|
                 event.inject_to(map.events[event.index])
             end
@@ -1155,7 +1155,7 @@ module R3EXS
         # @return [void]
         def in_strings(hash)
             @display_name = hash[@display_name] || @display_name
-            @note = hash[@note] || @note if self.instance_variable_defined?(:@note)
+            @note         = hash[@note] || @note if self.instance_variable_defined?(:@note)
             @events.each do |event|
                 event.in_strings(hash)
             end
@@ -1186,7 +1186,7 @@ module R3EXS
         # @return [R3EXS::MapInfo]
         def initialize(mapinfo, index, _unused = nil)
             @index = index
-            @name = mapinfo.name
+            @name  = mapinfo.name
         end
 
         # 注入到 RPG::MapInfo 对象
@@ -1378,9 +1378,9 @@ module R3EXS
             # @param terms [RPG::System::Terms] 待处理的 RPG::System::Terms 对象
             # @return [R3EXS::System::Terms]
             def initialize(terms)
-                @basic = terms.basic
-                @params = terms.params
-                @etypes = terms.etypes
+                @basic    = terms.basic
+                @params   = terms.params
+                @etypes   = terms.etypes
                 @commands = terms.commands
             end
 
@@ -1389,9 +1389,9 @@ module R3EXS
             # @param terms [RPG::System::Terms] 待注入的 RPG::System::Terms 对象
             # @return [void]
             def inject_to(terms)
-                terms.basic = @basic
-                terms.params = @params
-                terms.etypes = @etypes
+                terms.basic    = @basic
+                terms.params   = @params
+                terms.etypes   = @etypes
                 terms.commands = @commands
             end
 
@@ -1444,15 +1444,15 @@ module R3EXS
         # @param system [RPG::System] 待处理的 RPG::System 对象
         # @return [R3EXS::System]
         def initialize(system, _unused = nil)
-            @game_title = system.game_title
+            @game_title    = system.game_title
             @currency_unit = system.currency_unit
-            @elements = system.elements
-            @skill_types = system.skill_types
-            @weapon_types = system.weapon_types
-            @armor_types = system.armor_types
-            @switches = system.switches
-            @variables = system.variables
-            @terms = R3EXS::System::Terms.new(system.terms)
+            @elements      = system.elements
+            @skill_types   = system.skill_types
+            @weapon_types  = system.weapon_types
+            @armor_types   = system.armor_types
+            @switches      = system.switches
+            @variables     = system.variables
+            @terms         = R3EXS::System::Terms.new(system.terms)
         end
 
         # 注入到 RPG::System 对象
@@ -1460,14 +1460,14 @@ module R3EXS
         # @param system [RPG::System] 待注入的 RPG::System 对象
         # @return [void]
         def inject_to(system)
-            system.game_title = @game_title
+            system.game_title    = @game_title
             system.currency_unit = @currency_unit
-            system.elements = @elements
-            system.skill_types = @skill_types
-            system.weapon_types = @weapon_types
-            system.armor_types = @armor_types
-            system.switches = @switches
-            system.variables = @variables
+            system.elements      = @elements
+            system.skill_types   = @skill_types
+            system.weapon_types  = @weapon_types
+            system.armor_types   = @armor_types
+            system.switches      = @switches
+            system.variables     = @variables
             @terms.inject_to(system.terms)
         end
 
@@ -1493,7 +1493,7 @@ module R3EXS
         # @param hash [Hash<String, String>] 字符串翻译表
         # @return [void]
         def in_strings(hash)
-            @game_title = hash[@game_title] || @game_title
+            @game_title    = hash[@game_title] || @game_title
             @currency_unit = hash[@currency_unit] || @currency_unit
             @elements.map! { |string| hash[string] || string }
             @skill_types.map! { |string| hash[string] || string }
@@ -1561,8 +1561,8 @@ module R3EXS
         # @return [R3EXS::Tileset]
         def initialize(tileset, index, with_note)
             @index = index
-            @name = tileset.name
-            @note = tileset.note
+            @name  = tileset.name
+            @note  = tileset.note
             self.remove_instance_variable(:@note) unless with_note
         end
 
@@ -1630,7 +1630,7 @@ module R3EXS
             # @return [R3EXS::Troop::Page]
             def initialize(page, index)
                 @index = index
-                @list = []
+                @list  = []
                 page.list.each_with_index do |eventcommand, eventcommand_index|
                     next if eventcommand == nil
                     eventcommand_r3exs = R3EXS::EventCommand.new(eventcommand, eventcommand_index)
@@ -1693,7 +1693,7 @@ module R3EXS
         # @return [R3EXS::Troop]
         def initialize(troop, index, _unused = nil)
             @index = index
-            @name = troop.name
+            @name  = troop.name
             @pages = []
             troop.pages.each_with_index do |page, page_index|
                 next if page == nil

@@ -11,7 +11,7 @@ module R3EXS
         # @param with_symbol [Boolean] 是否包含脚本中的符号
         # @return [StringsExtractor]
         def initialize(strings, with_symbol)
-            @strings = strings
+            @strings     = strings
             @with_symbol = with_symbol
         end
 
@@ -59,8 +59,8 @@ module R3EXS
             # @return [Location]
             def initialize(start_offset, length, content)
                 @start_offset = start_offset
-                @length = length
-                @content = content
+                @length       = length
+                @content      = content
             end
 
             # 字符串在二进制源文件中的起始位置
@@ -84,8 +84,8 @@ module R3EXS
         # @return [StringsInjector]
         def initialize(hash)
             @strings_hash = hash
-            @content_loc = []
-            @code = []
+            @content_loc  = []
+            @code         = []
         end
 
         # 处理类型为 StringNode 的节点
@@ -94,7 +94,7 @@ module R3EXS
         # @return [void]
         def visit_string_node(node)
             location = node.content_loc
-            value = location.slice
+            value    = location.slice
             if @strings_hash.has_key?(value)
                 @content_loc << Location.new(location.start_offset, location.length, @strings_hash[value])
             end

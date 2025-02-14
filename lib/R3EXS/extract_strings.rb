@@ -19,7 +19,7 @@ module R3EXS
         full_dir = File.join(target_dir, 'Scripts')
         Dir.exist?(full_dir) or raise ScriptsDirError.new(full_dir), "Scripts directory not found: #{full_dir}"
 
-        strings = []
+        strings           = []
         strings_extractor = StringsExtractor.new(strings, with_symbol)
         Dir.glob(File.join(full_dir, '*.rb')).each do |script_file_path|
             print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Exreacting from #{Utils::RESET_COLOR}#{script_file_path}...\r" if $global_options[:verbose]

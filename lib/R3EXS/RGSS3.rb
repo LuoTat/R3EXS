@@ -43,22 +43,22 @@ class Color
         when 1 # 一个参数, 为 Color 对象
             if args[0].is_a?(Color)
                 other_color = args[0]
-                self.red = other_color.red
-                self.green = other_color.green
-                self.blue = other_color.blue
-                self.alpha = other_color.alpha
+                self.red    = other_color.red
+                self.green  = other_color.green
+                self.blue   = other_color.blue
+                self.alpha  = other_color.alpha
             else
                 raise ArgumentError, "Invalid arguments for set method"
             end
         when 3 # 三个参数, 分别为 red, green, blue (alpha 默认为 255)
-            self.red = args[0]
+            self.red   = args[0]
             self.green = args[1]
-            self.blue = args[2]
+            self.blue  = args[2]
             self.alpha = 255.0
         when 4 # 四个参数, 分别为 red, green, blue, alpha
-            self.red = args[0]
+            self.red   = args[0]
             self.green = args[1]
-            self.blue = args[2]
+            self.blue  = args[2]
             self.alpha = args[3]
         else
             raise ArgumentError, "Invalid arguments for set method"
@@ -176,23 +176,23 @@ class Tone
         case args.length
         when 1 # 一个参数, 为 Tone 对象
             if args[0].is_a?(Tone)
-                self.red = args[0].red
+                self.red   = args[0].red
                 self.green = args[0].green
-                self.blue = args[0].blue
-                self.gray = args[0].gray
+                self.blue  = args[0].blue
+                self.gray  = args[0].gray
             else
                 raise ArgumentError, "Invalid arguments for set method"
             end
         when 3 # 三个参数, 分别为 red, green, blue (gray 默认为 0)
-            self.red = args[0]
+            self.red   = args[0]
             self.green = args[1]
-            self.blue = args[2]
-            self.gray = 0.0
+            self.blue  = args[2]
+            self.gray  = 0.0
         when 4 # 四个参数, 分别为 red, green, blue, gray
-            self.red = args[0]
+            self.red   = args[0]
             self.green = args[1]
-            self.blue = args[2]
-            self.gray = args[3]
+            self.blue  = args[2]
+            self.gray  = args[3]
         else
             raise ArgumentError, "Invalid arguments for set method"
         end
@@ -298,11 +298,11 @@ class Table
     # @param zsize [Integer, nil] 第三维的长度（如果为 nil，则默认为 1）
     # @return [void]
     def init_attr(xsize, ysize, zsize)
-        @dim = 1 + (ysize.nil? ? 0 : 1) + (zsize.nil? ? 0 : 1)
+        @dim   = 1 + (ysize.nil? ? 0 : 1) + (zsize.nil? ? 0 : 1)
         @xsize = xsize
         @ysize = ysize.nil? ? 1 : ysize
         @zsize = zsize.nil? ? 1 : zsize
-        @data = Array.new(@xsize * @ysize * @zsize, 0)
+        @data  = Array.new(@xsize * @ysize * @zsize, 0)
     end
 
     # 获取指定位置的元素值
@@ -324,10 +324,10 @@ class Table
     #   - v: 新的元素值
     # @return [void]
     def []=(*args)
-        v = args.pop
-        x, y, z = args
-        y ||= 0
-        z ||= 0
+        v                                           = args.pop
+        x, y, z                                     = args
+        y                                           ||= 0
+        z                                           ||= 0
         @data[x + y * @xsize + z * @xsize * @ysize] = v
     end
 
@@ -338,7 +338,7 @@ class Table
     # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
     # @return [void]
     def resize(xsize, ysize = nil, zsize = nil)
-        old_data = @data.dup
+        old_data                        = @data.dup
         old_xsize, old_ysize, old_zsize = @xsize, @ysize, @zsize
         init_attr(xsize, ysize, zsize)
         (0...[old_xsize, @xsize].min).each { |x|
@@ -370,7 +370,7 @@ class Table
         # 从序列化字符串中解包维度信息
         dim, xsize, ysize, zsize, total_size = *obj[0, 20].unpack('LLLLL')
         # 初始化 Table 对象
-        table = Table.new(*[xsize, ysize, zsize].first(dim))
+        table      = Table.new(*[xsize, ysize, zsize].first(dim))
         table.data = obj[20, total_size * 2].unpack("s#{total_size}")
         # 现在 @data 已经从序列化字符串中完整提取
         table
@@ -406,30 +406,30 @@ end
 module RPG
     class Map
         def initialize(width, height)
-            @display_name = ''
-            @tileset_id = 1
-            @width = width
-            @height = height
-            @scroll_type = 0
-            @specify_battleback = false
+            @display_name          = ''
+            @tileset_id            = 1
+            @width                 = width
+            @height                = height
+            @scroll_type           = 0
+            @specify_battleback    = false
             @battleback_floor_name = ''
-            @battleback_wall_name = ''
-            @autoplay_bgm = false
-            @bgm = RPG::BGM.new
-            @autoplay_bgs = false
-            @bgs = RPG::BGS.new('', 80)
-            @disable_dashing = false
-            @encounter_list = []
-            @encounter_step = 30
-            @parallax_name = ''
-            @parallax_loop_x = false
-            @parallax_loop_y = false
-            @parallax_sx = 0
-            @parallax_sy = 0
-            @parallax_show = false
-            @note = ''
-            @data = Table.new(width, height, 4)
-            @events = {}
+            @battleback_wall_name  = ''
+            @autoplay_bgm          = false
+            @bgm                   = RPG::BGM.new
+            @autoplay_bgs          = false
+            @bgs                   = RPG::BGS.new('', 80)
+            @disable_dashing       = false
+            @encounter_list        = []
+            @encounter_step        = 30
+            @parallax_name         = ''
+            @parallax_loop_x       = false
+            @parallax_loop_y       = false
+            @parallax_sx           = 0
+            @parallax_sy           = 0
+            @parallax_show         = false
+            @note                  = ''
+            @data                  = Table.new(width, height, 4)
+            @events                = {}
         end
 
         attr_accessor :display_name
@@ -460,8 +460,8 @@ module RPG
 
     class Map::Encounter
         def initialize
-            @troop_id = 1
-            @weight = 10
+            @troop_id   = 1
+            @weight     = 10
             @region_set = []
         end
 
@@ -472,12 +472,12 @@ module RPG
 
     class MapInfo
         def initialize
-            @name = ''
+            @name      = ''
             @parent_id = 0
-            @order = 0
-            @expanded = false
-            @scroll_x = 0
-            @scroll_y = 0
+            @order     = 0
+            @expanded  = false
+            @scroll_x  = 0
+            @scroll_y  = 0
         end
 
         attr_accessor :name
@@ -490,10 +490,10 @@ module RPG
 
     class Event
         def initialize(x, y)
-            @id = 0
-            @name = ''
-            @x = x
-            @y = y
+            @id    = 0
+            @name  = ''
+            @x     = x
+            @y     = y
             @pages = [RPG::Event::Page.new]
         end
 
@@ -506,19 +506,19 @@ module RPG
 
     class Event::Page
         def initialize
-            @condition = RPG::Event::Page::Condition.new
-            @graphic = RPG::Event::Page::Graphic.new
-            @move_type = 0
-            @move_speed = 3
+            @condition      = RPG::Event::Page::Condition.new
+            @graphic        = RPG::Event::Page::Graphic.new
+            @move_type      = 0
+            @move_speed     = 3
             @move_frequency = 3
-            @move_route = RPG::MoveRoute.new
-            @walk_anime = true
-            @step_anime = false
-            @direction_fix = false
-            @through = false
-            @priority_type = 0
-            @trigger = 0
-            @list = [RPG::EventCommand.new]
+            @move_route     = RPG::MoveRoute.new
+            @walk_anime     = true
+            @step_anime     = false
+            @direction_fix  = false
+            @through        = false
+            @priority_type  = 0
+            @trigger        = 0
+            @list           = [RPG::EventCommand.new]
         end
 
         attr_accessor :condition
@@ -538,19 +538,19 @@ module RPG
 
     class Event::Page::Condition
         def initialize
-            @switch1_valid = false
-            @switch2_valid = false
-            @variable_valid = false
+            @switch1_valid     = false
+            @switch2_valid     = false
+            @variable_valid    = false
             @self_switch_valid = false
-            @item_valid = false
-            @actor_valid = false
-            @switch1_id = 1
-            @switch2_id = 1
-            @variable_id = 1
-            @variable_value = 0
-            @self_switch_ch = 'A'
-            @item_id = 1
-            @actor_id = 1
+            @item_valid        = false
+            @actor_valid       = false
+            @switch1_id        = 1
+            @switch2_id        = 1
+            @variable_id       = 1
+            @variable_value    = 0
+            @self_switch_ch    = 'A'
+            @item_id           = 1
+            @actor_id          = 1
         end
 
         attr_accessor :switch1_valid
@@ -570,11 +570,11 @@ module RPG
 
     class Event::Page::Graphic
         def initialize
-            @tile_id = 0
-            @character_name = ''
+            @tile_id         = 0
+            @character_name  = ''
             @character_index = 0
-            @direction = 2
-            @pattern = 0
+            @direction       = 2
+            @pattern         = 0
         end
 
         attr_accessor :tile_id
@@ -586,8 +586,8 @@ module RPG
 
     class EventCommand
         def initialize(code = 0, indent = 0, parameters = [])
-            @code = code
-            @indent = indent
+            @code       = code
+            @indent     = indent
             @parameters = parameters
         end
 
@@ -598,10 +598,10 @@ module RPG
 
     class MoveRoute
         def initialize
-            @repeat = true
+            @repeat    = true
             @skippable = false
-            @wait = false
-            @list = [RPG::MoveCommand.new]
+            @wait      = false
+            @list      = [RPG::MoveCommand.new]
         end
 
         attr_accessor :repeat
@@ -612,7 +612,7 @@ module RPG
 
     class MoveCommand
         def initialize(code = 0, parameters = [])
-            @code = code
+            @code       = code
             @parameters = parameters
         end
 
@@ -622,12 +622,12 @@ module RPG
 
     class BaseItem
         def initialize
-            @id = 0
-            @name = ''
-            @icon_index = 0
+            @id          = 0
+            @name        = ''
+            @icon_index  = 0
             @description = ''
-            @features = []
-            @note = ''
+            @features    = []
+            @note        = ''
         end
 
         attr_accessor :id
@@ -642,15 +642,15 @@ module RPG
 
         def initialize
             super
-            @nickname = ''
-            @class_id = 1
-            @initial_level = 1
-            @max_level = 99
-            @character_name = ''
+            @nickname        = ''
+            @class_id        = 1
+            @initial_level   = 1
+            @max_level       = 99
+            @character_name  = ''
             @character_index = 0
-            @face_name = ''
-            @face_index = 0
-            @equips = [0, 0, 0, 0, 0]
+            @face_name       = ''
+            @face_index      = 0
+            @equips          = [0, 0, 0, 0, 0]
         end
 
         attr_accessor :nickname
@@ -668,7 +668,7 @@ module RPG
         def initialize
             super
             @exp_params = [30, 20, 30, 30]
-            @params = Table.new(8, 100)
+            @params     = Table.new(8, 100)
             (1..99).each do |i|
                 @params[0, i] = 400 + i * 50
                 @params[1, i] = 80 + i * 10
@@ -686,13 +686,13 @@ module RPG
         end
 
         def exp_for_level(level)
-            lv = level.to_f
+            lv    = level.to_f
             basis = @exp_params[0].to_f
             extra = @exp_params[1].to_f
             acc_a = @exp_params[2].to_f
             acc_b = @exp_params[3].to_f
             return (basis * ((lv - 1) ** (0.9 + acc_a / 250)) * lv * (lv + 1) /
-                (6 + lv ** 2 / 50 / acc_b) + (lv - 1) * extra).round.to_i
+              (6 + lv ** 2 / 50 / acc_b) + (lv - 1) * extra).round.to_i
         end
 
         attr_accessor :exp_params
@@ -703,16 +703,16 @@ module RPG
     class UsableItem < BaseItem
         def initialize
             super
-            @scope = 0
-            @occasion = 0
-            @speed = 0
+            @scope        = 0
+            @occasion     = 0
+            @speed        = 0
             @success_rate = 100
-            @repeats = 1
-            @tp_gain = 0
-            @hit_type = 0
+            @repeats      = 1
+            @tp_gain      = 0
+            @hit_type     = 0
             @animation_id = 0
-            @damage = RPG::UsableItem::Damage.new
-            @effects = []
+            @damage       = RPG::UsableItem::Damage.new
+            @effects      = []
         end
 
         def for_opponent?
@@ -786,12 +786,12 @@ module RPG
     class Skill < UsableItem
         def initialize
             super
-            @scope = 1
-            @stype_id = 1
-            @mp_cost = 0
-            @tp_cost = 0
-            @message1 = ''
-            @message2 = ''
+            @scope              = 1
+            @stype_id           = 1
+            @mp_cost            = 0
+            @tp_cost            = 0
+            @message1           = ''
+            @message2           = ''
             @required_wtype_id1 = 0
             @required_wtype_id2 = 0
         end
@@ -808,9 +808,9 @@ module RPG
     class Item < UsableItem
         def initialize
             super
-            @scope = 7
-            @itype_id = 1
-            @price = 0
+            @scope      = 7
+            @itype_id   = 1
+            @price      = 0
             @consumable = true
         end
 
@@ -826,9 +826,9 @@ module RPG
     class EquipItem < BaseItem
         def initialize
             super
-            @price = 0
+            @price    = 0
             @etype_id = 0
-            @params = [0] * 8
+            @params   = [0] * 8
         end
 
         attr_accessor :price
@@ -839,7 +839,7 @@ module RPG
     class Weapon < EquipItem
         def initialize
             super
-            @wtype_id = 0
+            @wtype_id     = 0
             @animation_id = 0
             @features.push(RPG::BaseItem::Feature.new(31, 1, 0))
             @features.push(RPG::BaseItem::Feature.new(22, 0, 0))
@@ -872,12 +872,12 @@ module RPG
         def initialize
             super
             @battler_name = ''
-            @battler_hue = 0
-            @params = [100, 0, 10, 10, 10, 10, 10, 10]
-            @exp = 0
-            @gold = 0
-            @drop_items = Array.new(3) { RPG::Enemy::DropItem.new }
-            @actions = [RPG::Enemy::Action.new]
+            @battler_hue  = 0
+            @params       = [100, 0, 10, 10, 10, 10, 10, 10]
+            @exp          = 0
+            @gold         = 0
+            @drop_items   = Array.new(3) { RPG::Enemy::DropItem.new }
+            @actions      = [RPG::Enemy::Action.new]
             @features.push(RPG::BaseItem::Feature.new(22, 0, 0.95))
             @features.push(RPG::BaseItem::Feature.new(22, 1, 0.05))
             @features.push(RPG::BaseItem::Feature.new(31, 1, 0))
@@ -895,21 +895,21 @@ module RPG
     class State < BaseItem
         def initialize
             super
-            @restriction = 0
-            @priority = 50
-            @remove_at_battle_end = false
+            @restriction           = 0
+            @priority              = 50
+            @remove_at_battle_end  = false
             @remove_by_restriction = false
-            @auto_removal_timing = 0
-            @min_turns = 1
-            @max_turns = 1
-            @remove_by_damage = false
-            @chance_by_damage = 100
-            @remove_by_walking = false
-            @steps_to_remove = 100
-            @message1 = ''
-            @message2 = ''
-            @message3 = ''
-            @message4 = ''
+            @auto_removal_timing   = 0
+            @min_turns             = 1
+            @max_turns             = 1
+            @remove_by_damage      = false
+            @chance_by_damage      = 100
+            @remove_by_walking     = false
+            @steps_to_remove       = 100
+            @message1              = ''
+            @message2              = ''
+            @message3              = ''
+            @message4              = ''
         end
 
         attr_accessor :restriction
@@ -931,9 +931,9 @@ module RPG
 
     class BaseItem::Feature
         def initialize(code = 0, data_id = 0, value = 0)
-            @code = code
+            @code    = code
             @data_id = data_id
-            @value = value
+            @value   = value
         end
 
         attr_accessor :code
@@ -943,11 +943,11 @@ module RPG
 
     class UsableItem::Damage
         def initialize
-            @type = 0
+            @type       = 0
             @element_id = 0
-            @formula = '0'
-            @variance = 20
-            @critical = false
+            @formula    = '0'
+            @variance   = 20
+            @critical   = false
         end
 
         def none?
@@ -987,10 +987,10 @@ module RPG
 
     class UsableItem::Effect
         def initialize(code = 0, data_id = 0, value1 = 0, value2 = 0)
-            @code = code
+            @code    = code
             @data_id = data_id
-            @value1 = value1
-            @value2 = value2
+            @value1  = value1
+            @value2  = value2
         end
 
         attr_accessor :code
@@ -1001,9 +1001,9 @@ module RPG
 
     class Class::Learning
         def initialize
-            @level = 1
+            @level    = 1
             @skill_id = 1
-            @note = ''
+            @note     = ''
         end
 
         attr_accessor :level
@@ -1013,8 +1013,8 @@ module RPG
 
     class Enemy::DropItem
         def initialize
-            @kind = 0
-            @data_id = 1
+            @kind        = 0
+            @data_id     = 1
             @denominator = 1
         end
 
@@ -1025,11 +1025,11 @@ module RPG
 
     class Enemy::Action
         def initialize
-            @skill_id = 1
-            @condition_type = 0
+            @skill_id         = 1
+            @condition_type   = 0
             @condition_param1 = 0
             @condition_param2 = 0
-            @rating = 5
+            @rating           = 5
         end
 
         attr_accessor :skill_id
@@ -1041,10 +1041,10 @@ module RPG
 
     class Troop
         def initialize
-            @id = 0
-            @name = ''
+            @id      = 0
+            @name    = ''
             @members = []
-            @pages = [RPG::Troop::Page.new]
+            @pages   = [RPG::Troop::Page.new]
         end
 
         attr_accessor :id
@@ -1056,9 +1056,9 @@ module RPG
     class Troop::Member
         def initialize
             @enemy_id = 1
-            @x = 0
-            @y = 0
-            @hidden = false
+            @x        = 0
+            @y        = 0
+            @hidden   = false
         end
 
         attr_accessor :enemy_id
@@ -1070,8 +1070,8 @@ module RPG
     class Troop::Page
         def initialize
             @condition = RPG::Troop::Page::Condition.new
-            @span = 0
-            @list = [RPG::EventCommand.new]
+            @span      = 0
+            @list      = [RPG::EventCommand.new]
         end
 
         attr_accessor :condition
@@ -1081,18 +1081,18 @@ module RPG
 
     class Troop::Page::Condition
         def initialize
-            @turn_ending = false
-            @turn_valid = false
-            @enemy_valid = false
-            @actor_valid = false
+            @turn_ending  = false
+            @turn_valid   = false
+            @enemy_valid  = false
+            @actor_valid  = false
             @switch_valid = false
-            @turn_a = 0
-            @turn_b = 0
-            @enemy_index = 0
-            @enemy_hp = 50
-            @actor_id = 1
-            @actor_hp = 50
-            @switch_id = 1
+            @turn_a       = 0
+            @turn_b       = 0
+            @enemy_index  = 0
+            @enemy_hp     = 50
+            @actor_id     = 1
+            @actor_hp     = 50
+            @switch_id    = 1
         end
 
         attr_accessor :turn_ending
@@ -1111,16 +1111,16 @@ module RPG
 
     class Animation
         def initialize
-            @id = 0
-            @name = ''
+            @id              = 0
+            @name            = ''
             @animation1_name = ''
-            @animation1_hue = 0
+            @animation1_hue  = 0
             @animation2_name = ''
-            @animation2_hue = 0
-            @position = 1
-            @frame_max = 1
-            @frames = [RPG::Animation::Frame.new]
-            @timings = []
+            @animation2_hue  = 0
+            @position        = 1
+            @frame_max       = 1
+            @frames          = [RPG::Animation::Frame.new]
+            @timings         = []
         end
 
         def to_screen?
@@ -1141,7 +1141,7 @@ module RPG
 
     class Animation::Frame
         def initialize
-            @cell_max = 0
+            @cell_max  = 0
             @cell_data = Table.new(0, 0)
         end
 
@@ -1151,10 +1151,10 @@ module RPG
 
     class Animation::Timing
         def initialize
-            @frame = 0
-            @se = RPG::SE.new('', 80)
-            @flash_scope = 0
-            @flash_color = Color.new(255, 255, 255, 255)
+            @frame          = 0
+            @se             = RPG::SE.new('', 80)
+            @flash_scope    = 0
+            @flash_color    = Color.new(255, 255, 255, 255)
             @flash_duration = 5
         end
 
@@ -1167,12 +1167,12 @@ module RPG
 
     class Tileset
         def initialize
-            @id = 0
-            @mode = 1
-            @name = ''
+            @id            = 0
+            @mode          = 1
+            @name          = ''
             @tileset_names = Array.new(9).collect { '' }
-            @flags = Table.new(8192)
-            @flags[0] = 0x0010
+            @flags         = Table.new(8192)
+            @flags[0]      = 0x0010
             (2048..2815).each { |i| @flags[i] = 0x000F }
             (4352..8191).each { |i| @flags[i] = 0x000F }
             @note = ''
@@ -1188,11 +1188,11 @@ module RPG
 
     class CommonEvent
         def initialize
-            @id = 0
-            @name = ''
-            @trigger = 0
+            @id        = 0
+            @name      = ''
+            @trigger   = 0
             @switch_id = 1
-            @list = [RPG::EventCommand.new]
+            @list      = [RPG::EventCommand.new]
         end
 
         def autorun?
@@ -1212,47 +1212,47 @@ module RPG
 
     class System
         def initialize
-            @game_title = ''
-            @version_id = 0
-            @japanese = true
-            @party_members = [1]
-            @currency_unit = ''
-            @elements = [nil, '']
-            @skill_types = [nil, '']
-            @weapon_types = [nil, '']
-            @armor_types = [nil, '']
-            @switches = [nil, '']
-            @variables = [nil, '']
-            @boat = RPG::System::Vehicle.new
-            @ship = RPG::System::Vehicle.new
-            @airship = RPG::System::Vehicle.new
-            @title1_name = ''
-            @title2_name = ''
-            @opt_draw_title = true
-            @opt_use_midi = false
-            @opt_transparent = false
-            @opt_followers = true
-            @opt_slip_death = false
-            @opt_floor_death = false
-            @opt_display_tp = true
-            @opt_extra_exp = false
-            @window_tone = Tone.new(0, 0, 0)
-            @title_bgm = RPG::BGM.new
-            @battle_bgm = RPG::BGM.new
-            @battle_end_me = RPG::ME.new
-            @gameover_me = RPG::ME.new
-            @sounds = Array.new(24) { RPG::SE.new }
-            @test_battlers = []
-            @test_troop_id = 1
-            @start_map_id = 1
-            @start_x = 0
-            @start_y = 0
-            @terms = RPG::System::Terms.new
+            @game_title       = ''
+            @version_id       = 0
+            @japanese         = true
+            @party_members    = [1]
+            @currency_unit    = ''
+            @elements         = [nil, '']
+            @skill_types      = [nil, '']
+            @weapon_types     = [nil, '']
+            @armor_types      = [nil, '']
+            @switches         = [nil, '']
+            @variables        = [nil, '']
+            @boat             = RPG::System::Vehicle.new
+            @ship             = RPG::System::Vehicle.new
+            @airship          = RPG::System::Vehicle.new
+            @title1_name      = ''
+            @title2_name      = ''
+            @opt_draw_title   = true
+            @opt_use_midi     = false
+            @opt_transparent  = false
+            @opt_followers    = true
+            @opt_slip_death   = false
+            @opt_floor_death  = false
+            @opt_display_tp   = true
+            @opt_extra_exp    = false
+            @window_tone      = Tone.new(0, 0, 0)
+            @title_bgm        = RPG::BGM.new
+            @battle_bgm       = RPG::BGM.new
+            @battle_end_me    = RPG::ME.new
+            @gameover_me      = RPG::ME.new
+            @sounds           = Array.new(24) { RPG::SE.new }
+            @test_battlers    = []
+            @test_troop_id    = 1
+            @start_map_id     = 1
+            @start_x          = 0
+            @start_y          = 0
+            @terms            = RPG::System::Terms.new
             @battleback1_name = ''
             @battleback2_name = ''
-            @battler_name = ''
-            @battler_hue = 0
-            @edit_map_id = 1
+            @battler_name     = ''
+            @battler_hue      = 0
+            @edit_map_id      = 1
         end
 
         attr_accessor :game_title
@@ -1300,12 +1300,12 @@ module RPG
 
     class System::Vehicle
         def initialize
-            @character_name = ''
+            @character_name  = ''
             @character_index = 0
-            @bgm = RPG::BGM.new
-            @start_map_id = 0
-            @start_x = 0
-            @start_y = 0
+            @bgm             = RPG::BGM.new
+            @start_map_id    = 0
+            @start_x         = 0
+            @start_y         = 0
         end
 
         attr_accessor :character_name
@@ -1318,9 +1318,9 @@ module RPG
 
     class System::Terms
         def initialize
-            @basic = Array.new(8) { '' }
-            @params = Array.new(8) { '' }
-            @etypes = Array.new(5) { '' }
+            @basic    = Array.new(8) { '' }
+            @params   = Array.new(8) { '' }
+            @etypes   = Array.new(5) { '' }
             @commands = Array.new(23) { '' }
         end
 
@@ -1333,8 +1333,8 @@ module RPG
     class System::TestBattler
         def initialize
             @actor_id = 1
-            @level = 1
-            @equips = [0, 0, 0, 0, 0]
+            @level    = 1
+            @equips   = [0, 0, 0, 0, 0]
         end
 
         attr_accessor :actor_id
@@ -1344,9 +1344,9 @@ module RPG
 
     class AudioFile
         def initialize(name = '', volume = 100, pitch = 100)
-            @name = name
+            @name   = name
             @volume = volume
-            @pitch = pitch
+            @pitch  = pitch
         end
 
         attr_accessor :name

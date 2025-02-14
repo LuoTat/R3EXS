@@ -11,116 +11,116 @@ module R3EXS
 
         # 用来匹配读取的 rvdata2 文件名
         RVDATA2_FILE_NAME =
-            [
-                /\AActors\.rvdata2\z/,
-                /\AAnimations\.rvdata2\z/,
-                /\AArmors\.rvdata2\z/,
-                /\AClasses\.rvdata2\z/,
-                /\ACommonEvents\.rvdata2\z/,
-                /\AEnemies\.rvdata2\z/,
-                /\AItems\.rvdata2\z/,
-                /\AMap\d{3}\.rvdata2\z/,
-                /\AMapInfos\.rvdata2\z/,
-                /\AScripts\.rvdata2\z/,
-                /\ASkills\.rvdata2\z/,
-                /\AStates\.rvdata2\z/,
-                /\ASystem\.rvdata2\z/,
-                /\ATilesets\.rvdata2\z/,
-                /\ATroops\.rvdata2\z/,
-                /\AWeapons\.rvdata2\z/
-            ]
+          [
+            /\AActors\.rvdata2\z/,
+            /\AAnimations\.rvdata2\z/,
+            /\AArmors\.rvdata2\z/,
+            /\AClasses\.rvdata2\z/,
+            /\ACommonEvents\.rvdata2\z/,
+            /\AEnemies\.rvdata2\z/,
+            /\AItems\.rvdata2\z/,
+            /\AMap\d{3}\.rvdata2\z/,
+            /\AMapInfos\.rvdata2\z/,
+            /\AScripts\.rvdata2\z/,
+            /\ASkills\.rvdata2\z/,
+            /\AStates\.rvdata2\z/,
+            /\ASystem\.rvdata2\z/,
+            /\ATilesets\.rvdata2\z/,
+            /\ATroops\.rvdata2\z/,
+            /\AWeapons\.rvdata2\z/
+          ]
 
         # 用来匹配读取的 JSON 文件名
         JSON_FILE_NAME =
-            [
-                /\AActors\.json\z/,
-                /\AAnimations\.json\z/,
-                /\AArmors\.json\z/,
-                /\AClasses\.json\z/,
-                /\ACommonEvents\.json\z/,
-                /\AEnemies\.json\z/,
-                /\AItems\.json\z/,
-                /\AMap\d{3}\.json\z/,
-                /\AMapInfos\.json\z/,
-                /\ASkills\.json\z/,
-                /\AStates\.json\z/,
-                /\ASystem\.json\z/,
-                /\ATilesets\.json\z/,
-                /\ATroops\.json\z/,
-                /\AWeapons\.json\z/
-            ]
+          [
+            /\AActors\.json\z/,
+            /\AAnimations\.json\z/,
+            /\AArmors\.json\z/,
+            /\AClasses\.json\z/,
+            /\ACommonEvents\.json\z/,
+            /\AEnemies\.json\z/,
+            /\AItems\.json\z/,
+            /\AMap\d{3}\.json\z/,
+            /\AMapInfos\.json\z/,
+            /\ASkills\.json\z/,
+            /\AStates\.json\z/,
+            /\ASystem\.json\z/,
+            /\ATilesets\.json\z/,
+            /\ATroops\.json\z/,
+            /\AWeapons\.json\z/
+          ]
 
         # 用来匹配读取的文件名到对应的R3EXS的类
         FILE_BASENAME_TO_CLASS_R3EXS = {
-            /\AActors\z/ => R3EXS::Actor,
-            /\AAnimations\z/ => R3EXS::Animation,
-            /\AArmors\z/ => R3EXS::Armor,
-            /\AClasses\z/ => R3EXS::Class,
-            /\ACommonEvents\z/ => R3EXS::CommonEvent,
-            /\AEnemies\z/ => R3EXS::Enemy,
-            /\AItems\z/ => R3EXS::Item,
-            /\AMap\d{3}\z/ => R3EXS::Map,
-            /\AMapInfos\z/ => R3EXS::MapInfo,
-            /\ASkills\z/ => R3EXS::Skill,
-            /\AStates\z/ => R3EXS::State,
-            /\ASystem\z/ => R3EXS::System,
-            /\ATilesets\z/ => R3EXS::Tileset,
-            /\ATroops\z/ => R3EXS::Troop,
-            /\AWeapons\z/ => R3EXS::Weapon
+          /\AActors\z/       => R3EXS::Actor,
+          /\AAnimations\z/   => R3EXS::Animation,
+          /\AArmors\z/       => R3EXS::Armor,
+          /\AClasses\z/      => R3EXS::Class,
+          /\ACommonEvents\z/ => R3EXS::CommonEvent,
+          /\AEnemies\z/      => R3EXS::Enemy,
+          /\AItems\z/        => R3EXS::Item,
+          /\AMap\d{3}\z/     => R3EXS::Map,
+          /\AMapInfos\z/     => R3EXS::MapInfo,
+          /\ASkills\z/       => R3EXS::Skill,
+          /\AStates\z/       => R3EXS::State,
+          /\ASystem\z/       => R3EXS::System,
+          /\ATilesets\z/     => R3EXS::Tileset,
+          /\ATroops\z/       => R3EXS::Troop,
+          /\AWeapons\z/      => R3EXS::Weapon
         }
 
         # 用来匹配读取的文件名到对应的RPG的类
         FILE_BASENAME_TO_CLASS_RPG = {
-            /\AActors\z/ => RPG::Actor,
-            /\AAnimations\z/ => RPG::Animation,
-            /\AArmors\z/ => RPG::Armor,
-            /\AClasses\z/ => RPG::Class,
-            /\ACommonEvents\z/ => RPG::CommonEvent,
-            /\AEnemies\z/ => RPG::Enemy,
-            /\AItems\z/ => RPG::Item,
-            /\AMap\d{3}\z/ => RPG::Map,
-            /\AMapInfos\z/ => RPG::MapInfo,
-            /\ASkills\z/ => RPG::Skill,
-            /\AStates\z/ => RPG::State,
-            /\ASystem\z/ => RPG::System,
-            /\ATilesets\z/ => RPG::Tileset,
-            /\ATroops\z/ => RPG::Troop,
-            /\AWeapons\z/ => RPG::Weapon
+          /\AActors\z/       => RPG::Actor,
+          /\AAnimations\z/   => RPG::Animation,
+          /\AArmors\z/       => RPG::Armor,
+          /\AClasses\z/      => RPG::Class,
+          /\ACommonEvents\z/ => RPG::CommonEvent,
+          /\AEnemies\z/      => RPG::Enemy,
+          /\AItems\z/        => RPG::Item,
+          /\AMap\d{3}\z/     => RPG::Map,
+          /\AMapInfos\z/     => RPG::MapInfo,
+          /\ASkills\z/       => RPG::Skill,
+          /\AStates\z/       => RPG::State,
+          /\ASystem\z/       => RPG::System,
+          /\ATilesets\z/     => RPG::Tileset,
+          /\ATroops\z/       => RPG::Troop,
+          /\AWeapons\z/      => RPG::Weapon
         }
 
         # 事件指令的命令名称
         EVENT_COMMANDS = {
-            0 => 'Empty',
+          0   => 'Empty',
 
 =begin
     [string(Face Graphic name)]---[int(Face Graphic index)]---[int:{0:Normal Window, 1:Dim Background, 2:Transparent}]---[int:{0:Top, 1:Middle, 2:Bottom}]---END
 =end
-            101 => 'ShowTextAttributes',
+          101 => 'ShowTextAttributes',
 
 =begin
     [Array<string>(Choices Array)]---[int:{0:Disallow, 1:Choice 1, 2:Choice 2, 3:Choice 3, 4:Choice 4, 5:Branch}(When Cancel)]---END
 =end
-            102 => 'ShowChoices',
+          102 => 'ShowChoices',
 
 =begin
     [int(Variable for Number)]---[int:{1~8}(Digits)]---END
 =end
-            103 => 'InputNumber',
+          103 => 'InputNumber',
 
 =begin
     [int(Variable for Item ID)]---END
 =end
-            104 => 'SelectKeyItem',
+          104 => 'SelectKeyItem',
 
 =begin
     [int:{1~8}(Speed)]---[bool(No Fast Forward)]---END
 =end
-            105 => 'ShowScrollingTextAttributes',
+          105 => 'ShowScrollingTextAttributes',
 
 =begin
     [string]---END
 =end
-            108 => 'Comment',
+          108 => 'Comment',
 
 =begin
     |--[int:0(Switch)]---[int(Switch ID)]---[int{0:ON, 1:OFF}]---END
@@ -167,31 +167,31 @@ module R3EXS
     |
     |--[int:13(Vehicle)]---[int:{0:Boat, 1:Ship, 2:Airship}]---END
 =end
-            111 => 'ConditionalBranch',
-            112 => 'Loop',
-            113 => 'BreakLoop',
-            115 => 'ExitEventProcessing',
+          111 => 'ConditionalBranch',
+          112 => 'Loop',
+          113 => 'BreakLoop',
+          115 => 'ExitEventProcessing',
 
 =begin
     [int(Common Event ID)]---END
 =end
-            117 => 'CallCommonEvent',
+          117 => 'CallCommonEvent',
 
 =begin
     [string]---END
 =end
-            118 => 'Label',
+          118 => 'Label',
 
 =begin
 
     [string]---END
 =end
-            119 => 'JumpToLabel',
+          119 => 'JumpToLabel',
 
 =begin
     [int(Switch Begin ID)]---[int(Switch End ID)]---[int:{0:ON, 1:OFF}]---END
 =end
-            121 => 'ControlSwitches',
+          121 => 'ControlSwitches',
 
 =begin
                                                                                                           |--[int:0(Constant)]---[int(Number)]---END
@@ -214,31 +214,31 @@ module R3EXS
                                                                                                           |
                                                                                                           |--[int:4(Scripts)]---[string]---END
 =end
-            122 => 'ControlVariables',
+          122 => 'ControlVariables',
 
 =begin
     [string:{'A', 'B', 'C', 'D'}(Self Switch Name)]---[int:{0:ON, 1:OFF}]---END
 =end
-            123 => 'ControlSelfSwitch',
+          123 => 'ControlSelfSwitch',
 
 =begin
     [int:{0:Start, 1:Stop}]---[int:{0~5999}(sec)]---END
 =end
-            124 => 'ControlTimer',
+          124 => 'ControlTimer',
 
 =begin
                                     |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
     [int:{0:Increase, 1:Decrease}]--|
                                     |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            125 => 'ChangeGold',
+          125 => 'ChangeGold',
 
 =begin
                                                      |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
     [int(Item ID)]---[int:{0:Increase, 1:Decrease}]--|
                                                      |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            126 => 'ChangeItems',
+          126 => 'ChangeItems',
 
 =begin
                                             |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
@@ -249,7 +249,7 @@ module R3EXS
                       |--[int:1(Decrease)]--|                                                 |--[bool(Include Equipment)]---END
                                             |--[int:1(Variable)]---[int(Variable ID)]---------|
 =end
-            127 => 'ChangeWeapons',
+          127 => 'ChangeWeapons',
 
 =begin
                                            |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
@@ -260,61 +260,61 @@ module R3EXS
                      |--[int:1(Decrease)]--|                                                 |--[bool(Include Equipment)]---END
                                            |--[int:1(Variable)]---[int(Variable ID)]---------|
 =end
-            128 => 'ChangeArmor',
+          128 => 'ChangeArmor',
 
 =begin
     [int(Actor ID)]---[int:{0:Add, 1:Remove}]---[int:{0:NO, 1:YES}(Initialize)]---END
 =end
-            129 => 'ChangePartyMember',
+          129 => 'ChangePartyMember',
 
 =begin
     [RPG::BGM]---END
 =end
-            132 => 'ChangeBattleBGM',
+          132 => 'ChangeBattleBGM',
 
 =begin
     [RPG::ME]---END
 =end
-            133 => 'ChangeBattleEndME',
+          133 => 'ChangeBattleEndME',
 
 =begin
     [int:{0:Disable, 1:Enable}]---END
 =end
-            134 => 'ChangeSaveAccess',
+          134 => 'ChangeSaveAccess',
 
 =begin
     [int:{0:Disable, 1:Enable}]---END
 =end
-            135 => 'ChangeMenuAccess',
+          135 => 'ChangeMenuAccess',
 
 =begin
     [int:{0:Disable, 1:Enable}]---END
 =end
-            136 => 'ChangeEncounter',
+          136 => 'ChangeEncounter',
 
 =begin
     [int:{0:Disable, 1:Enable}]---END
 =end
-            137 => 'ChangeFormationAccess',
+          137 => 'ChangeFormationAccess',
 
 =begin
     [RPG::Tone]---END
 =end
-            138 => 'ChangeWindowColor',
+          138 => 'ChangeWindowColor',
 
 =begin
     |--[int:0(Direct Designation)]---[int(Map ID)]---[int(Map X)]---[int(Map Y)]-------------------------------------------------------------------------------------|
     |                                                                                                                                                                |--[int:{0:Retain, 2:Down, 4:Left, 6:Right, 8:Up}(Direction)]---[int:{0:Normal, 1:White, 2:None}(Fade)]---END
     |--[int:1(Designation with Variables)]---[int(Map ID Corresponded Variable ID)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
 =end
-            201 => 'TransferPlayer',
+          201 => 'TransferPlayer',
 
 =begin
                                        |--[int:0(Direct Designation)]---[int(Map ID)]---[int(Map X)]---[int(Map Y)]---END
     [int:{0:Boat, 1:Ship, 2:Airship}]--|
                                        |--[int:1(Designation with Variables)]---[int(Map ID Corresponded Variable ID)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]---END
 =end
-            202 => 'SetVehicleLocation',
+          202 => 'SetVehicleLocation',
 
 =begin
                                                 |--[int:0(Direct Designation)]---[int(Map X)]---[int(Map Y)]------------------------------------------------------------|
@@ -323,184 +323,184 @@ module R3EXS
                                                 |                                                                                                                       |
                                                 |--[int:2(Exchange with Another Event)]---[int(Exchanged Event ID)]---[int:0]----------------------------------------- |
 =end
-            203 => 'SetEventLocation',
+          203 => 'SetEventLocation',
 
 =begin
     [int:{2:Down, 4:Left, 6:Right, 8:Up}]---[int:{0~100}(Distance)]---[int:{1:1/8 Speed, 2:1/4 Speed, 3:1/2 Speed, 4:Normal, 5:2 Speed, 6:4 Speed}]---END
 =end
-            204 => 'ScrollMap',
+          204 => 'ScrollMap',
 
 =begin
     [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[RPG::MoveRoute(45 is Script)]---END
 =end
-            205 => 'SetMoveRoute',
+          205 => 'SetMoveRoute',
 
 =begin
     END
 =end
-            206 => 'GetSwitchVehicle',
+          206 => 'GetSwitchVehicle',
 
 =begin
     [int:{0:ON, 1:OFF}]---END
 =end
-            211 => 'ChangeTransparency',
+          211 => 'ChangeTransparency',
 
 =begin
     [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int(Animation ID)]---[bool(Wait for Completion)]---END
 =end
-            212 => 'ShowAnimation',
+          212 => 'ShowAnimation',
 
 =begin
     [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int(Ballon Icon ID)]---[bool(Wait for Completion)]---END
 =end
-            213 => 'ShowBalloonIcon',
-            214 => 'EraseEvent',
+          213 => 'ShowBalloonIcon',
+          214 => 'EraseEvent',
 
 =begin
     [int:{0:ON, 1:OFF}]---END
 =end
-            216 => 'ChangePlayerFollowers',
-            217 => 'GatherFollowers',
-            221 => 'FadeoutScreen',
-            222 => 'FadeinScreen',
+          216 => 'ChangePlayerFollowers',
+          217 => 'GatherFollowers',
+          221 => 'FadeoutScreen',
+          222 => 'FadeinScreen',
 
 =begin
     [RPG::Tone]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
 =end
-            223 => 'TintScreen',
+          223 => 'TintScreen',
 
 =begin
     [RPG::Color]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
 =end
-            224 => 'FlashScreen',
+          224 => 'FlashScreen',
 
 =begin
     [int:{1~9}(Power)]---[int:{1~9}(Speed)]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
 =end
-            225 => 'ShakeScreen',
+          225 => 'ShakeScreen',
 
 =begin
     [int:{0~999}(Time 1/60 sec)]---END
 =end
-            230 => 'Wait',
+          230 => 'Wait',
 
 =begin
                                                                                                      |--[int:0(Constant)]---[int:{-9999~9999}(Map X)]---[int:{-9999~9999}(Map Y)]--------------------------|
     [int:{1~100}(Number)]---[string(Picture Graphic Name)]---[int:{0:Upper Left, 1:Center}(Origin)]--|                                                                                                     |--[int:{0~2000}(Width %)]---[int:{0~2000}(Height %)]---[int:{0~255}(Opacity)]---[int:{0:Normal, 1:Add, 2:Sub}]---END
                                                                                                      |--[int:1(Variable)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
 =end
-            231 => 'ShowPicture',
+          231 => 'ShowPicture',
 
 =begin
                                                                     |--[int:0(Constant)]---[int:{-9999~9999}(Map X)]---[int:{-9999~9999}(Map Y)]--------------------------|
     [int:{1~100}(Number)]---[int:{0:Upper Left, 1:Center}(Origin)]--|                                                                                                     |--[int:{0~2000}(Width %)]---[int:{0~2000}(Height %)]---[int:{0~255}(Opacity)]---[int:{0:Normal, 1:Add, 2:Sub}]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
                                                                     |--[int:1(Variable)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
 =end
-            232 => 'MovePicture',
+          232 => 'MovePicture',
 
 =begin
     [int:{1~100}(Number)]-[int:{-90~90}(Speed)]--END
 =end
-            233 => 'RotatePicture',
+          233 => 'RotatePicture',
 
 =begin
     [int:{1~100}(Number)]---[RPG::Tone]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
 =end
-            234 => 'TintPicture',
+          234 => 'TintPicture',
 
 =begin
     [int:{1~100}(Number)]---END
 =end
-            235 => 'ErasePicture',
+          235 => 'ErasePicture',
 
 =begin
     [string:{":none", ":rain", ":storm", ":snow"}]---[int:{0~9}(Power)]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
 =end
-            236 => 'SetWeatherEffects',
+          236 => 'SetWeatherEffects',
 
 =begin
     [RPG::BGM]---END
 =end
-            241 => 'PlayBGM',
+          241 => 'PlayBGM',
 
 =begin
     [int:{1~60}(Time sec)]---END
 =end
-            242 => 'FadeoutBGM',
-            243 => 'SaveBGM',
-            244 => 'ReplayBGM',
+          242 => 'FadeoutBGM',
+          243 => 'SaveBGM',
+          244 => 'ReplayBGM',
 
 =begin
     [RPG::BGM]---END
 =end
-            245 => 'PlayBGS',
+          245 => 'PlayBGS',
 
 =begin
     [int:{1~60}(Time sec)]---END
 =end
-            246 => 'FadeoutBGS',
+          246 => 'FadeoutBGS',
 
 =begin
     [RPG::ME]---END
 =end
-            249 => 'PlayME',
+          249 => 'PlayME',
 
 =begin
     [RPG::SE]---END
 =end
-            250 => 'PlaySE',
-            251 => 'StopSE',
+          250 => 'PlaySE',
+          251 => 'StopSE',
 
 =begin
     [string(Movie Name)]---END
 =end
-            261 => 'PlayMovie',
+          261 => 'PlayMovie',
 
 =begin
     [int:{0:ON, 1:OFF}]---END
 =end
-            281 => 'ChangeMapNameDisplay',
+          281 => 'ChangeMapNameDisplay',
 
 =begin
     [int(Tileset ID)]---END
 =end
-            282 => 'ChangeTileset',
+          282 => 'ChangeTileset',
 
 =begin
     [string(Floor Picture)]---[string(Wall Picture)]---END
 =end
-            283 => 'ChangeBattleBack',
+          283 => 'ChangeBattleBack',
 
 =begin
     [string(Distant view Picture)]---[bool(Loop Horizontal)]---[bool(Loop Vertical)]---[int(-32~32)(Horizontal Scroll)]---[int(-32~32)(Vertical Scrool)]---END
 =end
-            284 => 'ChangeParallaxBack',
+          284 => 'ChangeParallaxBack',
 
 =begin
                                                                                                                                                   |--[int:0(Direct Designation)]---[int(Map X)]---[int(Map Y)]---END
     [int(Variable for Info)]---[int:{0:Terrain, 1:Event ID, 2:Tile ID(Layer 1), 3:Tile ID(Layer 2), 4:Tile ID(Layer 3), 5:Region ID}(Info Type)]--|
                                                                                                                                                   |--[int:1(Designation with Variables)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]---END
 =end
-            285 => 'GetLocationInfo',
+          285 => 'GetLocationInfo',
 
 =begin
     |--[int:0(Direct Designation)]---[int(Enemy ID)]-----------------------------------|
     |                                                                                  |--[bool(Can Escape)]---[bool(Continue Even When Loser)]---END
     |--[int:1(Designation with Variables)]---[int(Enemy ID Corresponded Variable ID)]--|
 =end
-            301 => 'BattleProcessing',
+          301 => 'BattleProcessing',
 
 =begin
                                                                      |--[int:0(Price: Standard)]---[int:0]------------------|
     [int:{0:Item, 1:Weapon, 2:Armor}]---[int(Corresponded Item ID)]--|                                                      |--[bool(Purchase Only)]---END
                                                                      |--[int:1(Price: Specify)]---[int:{0~9999999}(Price)]--|
 =end
-            302 => 'ShopProcessing',
+          302 => 'ShopProcessing',
 
 =begin
     [int(Actor ID)]---[int:{1~16}(Max Characters)]---END
 =end
-            303 => 'NameInputProcessing',
+          303 => 'NameInputProcessing',
 
 =begin
                                                                                         |--[int:0(Constant)]---[int:{1~9999}(Number)]--|
@@ -519,28 +519,28 @@ module R3EXS
                                                                     |--[int:1(Decrease)]--|                                              |--[bool(Allow Knockout)]---END
                                                                                           |--[int:1(Variable)]---[int(Variable ID)]------|
 =end
-            311 => 'ChangeHP',
+          311 => 'ChangeHP',
 
 =begin
     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|                                  |--[int:0(Constant)]---[int:{1~9999}(Number)]---END
     |                                                             |--[int:{0:Increase, 1:Decrease}]--|
     |--[int:1(Variable)]---[int(Variable ID)]---------------------|                                  |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            312 => 'ChangeMP',
+          312 => 'ChangeMP',
 
 =begin
     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
     |                                                             |--[int:{0:Add, 1:Remove}]---[int(State ID)]---END
     |--[int:1(Variable)]---[int(Variable ID)]---------------------|
 =end
-            313 => 'ChangeState',
+          313 => 'ChangeState',
 
 =begin
     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]---END
     |
     |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            314 => 'RecoverAll',
+          314 => 'RecoverAll',
 
 =begin
                                                                                         |--[int:0(:Constant)]---[int:{1~9999999}(Number)]--|
@@ -559,7 +559,7 @@ module R3EXS
                                                                   |--[int:1(Decrease)]--|                                                 |--[bool:false(Show Level Up Message)]---END
                                                                                         |--[int:1(Variable)]---[int(Variable ID)]---------|
 =end
-            315 => 'ChangeEXP',
+          315 => 'ChangeEXP',
 
 =begin
                                                                                         |--[int:0(Constant)]---[int:{1~98}(Number)]--|
@@ -578,51 +578,51 @@ module R3EXS
                                                                   |--[int:1(Decrease)]--|                                            |--[bool:false(Show Level Up Message)]---END
                                                                                       |--[int:1(Variable)]---[int(Variable ID)]------|
 =end
-            316 => 'ChangeLevel',
+          316 => 'ChangeLevel',
 
 =begin
     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|                                                                                                   |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
     |                                                             |--[int:{0:MHP, 1:MMP, 2:ATK, 3:DEF, 4:MAT, 5:MDF, 6:AGI, 7:LUK}]---[int:{0:Increase, 1:Decrease}]--|
     |--[int:1(Variable)]---[int(Variable ID)]---------------------|                                                                                                   |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            317 => 'ChangeParameters',
+          317 => 'ChangeParameters',
 
 =begin
     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
     |                                                             |--[int:{0:Learn, 1:Forget}]---[int(Skill ID)]---END
     |--[int:1(Variable)]---[int(Variable ID)]---------------------|
 =end
-            318 => 'ChangeSkills',
+          318 => 'ChangeSkills',
 
 =begin
     [int(Actor ID)]---[int:{0:Weapon, 1:Shield, 2:Head, 3:Boby, 4:Accessory}]---[int:{0:None, 1:Equipment 001, ...}(Equipment ID)]---END
 =end
-            319 => 'ChangeEquipment',
+          319 => 'ChangeEquipment',
 
 =begin
     [int(Actor ID)]---[string(New Actor Name)]---END
 =end
-            320 => 'ChangeActorName',
+          320 => 'ChangeActorName',
 
 =begin
     [int(Actor ID)]---[int(New Class ID)]---END
 =end
-            321 => 'ChangeActorClass',
+          321 => 'ChangeActorClass',
 
 =begin
     [int(Actor ID)]---[string(New Actor walking Picture Name)]---[int(New Actor Walking Picture Index)]---[string(New Actor Portrait Picture Name)]---[int(New Actor Portrait Picture Index)]---END
 =end
-            322 => 'ChangeActorGraphic',
+          322 => 'ChangeActorGraphic',
 
 =begin
     [int:{0:Boat, 1:Ship, 2:Airship}]---[string(New Vehicle Picture Name)]---[int(New Vehicle Picture Index)]---END
 =end
-            323 => 'ChangeVehicleGraphic',
+          323 => 'ChangeVehicleGraphic',
 
 =begin
     [int(Actor ID)]---[string(New Actor Nickname)]---END
 =end
-            324 => 'ChangeActorNickname',
+          324 => 'ChangeActorNickname',
 
 =begin
                                                                      |--[int:0(Constant)]---[int:{1~999999}(Number)]--|
@@ -634,102 +634,102 @@ module R3EXS
                                                                      |--[int:1(Variable)]---[int(Variable ID)]--------|
 
 =end
-            331 => 'ChangeEnemyHP',
+          331 => 'ChangeEnemyHP',
 
 =begin
                                                                                 |--[int:0(Constant)]---[int:{1~9999}(Number)]---END
     [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int:{0:Increase, 1:Decrease}]--|
                                                                                 |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            332 => 'ChangeEnemyMP',
+          332 => 'ChangeEnemyMP',
 
 =begin
     [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int:{0:Add, 1:Remove}]---[int(State ID)]---END
 =end
-            333 => 'ChangeEnemyState',
+          333 => 'ChangeEnemyState',
 
 =begin
     [int:{-1:Entire Troop, 0:Troop 001, ...}]---END
 =end
-            334 => 'EnemyRecoverAll',
+          334 => 'EnemyRecoverAll',
 
 =begin
     [int:{-1:Entire Troop, 0:Troop 001, ...}]---END
 =end
-            335 => 'EnemyAppear',
+          335 => 'EnemyAppear',
 
 =begin
     [int(Troop ID)]---[int(Enemy ID)]---END
 =end
-            336 => 'EnemyTransform',
+          336 => 'EnemyTransform',
 
 =begin
     [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int(Animation ID)]---END
 =end
-            337 => 'ShowBattleAnimation',
+          337 => 'ShowBattleAnimation',
 
 =begin
     |--[int:0(Enemy)]---[int(Troop ID)]--|
     |                                    |--[int(Skill ID)]---[int:{-2:Last Target, -1:Random, 0:Index 1,...}]---END
     |--[int:1(Actor)]---[int(Actor ID)]--|
 =end
-            339 => 'ForceAction',
-            340 => 'AbortBattle',
-            351 => 'OpenMenuScreen',
-            352 => 'OpenSaveScreen',
-            353 => 'GameOver',
-            354 => 'ReturnToTitleScreen',
+          339 => 'ForceAction',
+          340 => 'AbortBattle',
+          351 => 'OpenMenuScreen',
+          352 => 'OpenSaveScreen',
+          353 => 'GameOver',
+          354 => 'ReturnToTitleScreen',
 
 =begin
     [string]---END
 =end
-            355 => 'Script',
+          355 => 'Script',
 
 =begin
     [string]---END
 =end
-            401 => 'ShowText',
+          401 => 'ShowText',
 
 =begin
     [int(Choice Index)]---[string(Choice Name)]---END
 =end
-            402 => 'When',
-            403 => 'WhenCancel',
-            404 => 'ChoicesEnd',
+          402 => 'When',
+          403 => 'WhenCancel',
+          404 => 'ChoicesEnd',
 
 =begin
     [string]---END
 =end
-            405 => 'ShowScrollingText',
+          405 => 'ShowScrollingText',
 
 =begin
     [string]---END
 =end
-            408 => 'CommentMore',
-            411 => 'Else',
-            412 => 'BranchEnd',
-            413 => 'RepeatAbove',
+          408 => 'CommentMore',
+          411 => 'Else',
+          412 => 'BranchEnd',
+          413 => 'RepeatAbove',
 
 =begin
     [RPG::MoveCommand(45 is script)]---END
 =end
-            505 => 'MoveRoute',
-            601 => 'IfWin',
-            602 => 'IfEscape',
-            603 => 'IfLose',
-            604 => 'BattleProcessingEnd',
+          505 => 'MoveRoute',
+          601 => 'IfWin',
+          602 => 'IfEscape',
+          603 => 'IfLose',
+          604 => 'BattleProcessingEnd',
 
 =begin
                                                                      |--[int:0(Price: Standard)]---[int:0]---END
     [int:{0:Item, 1:Weapon, 2:Armor}]---[int(Corresponded Item ID)]--|
                                                                      |--[int:1(Price: Specify)]---[int:{0~9999999}(Price)]---END
 =end
-            605 => 'ShopItem',
+          605 => 'ShopItem',
 
 =begin
     [string]---END
 =end
-            655 => 'ScriptMore' }
+          655 => 'ScriptMore' }
 
         # 红色
         RED_COLOR = "\e[31m"
