@@ -27,7 +27,7 @@ R3EXS 是一个基于 Ruby 语言，用来提取和翻译 RGSS3 游戏里字符�
 
 ## [功能列表](#目录)
 
-1. [解包 Game.rgss3a 文件](#解包-Game.rgss3a-文件)
+1. [解包 Game.rgss3a 文件](#解包-Gamergss3a-文件)
 2. [序列化 rvdata2 文件为 json 格式](#序列化-rvdata2-文件为-json-格式)
 3. [反序列化 json 文件为 rvdata2 格式](#反序列化-json-文件为-rvdata2-格式)
 4. [提取所有的字符串](#提取所有的字符串)

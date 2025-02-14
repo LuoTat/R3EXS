@@ -27,7 +27,7 @@ It uses [Prism](https://github.com/ruby/prism) to accurately extract strings and
 
 ## [Function List](#contents)
 
-1. [Unpack Game.rgss3a file](#unpack-game-rgss3a-file)
+1. [Unpack Game.rgss3a file](#unpack-gamergss3a-file)
 2. [Serialize rvdata2 files to JSON file](#serialize-rvdata2-files-to-json-file)
 3. [Deserialize JSON files to rvdata2 file](#deserialize-json-files-to-rvdata2-file)
 4. [Extract all strings](#extract-all-strings)
