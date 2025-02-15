@@ -36,7 +36,7 @@ module R3EXS
         attr_reader :obj
     end
 
-    # 用来处理 Game.rgss3a 文件损坏的异常
+    # 用来处理 Game.rgss3a 文件加密格式不支持的异常
     class RGSS3AFileError < StandardError
 
         # @param msg [String] 异常信息
