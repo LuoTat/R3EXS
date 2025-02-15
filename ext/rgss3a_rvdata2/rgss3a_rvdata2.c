@@ -270,7 +270,7 @@ void fclose_error_handler(const char* path)
  * @param output_dir 输出目录
  * @param verbose 是否输出详细信息
  * @raise [RGSS3AFileError] 未知的 RGSS3A 文件加密类型
- * @raise [Errno] 系统调用失败
+ * @raise [SystemCallError] 系统调用失败
  * @return [void]
  */
 VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALUE verbose)
@@ -523,9 +523,8 @@ VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALU
         VALUE output_full_path   = rb_funcall(r3exs_File_module, r3exs_join_id, 2, output_dir, rb_utf8_str_new(Rgss3a_p, filename_size));
         VALUE output_full_dir    = rb_funcall(r3exs_File_module, r3exs_dirname_id, 1, output_full_path);
         char* output_full_path_C = StringValueCStr(output_full_path);
-        // 如果目录不存在则创建目录
-        if (!RTEST(rb_funcall(r3exs_Dir_module, r3exs_exist_id, 1, output_full_dir)))
-            rb_funcall(r3exs_FileUtils_module, r3exs_mkdir_p_id, 1, output_full_dir);
+        // 创建目录
+        rb_funcall(r3exs_FileUtils_module, r3exs_mkdir_p_id, 1, output_full_dir);
 
 #ifdef _WIN32
         utf8towc(output_full_path_C, strlen(output_full_path_C));

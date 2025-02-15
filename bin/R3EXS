@@ -32,9 +32,11 @@ class App
             begin
                 R3EXS.rgss3a_rvdata2(args[0], options[:output_dir], global_options[:verbose])
                 puts "#{R3EXS::Utils::GREEN_COLOR}All rvdata2 files have been written to #{options[:output_dir]}#{R3EXS::Utils::RESET_COLOR}"
-            rescue TypeError => e
-                puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
-                puts 'Please make sure the rgss3a file is not corrupted.'
+            rescue R3EXS::RGSS3AFileError => e
+                $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
+                $stderr.puts 'Unknown RGSS3A file decrypted type'
+            rescue SystemCallError => e
+                $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.class}: #{e.message}#{R3EXS::Utils::RESET_COLOR}"
             end
         end
     end
