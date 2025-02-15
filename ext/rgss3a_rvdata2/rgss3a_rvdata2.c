@@ -17,16 +17,22 @@ int utf8towc(const char* utf8char, size_t n)
 {
     // 计算转换为 wchar 所需的缓冲区大小，包括结尾的 '\0'
     int wc_size = MultiByteToWideChar(CP_UTF8, 0, utf8char, n, NULL, 0) + 1;
-    if (wc_size == 0)
+    if (wc_size == 1)    // 转换失败
     {
-        errno = EILSEQ;
-        return -1;
+        if (GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
+        {
+            errno = EILSEQ;
+            return -1;
+        }
     }
     if (wc_size > wchar_arr_size)
     {
         wchar_t* wchar_arr_new = (wchar_t*)realloc(wchar_arr, sizeof(wchar_t) * wc_size);
         if (!wchar_arr_new)
+        {
+            errno = ENOMEM;
             return -1;
+        }
         wchar_arr      = wchar_arr_new;
         wchar_arr_size = wc_size;
     }
@@ -70,7 +76,10 @@ int utf8tomb(const char* utf8char, size_t n)
     {
         char* char_arr_new = (char*)realloc(char_arr, sizeof(char) * mb_size);
         if (!char_arr_new)
+        {
+            errno = ENOMEM;
             return -1;
+        }
         char_arr      = char_arr_new;
         char_arr_size = mb_size;
     }
@@ -89,6 +98,23 @@ void utf8tomb_error_handler(void)
     rb_sys_fail("Failed to convert UTF-8 to char");
 }
 #endif
+
+VALUE R3EXS = Qnil;
+
+ID r3exs_RGSS3AFileError_id;
+ID r3exs_File_id;
+ID r3exs_FileUtils_id;
+ID r3exs_Dir_id;
+ID r3exs_new_id;
+ID r3exs_join_id;
+ID r3exs_dirname_id;
+ID r3exs_exist_id;
+ID r3exs_mkdir_p_id;
+
+VALUE r3exs_RGSS3AFileError_class;
+VALUE r3exs_File_module;
+VALUE r3exs_FileUtils_module;
+VALUE r3exs_Dir_module;
 
 #define MOD_4_MASK 0b11
 #define MASK_KEY_1 0x000000FF
@@ -243,11 +269,11 @@ void fclose_error_handler(const char* path)
  * @param target_path Game.rgss3a 文件路径
  * @param output_dir 输出目录
  * @param verbose 是否输出详细信息
+ * @raise [RGSS3AFileError] 未知的 RGSS3A 文件加密类型
  * @raise [Errno] 系统调用失败
- * @raise [TypeError] 未知的 RGSS3A 文件加密类型
  * @return [void]
  */
-VALUE rb_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALUE verbose)
+VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALUE verbose)
 {
     bool verbose_bool   = RTEST(verbose);
     // 首先将 Ruby 的 VALUE 转换为 C 的字符串
@@ -401,8 +427,11 @@ VALUE rb_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALUE v
 #ifdef __linux__
         free(char_arr);
 #endif
+        // 不支持的 RGSS3A 加密格式
         free(Rgss3a_data);
-        rb_raise(rb_eTypeError, "Unknown RGSS3A file type: %s", target_path_C);
+        VALUE error_message = rb_sprintf("Unknown RGSS3A file decrypted type: %+" PRIsVALUE, target_path);
+        VALUE exception     = rb_funcall(r3exs_RGSS3AFileError_class, r3exs_new_id, 1, error_message);
+        rb_exc_raise(exception);
     }
 
     // 读取 MagicKey
@@ -488,16 +517,16 @@ VALUE rb_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALUE v
 #endif
 
         // 写入解密后的数据到文件
-
         // 先将 output_dir 和文件名拼接得到 output_full_path
         // 再通过 File.dirname(output_full_path) 获得 output_full_dir
         // 最后通过 FileUtils.mkdir_p(output_full_dir) 递归创建目录
-        VALUE rb_mFile         = rb_const_get(rb_cObject, rb_intern("File"));
-        VALUE rb_mFileUtils    = rb_const_get(rb_cObject, rb_intern("FileUtils"));
-        VALUE output_full_path = rb_funcall(rb_mFile, rb_intern("join"), 2, output_dir, rb_utf8_str_new(Rgss3a_p, filename_size));
-        VALUE output_full_dir  = rb_funcall(rb_mFile, rb_intern("dirname"), 1, output_full_path);
-        rb_funcall(rb_mFileUtils, rb_intern("mkdir_p"), 1, output_full_dir);
+        VALUE output_full_path   = rb_funcall(r3exs_File_module, r3exs_join_id, 2, output_dir, rb_utf8_str_new(Rgss3a_p, filename_size));
+        VALUE output_full_dir    = rb_funcall(r3exs_File_module, r3exs_dirname_id, 1, output_full_path);
         char* output_full_path_C = StringValueCStr(output_full_path);
+        // 如果目录不存在则创建目录
+        if (!RTEST(rb_funcall(r3exs_Dir_module, r3exs_exist_id, 1, output_full_dir)))
+            rb_funcall(r3exs_FileUtils_module, r3exs_mkdir_p_id, 1, output_full_dir);
+
 #ifdef _WIN32
         utf8towc(output_full_path_C, strlen(output_full_path_C));
         if (verbose_bool)
@@ -566,7 +595,23 @@ VALUE rb_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALUE v
  */
 void Init_rgss3a_rvdata2()
 {
-    // 定义 Ruby 模块
-    VALUE rb_mR3EXS = rb_define_module("R3EXS");
-    rb_define_singleton_method(rb_mR3EXS, "rgss3a_rvdata2", rb_rgss3a_rvdata2, 3);
+    // 定义 R3EXS 模块
+    R3EXS                       = rb_define_module("R3EXS");
+    // 定义 ID
+    r3exs_RGSS3AFileError_id    = rb_intern("RGSS3AFileError");
+    r3exs_File_id               = rb_intern("File");
+    r3exs_FileUtils_id          = rb_intern("FileUtils");
+    r3exs_Dir_id                = rb_intern("Dir");
+    r3exs_join_id               = rb_intern("join");
+    r3exs_dirname_id            = rb_intern("dirname");
+    r3exs_exist_id              = rb_intern("exist?");
+    r3exs_mkdir_p_id            = rb_intern("mkdir_p");
+
+    // 定义模块和类
+    r3exs_RGSS3AFileError_class = rb_const_get(R3EXS, r3exs_RGSS3AFileError_id);
+    r3exs_File_module           = rb_const_get(rb_cObject, r3exs_File_id);
+    r3exs_FileUtils_module      = rb_const_get(rb_cObject, r3exs_FileUtils_id);
+    r3exs_Dir_module            = rb_const_get(rb_cObject, r3exs_Dir_id);
+    // 定义 rgss3a_rvdata2 方法
+    rb_define_singleton_method(R3EXS, "rgss3a_rvdata2", r3exs_rgss3a_rvdata2, 3);
 }
