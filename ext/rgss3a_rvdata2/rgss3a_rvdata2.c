@@ -443,6 +443,13 @@ VALUE rb_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALUE v
             printf("\e[34mDecrypting DataName...\r");
         decrypt_file_name(Rgss3a_p, filename_size, magickey);
 
+        // 将文件名中的 '\\' 替换为 '/'
+        for (unsigned int i = 0; i < filename_size; ++i)
+        {
+            if (Rgss3a_p[i] == '\\')
+                Rgss3a_p[i] = '/';
+        }
+
         // 读取文件名
 #ifdef _WIN32
         if (utf8towc((char*)Rgss3a_p, filename_size) == -1)
