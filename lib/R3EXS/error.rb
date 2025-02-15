@@ -36,6 +36,23 @@ module R3EXS
         attr_reader :obj
     end
 
+    # 用来处理 Game.rgss3a 文件损坏的异常
+    class RGSS3AFileError < StandardError
+
+        # @param msg [String] 异常信息
+        # @param rgss3a_path [String] 引发异常的 rgss3a 文件路径
+        # @return [Rvdata2DirError]
+        def initialize(msg = '', rgss3a_path)
+            super(msg)
+            @rgss3a_path = rgss3a_path
+        end
+
+        # 引发异常的 rgss3a 文件路径
+        #
+        # @return [String]
+        attr_reader :rgss3a_path
+    end
+
     # 用来处理 rvdata2 文件损坏的异常
     class Rvdata2FileError < StandardError
 
