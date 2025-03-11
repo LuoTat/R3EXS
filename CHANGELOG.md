@@ -1,5 +1,12 @@
 # [R3EXS]
 
+## [1.0.4] - 2025-03-11
+
+-   修复 rvdata2_json 方法里处理 Scripts 的 BUG
+-   rb_ex_strings 方法里 Extract 单词拼写修正
+-   oj 版本更新到 3.16.10
+-   redcarpet 版本更新到 3.6.1
+
 ## [1.0.3] - 2025-02-15
 
 -   添加 RGSS3AFileError 类以处理加密格式不支持的问题
