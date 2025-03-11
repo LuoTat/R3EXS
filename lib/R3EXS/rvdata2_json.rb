@@ -45,21 +45,20 @@ module R3EXS
     def R3EXS.rvdata2_json(target_dir, output_dir, complete, with_scripts, with_notes)
         FileUtils.mkdir(output_dir) unless Dir.exist?(output_dir)
         Utils.all_rvdata2_files(target_dir) do |object, file_basename|
-
             if file_basename == 'Scripts'
-                scripts_rb(object, output_dir) if with_scripts
+                next unless with_scripts
+                scripts_rb(object, output_dir)
                 print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{file_basename}\n" if $global_options[:verbose]
-                next
-            end
-
-            file_path = File.join(output_dir, "#{file_basename}.json")
-            print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
-            if complete
-                Utils.object_json(object, file_path)
             else
-                Utils.object_json(Utils.rpg_r3exs(object, file_basename, with_notes), file_path)
+                file_path = File.join(output_dir, "#{file_basename}.json")
+                print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
+                if complete
+                    Utils.object_json(object, file_path)
+                else
+                    Utils.object_json(Utils.rpg_r3exs(object, file_basename, with_notes), file_path)
+                end
+                print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{file_basename}\n" if $global_options[:verbose]
             end
-            print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{file_basename}\n" if $global_options[:verbose]
         end
     end
 
