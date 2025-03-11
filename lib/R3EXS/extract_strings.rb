@@ -22,11 +22,11 @@ module R3EXS
         strings           = []
         strings_extractor = StringsExtractor.new(strings, with_symbol)
         Dir.glob(File.join(full_dir, '*.rb')).each do |script_file_path|
-            print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Exreacting from #{Utils::RESET_COLOR}#{script_file_path}...\r" if $global_options[:verbose]
+            print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Extracting from #{Utils::RESET_COLOR}#{script_file_path}...\r" if $global_options[:verbose]
 
             strings_extractor.visit(Prism.parse_file(script_file_path).value)
 
-            print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Exreacted #{Utils::RESET_COLOR}#{script_file_path}\n" if $global_options[:verbose]
+            print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Extracted #{Utils::RESET_COLOR}#{script_file_path}\n" if $global_options[:verbose]
         end
         strings
     end
