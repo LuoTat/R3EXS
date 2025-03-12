@@ -14,13 +14,20 @@ module R3EXS
     # @param hash [Hash]
     #
     # @raise [ScriptsDirError] Scripts 目录不存在
+    # @raise [ScriptsInfoPathError] Scripts_info.json 文件不存在
     #
     # @return [void]
     def R3EXS.rb_in_strings(target_dir, output_dir, hash)
-        target_full_dir = File.join(target_dir, 'Scripts')
-        output_full_dir = File.join(output_dir, 'Scripts')
+        target_full_dir       = File.join(target_dir, 'Scripts')
+        output_full_dir       = File.join(output_dir, 'Scripts')
+        script_info_file_path = File.join(target_full_dir, 'Scripts_info.json')
+
         FileUtils.mkdir(output_full_dir) unless Dir.exist?(output_full_dir)
         Dir.exist?(target_full_dir) or raise ScriptsDirError.new(target_full_dir), "Scripts directory not found: #{target_full_dir}"
+        File.exist?(script_info_file_path) or raise ScriptsInfoPathError.new(script_info_file_path), "Scripts_info.json not found: #{script_info_file_path}"
+
+        print "#{Utils::ESCAPE}#{Utils::YELLOW_COLOR}Copying #{Utils::RESET_COLOR}Scripts_info.json to #{output_full_dir}...\r" if $global_options[:verbose]
+        FileUtils.cp(script_info_file_path, output_full_dir)
 
         Dir.glob(File.join(target_full_dir, "*.rb")).each do |script_file_path|
             output_script_file_dir = File.join(output_full_dir, File.basename(script_file_path))
@@ -42,6 +49,7 @@ module R3EXS
     # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
     # @raise [JsonDirError] target_dir 不存在
     # @raise [ScriptsDirError] Scripts 目录不存在
+    # @raise [ScriptsInfoPathError] Scripts_info.json 文件不存在
     # @raise [ManualTransFilePath] ManualTransFile.json 不存在
     #
     # @return [void]
