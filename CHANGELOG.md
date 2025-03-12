@@ -1,5 +1,10 @@
 # [R3EXS]
 
+## [1.0.5] - 2025-03-12
+
+-   rb_in_strings 方法里面添加将 Scripts_info.json 文件拷贝至目标目录里面，以避免后续报错
+-   优化了一下 json_rvdata2 方法里的输出
+
 ## [1.0.4] - 2025-03-11
 
 -   修复 rvdata2_json 方法里处理 Scripts 的 BUG
