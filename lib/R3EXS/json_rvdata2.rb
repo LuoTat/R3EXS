@@ -59,7 +59,7 @@ module R3EXS
         if complete
             Utils.all_json_files(target_dir, :RPG) do |object, file_basename|
                 file_path = File.join(output_dir, "#{file_basename}.rvdata2")
-                print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{file_path}...\n" if $global_options[:verbose]
+                print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
                 Utils.object_rvdata2(object, file_path)
                 print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{file_basename}\n" if $global_options[:verbose]
             end
@@ -80,7 +80,7 @@ module R3EXS
                 end
 
                 file_path = File.join(output_dir, "#{file_basename}.rvdata2")
-                print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{file_path}...\n" if $global_options[:verbose]
+                print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
 
                 # 根据是否为数组进行不同的处理
                 if object.is_a?(Array)
