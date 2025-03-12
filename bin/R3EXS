@@ -197,6 +197,10 @@ class App
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
                 $stderr.puts "You are supposed to use '#{R3EXS::Utils::GREEN_COLOR}-s#{R3EXS::Utils::RESET_COLOR}' or '#{R3EXS::Utils::GREEN_COLOR}--scripts#{R3EXS::Utils::RESET_COLOR}' to enable serialization of Scripts in #{R3EXS::Utils::GREEN_COLOR}rvdata2_json#{R3EXS::Utils::RESET_COLOR} subcommand"
                 $stderr.puts "For more information, please enter '#{R3EXS::Utils::GREEN_COLOR}R3EXS help rvdata2_json#{R3EXS::Utils::RESET_COLOR}'"
+            rescue R3EXS::ScriptsInfoPathError => e
+                $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
+                $stderr.puts "Make sure the Scripts_info.json is in the #{args[0]}/Scripts directory"
+                $stderr.puts "For more information, please enter '#{R3EXS::Utils::GREEN_COLOR}R3EXS help rvdata2_json#{R3EXS::Utils::RESET_COLOR}'"
             rescue R3EXS::ManualTransFilePathError => e
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
                 $stderr.puts "You are supposed to use #{R3EXS::Utils::GREEN_COLOR}ex_strings#{R3EXS::Utils::RESET_COLOR} subcommand to generate the ManualTransFile.json"
