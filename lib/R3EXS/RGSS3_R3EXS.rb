@@ -583,13 +583,14 @@ module R3EXS
                     @index = -1
                 end
             when 205 # SetMoveRoute
-                @index          = index
-                @code           = 205
-                @usage          = Utils::EVENT_COMMANDS[205]
                 moveroute_r3exs = R3EXS::MoveRoute.new(eventcommand.parameters[1])
-                @parameter      = moveroute_r3exs.list unless moveroute_r3exs.empty?
-                if @parameter.nil?
-                    @index = -1 # 如果没有可提取的 MoveCommand ，就将索引设为-1，empty? 将据此判断是否为空
+                if moveroute_r3exs.empty?
+                    @index = -1 # 如果 MoveRoute 里面没有可提取的 MoveCommand ，就将索引设为-1，empty? 将据此判断是否为空
+                else
+                    @index     = index
+                    @code      = 205
+                    @usage     = Utils::EVENT_COMMANDS[205]
+                    @parameter = moveroute_r3exs
                 end
             when 320 # ChangeActorName
                 @index     = index
@@ -627,13 +628,14 @@ module R3EXS
                 @usage     = Utils::EVENT_COMMANDS[408]
                 @parameter = eventcommand.parameters[0]
             when 505 # MoveRoute
-                if eventcommand.parameters[0].code == 45
+                movecommand_r3exs = R3EXS::MoveCommand.new(eventcommand.parameters[0], 0)
+                if movecommand_r3exs.empty?
+                    @index = -1
+                else
                     @index     = index
                     @code      = 505
                     @usage     = Utils::EVENT_COMMANDS[505]
-                    @parameter = eventcommand.parameters[0].parameters[0]
-                else
-                    @index = -1
+                    @parameter = movecommand_r3exs
                 end
             when 655 # ScriptMore
                 @index     = index
@@ -684,7 +686,7 @@ module R3EXS
             when 408 # CommentMore
                 eventcommand.parameters[0] = @parameter
             when 505 # MoveRoute
-                eventcommand.parameters[0].parameters[0] = @parameter
+                @parameter.inject_to(eventcommand.parameters[0])
             when 655 # ScriptMore
                 eventcommand.parameters[0] = @parameter
             else
@@ -703,6 +705,8 @@ module R3EXS
                 [@parameter]
             when 205
                 @parameter.ex_strings
+            when 505
+                @parameter.ex_strings
             else
                 puts "Unknown code: #{@code}"
                 []
@@ -720,6 +724,8 @@ module R3EXS
             when 108, 111, 118, 119, 122, 320, 324, 355, 401, 402, 405, 408, 655
                 @parameter = hash[@parameter] || @parameter
             when 205
+                @parameter.in_strings(hash)
+            when 505
                 @parameter.in_strings(hash)
             else
                 puts "Unknown code: #{@code}"
