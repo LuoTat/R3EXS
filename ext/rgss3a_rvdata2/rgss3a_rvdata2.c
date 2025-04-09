@@ -13,7 +13,7 @@ unsigned short wchar_arr_size = 0;
  * @param n 字符串长度
  * @return 0 成功，-1 失败
  */
-int utf8towc(const char* utf8char, size_t n)
+static int utf8towc(const char* utf8char, size_t n)
 {
     // 计算转换为 wchar 所需的缓冲区大小，包括结尾的 '\0'
     int wc_size = MultiByteToWideChar(CP_UTF8, 0, utf8char, n, NULL, 0) + 1;
@@ -49,7 +49,7 @@ int utf8towc(const char* utf8char, size_t n)
  *
  * @return [void]
  */
-void utf8towc_error_handler(void)
+static void utf8towc_error_handler(void)
 {
     rb_sys_fail("Failed to convert UTF-8 to wchar");
 }
@@ -68,7 +68,7 @@ unsigned short char_arr_size = 0;
  * @param n 字符串长度
  * @return 0 成功，-1 失败
  */
-int utf8tomb(const char* utf8char, size_t n)
+static int utf8tomb(const char* utf8char, size_t n)
 {
     // 计算转换为 char 所需的缓冲区大小，包括结尾的 '\0'
     int mb_size = n + 1;
@@ -93,7 +93,7 @@ int utf8tomb(const char* utf8char, size_t n)
  *
  * @return [void]
  */
-void utf8tomb_error_handler(void)
+static void utf8tomb_error_handler(void)
 {
     rb_sys_fail("Failed to convert UTF-8 to char");
 }
@@ -136,7 +136,7 @@ enum RGSSAD_DECRYPT_TYPE
  * @param magickey 解密密钥
  * @return [void]
  */
-void decrypt_file_name(unsigned char* data, size_t n, unsigned int magickey)
+static void decrypt_file_name(unsigned char* data, size_t n, unsigned int magickey)
 {
     size_t        q      = n >> 2;
     char          r      = n & MOD_4_MASK;
@@ -158,7 +158,7 @@ void decrypt_file_name(unsigned char* data, size_t n, unsigned int magickey)
  * @param magickey 解密密钥
  * @return [void]
  */
-void decrypt_file_data(unsigned char* data, size_t n, unsigned int magickey)
+static void decrypt_file_data(unsigned char* data, size_t n, unsigned int magickey)
 {
     size_t        q      = n >> 2;
     char          r      = n & MOD_4_MASK;
@@ -182,7 +182,7 @@ void decrypt_file_data(unsigned char* data, size_t n, unsigned int magickey)
  * @param dir 目录
  * @return [void]
  */
-void mkdir_error_handler(const char* dir)
+static void mkdir_error_handler(const char* dir)
 {
     rb_sys_fail(dir);
 }
@@ -192,7 +192,7 @@ void mkdir_error_handler(const char* dir)
  *
  * @return [void]
  */
-void malloc_error_handler(void)
+static void malloc_error_handler(void)
 {
     rb_sys_fail("Failed to allocate memory");
 }
@@ -203,7 +203,7 @@ void malloc_error_handler(void)
  * @param path 文件路径
  * @return [void]
  */
-void fopen_error_handler(const char* path)
+static void fopen_error_handler(const char* path)
 {
     rb_sys_fail(path);
 }
@@ -214,7 +214,7 @@ void fopen_error_handler(const char* path)
  * @param path 文件路径
  * @return [void]
  */
-void fseek_error_handler(const char* path)
+static void fseek_error_handler(const char* path)
 {
     rb_sys_fail(path);
 }
@@ -225,7 +225,7 @@ void fseek_error_handler(const char* path)
  * @param path 文件路径
  * @return [void]
  */
-void ftell_error_handler(const char* path)
+static void ftell_error_handler(const char* path)
 {
     rb_sys_fail(path);
 }
@@ -236,7 +236,7 @@ void ftell_error_handler(const char* path)
  * @param path 文件路径
  * @return [void]
  */
-void fread_error_handler(const char* path)
+static void fread_error_handler(const char* path)
 {
     rb_sys_fail(path);
 }
@@ -247,7 +247,7 @@ void fread_error_handler(const char* path)
  * @param path 文件路径
  * @return [void]
  */
-void fwrite_error_handler(const char* path)
+static void fwrite_error_handler(const char* path)
 {
     rb_sys_fail(path);
 }
@@ -258,7 +258,7 @@ void fwrite_error_handler(const char* path)
  * @param path 文件路径
  * @return [void]
  */
-void fclose_error_handler(const char* path)
+static void fclose_error_handler(const char* path)
 {
     rb_sys_fail(path);
 }
@@ -273,7 +273,7 @@ void fclose_error_handler(const char* path)
  * @raise [SystemCallError] 系统调用失败
  * @return [void]
  */
-VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALUE verbose)
+static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALUE verbose)
 {
     bool verbose_bool   = RTEST(verbose);
     // 首先将 Ruby 的 VALUE 转换为 C 的字符串
