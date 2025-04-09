@@ -101,7 +101,7 @@ module R3EXS
         # 引发异常的 json 文件路径
         #
         # @return [String]
-        attr_reader :rvdata2_path
+        attr_reader :json_path
     end
 
     # 用来处理模块名错误的异常
@@ -170,23 +170,6 @@ module R3EXS
         #
         # @return [String]
         attr_reader :json_dir
-    end
-
-    # 用来处理 *.rb 文件目录不存在的异常
-    class ScriptsDirError < IOError
-
-        # @param msg [String] 异常信息
-        # @param scripts_dir [String] 引发异常的 *.rb 文件目录
-        # @return [ScriptsDirError]
-        def initialize(msg = '', scripts_dir)
-            super(msg)
-            @scripts_dir = scripts_dir
-        end
-
-        # 引发异常的 *.rb 文件目录
-        #
-        # @return [String]
-        attr_reader :scripts_dir
     end
 
     # 用来处理 Scripts_info.json 文件不存在的异常
