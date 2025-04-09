@@ -17,7 +17,6 @@ module R3EXS
     #
     # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
     # @raise [JsonDirError] target_dir 不存在
-    # @raise [ScriptsDirError] Scripts 目录不存在
     #
     # @return [void]
     def R3EXS.ex_strings(target_dir, output_dir, with_scripts, with_symbol, with_scripts_separate)
@@ -38,29 +37,27 @@ module R3EXS
         end
 
         # 处理 CommonEvent_\d{5}.json 文件
-        Utils.all_commonevent_json_files(target_dir, :R3EXS) do |commonevents, parent_relative_dir|
-            file_path = target_dir.join(parent_relative_dir, "CommonEvent_*.json")
-            print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Extracting from #{Utils::RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
-            commonevents.each do |commonevent|
+        Utils.all_commonevent_json_files(target_dir, :R3EXS) do |commonevents, commonevents_basenames, parent_relative_dir|
+            commonevents.zip(commonevents_basenames).each do |commonevent, commonevent_basename|
+                file_path = target_dir.join(parent_relative_dir, "#{commonevent_basename}.json")
+                print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Extracting from #{Utils::RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
                 all_ex_strings.concat(commonevent.ex_strings)
+                print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Extracted #{Utils::RESET_COLOR}#{file_path}\n" if $global_options[:verbose]
             end
-            print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Extracted #{Utils::RESET_COLOR}#{file_path}\n" if $global_options[:verbose]
         end
 
-        # 处理 *.rb 文件
+        # 处理 \d{5}.rb 文件
         if with_scripts
             all_rb_strings    = []
             strings_extractor = StringsExtractor.new(all_rb_strings, with_symbol)
 
-            Utils.all_rb_files(target_dir) do |scripts, parent_relative_dir|
-                file_path = target_dir.join(parent_relative_dir, "*.rb")
-                print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Extracting from #{Utils::RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
-
-                scripts.each do |script|
+            Utils.all_rb_files(target_dir) do |scripts, scripts_basenames, parent_relative_dir|
+                scripts.zip(scripts_basenames).each do |script, script_basename|
+                    file_path = target_dir.join(parent_relative_dir, "#{script_basename}.rb")
+                    print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Extracting from #{Utils::RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
                     strings_extractor.visit(Prism.parse(script).value)
+                    print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Extracted #{Utils::RESET_COLOR}#{file_path}\n" if $global_options[:verbose]
                 end
-
-                print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Extracted #{Utils::RESET_COLOR}#{file_path}\n" if $global_options[:verbose]
             end
 
             if with_scripts_separate
