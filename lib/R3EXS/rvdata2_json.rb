@@ -8,7 +8,7 @@ module R3EXS
 
     # 将 Script 对象数组序列化为 Ruby 源码
     #
-    # @param scripts [Object] 待转换的 Script 对象数组
+    # @param scripts [Array<Object>] 待转换的 Script 对象数组
     # @param output_dir [Pathname] 输出目录
     # @return [void]
     def R3EXS.scripts_rb(scripts, output_dir)
@@ -34,21 +34,19 @@ module R3EXS
 
     # 将 CommonEvents 对象数组序列化为分开的 JSON 文件
     #
-    # @param commonevents [Object] 待转换的 CommonEvents 对象数组
+    # @param commonevents [Array<Object>] 待转换的 CommonEvents 对象数组
     # @param output_dir [Pathname] 输出目录
     # @param complete [Boolean] 是否序列化所有内容
     # @param with_notes [Boolean] 是否包含备注
     # @return [void]
     def R3EXS.commonevents_json(commonevents, output_dir, complete, with_notes)
-        output_dir.mkpath unless output_dir.exist?
         full_dir = output_dir.join('CommonEvents')
-        full_dir.mkdir unless full_dir.exist?
 
         if complete
             commonevents.each_with_index do |commonevent, index|
                 commonevent_file_path = full_dir.join("#{format('CommonEvent_%05d', index)}.json")
                 print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{commonevent_file_path}...\r" if $global_options[:verbose]
-                commonevent_file_path.write(Oj.dump(commonevent, indent: 2))
+                Utils.object_json(commonevent, commonevent_file_path)
                 print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{commonevent_file_path}\n" if $global_options[:verbose]
             end
         else
@@ -57,7 +55,7 @@ module R3EXS
                 index                 = commonevent.index
                 commonevent_file_path = full_dir.join("#{format('CommonEvent_%05d', index)}.json")
                 print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{commonevent_file_path}...\r" if $global_options[:verbose]
-                commonevent_file_path.write(Oj.dump(commonevent, indent: 2))
+                Utils.object_json(commonevent, commonevent_file_path)
                 print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{commonevent_file_path}\n" if $global_options[:verbose]
             end
         end
@@ -77,8 +75,8 @@ module R3EXS
     # @return [void]
     def R3EXS.rvdata2_json(target_dir, output_dir, complete, with_scripts, with_notes)
         Utils.all_rvdata2_files(target_dir) do |object, file_basename, parent_relative_dir|
-            if file_basename == 'Scripts' && with_scripts
-                scripts_rb(object, output_dir.join(parent_relative_dir))
+            if file_basename == 'Scripts'
+                scripts_rb(object, output_dir.join(parent_relative_dir)) if with_scripts
             elsif file_basename == 'CommonEvents'
                 commonevents_json(object, output_dir.join(parent_relative_dir), complete, with_notes)
             else
