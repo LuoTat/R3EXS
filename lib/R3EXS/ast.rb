@@ -95,8 +95,8 @@ module R3EXS
         def visit_string_node(node)
             location = node.content_loc
             value    = location.slice
-            if @strings_hash.has_key?(value)
-                @content_loc << Location.new(location.start_offset, location.length, @strings_hash[value])
+            if @strings_hash.has_key?(value) && @strings_hash[value].to_s != ''
+                @content_loc << Location.new(location.start_offset, location.length, value)
             end
             super
         end
@@ -110,24 +110,19 @@ module R3EXS
             # 如果 location 不为 nil，说明这个符号是一个字符串
             if location
                 value = location.slice
-                if @strings_hash.has_key?(value)
-                    @content_loc << Location.new(location.start_offset, location.length, @strings_hash[value])
+                if @strings_hash.has_key?(value) && @strings_hash[value].to_s != ''
+                    @content_loc << Location.new(location.start_offset, location.length, value)
                 end
             end
             super
         end
 
-        # 将 file_path 对应位置的源码中的字符串替换成 '@strings_hash' 翻译后的字符串
+        # 将 script 源码中的字符串替换成 @strings_hash 翻译后的字符串
         #
-        # @param file_path [String] 源文件路径
+        # @param script [String] Ruby 源码，以二进制编码打开
         # @param ast_root [Prism::ProgramNode] AST 树根节点
         # @return [String]
-        def rewrite(file_path, ast_root)
-            # 读取文件内容
-            # 这里必须使用 rb 模式，因为 Prism 定位的位置是二进制下的位置
-            # 也就是说没有考虑换行符的问题，所以必须使用二进制模式读取文件
-            code = File.read(file_path, mode: 'rb')
-
+        def rewrite(script, ast_root)
             # 首先遍历一遍，找到所有需要替换的字符串的位置
             visit(ast_root)
 
@@ -138,14 +133,14 @@ module R3EXS
             #  然后将 code 切片，将字符串替换成新的字符串
             start_offset = 0
             @content_loc.each do |loc|
-                @code << code[start_offset...loc.start_offset]
-                @code << loc.content
+                @code << script[start_offset...loc.start_offset]
+                @code << @strings_hash[loc.content]
                 start_offset = loc.start_offset + loc.length
             end
-            @code << code[start_offset..-1]
+            @code << script[start_offset..-1]
 
-            # 将 @code 里面的字符串全部改为 UTF-8 编码
-            @code.map! { |str| str.force_encoding('UTF-8') }
+            # 将 @code 里面的字符串全部改为二进制编码
+            @code.map! { |str| str.force_encoding('ASCII-8BIT') unless str.nil? }
             @code.join
         end
 
