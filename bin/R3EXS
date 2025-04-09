@@ -60,7 +60,7 @@ class App
 
         c.action do |global_options, options, args|
             begin
-                R3EXS.rvdata2_json(args[0], options[:output_dir], options[:complete], options[:with_scripts], options[:with_notes])
+                R3EXS.rvdata2_json(Pathname(args[0]), Pathname(options[:output_dir]), options[:complete], options[:with_scripts], options[:with_notes])
                 puts "#{R3EXS::Utils::GREEN_COLOR}All JSON files have been written to #{options[:output_dir]}#{R3EXS::Utils::RESET_COLOR}"
             rescue R3EXS::Rvdata2FileError => e
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
@@ -92,7 +92,7 @@ class App
 
         c.action do |global_options, options, args|
             begin
-                R3EXS.json_rvdata2(args[0], options[:output_dir], options[:original_dir], options[:complete], options[:with_scripts])
+                R3EXS.json_rvdata2(Pathname(args[0]), Pathname(options[:output_dir]), Pathname(options[:original_dir]), options[:complete], options[:with_scripts])
                 puts "#{R3EXS::Utils::GREEN_COLOR}All new rvdata2 files have been written to #{options[:output_dir]}#{R3EXS::Utils::RESET_COLOR}"
             rescue R3EXS::RPGJsonFileError => e
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
@@ -114,13 +114,9 @@ class App
             rescue R3EXS::Rvdata2DirError => e
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
                 $stderr.puts 'You are supposed to privide the original rvdata2 dir in complete deserialization mode'
-            rescue R3EXS::ScriptsDirError => e
-                $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
-                $stderr.puts "You are supposed to use '#{R3EXS::Utils::GREEN_COLOR}-s#{R3EXS::Utils::RESET_COLOR}' or '#{R3EXS::Utils::GREEN_COLOR}--scripts#{R3EXS::Utils::RESET_COLOR}' to enable serialization of Scripts in #{R3EXS::Utils::GREEN_COLOR}rvdata2_json#{R3EXS::Utils::RESET_COLOR} subcommand"
-                $stderr.puts "For more information, please enter '#{R3EXS::Utils::GREEN_COLOR}R3EXS help rvdata2_json#{R3EXS::Utils::RESET_COLOR}'"
             rescue R3EXS::ScriptsInfoPathError => e
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
-                $stderr.puts "You are supposed to use '#{R3EXS::Utils::GREEN_COLOR}-s#{R3EXS::Utils::RESET_COLOR}' or '#{R3EXS::Utils::GREEN_COLOR}--scripts#{R3EXS::Utils::RESET_COLOR}' to enable serialization of Scripts in #{R3EXS::Utils::GREEN_COLOR}rvdata2_json#{R3EXS::Utils::RESET_COLOR} subcommand"
+                $stderr.puts "Make sure the Scripts_info.json is in the Scripts directory"
                 $stderr.puts "For more information, please enter '#{R3EXS::Utils::GREEN_COLOR}R3EXS help rvdata2_json#{R3EXS::Utils::RESET_COLOR}'"
             end
         end
@@ -145,7 +141,7 @@ class App
 
         c.action do |global_options, options, args|
             begin
-                R3EXS.ex_strings(args[0], options[:output_dir], options[:with_scripts], options[:with_symbol], options[:with_scripts_separate])
+                R3EXS.ex_strings(Pathname(args[0]), Pathname(options[:output_dir]), options[:with_scripts], options[:with_symbol], options[:with_scripts_separate])
                 if options[:with_scripts_separate]
                     puts "#{R3EXS::Utils::GREEN_COLOR}All strings have been extracted to #{File.join(options[:output_dir], 'ManualTransFile.json')} and #{File.join(options[:output_dir], 'ManualTransFile_scripts.json')}#{R3EXS::Utils::RESET_COLOR}"
                 else
@@ -158,10 +154,6 @@ class App
                 $stderr.puts "For more information, please enter '#{R3EXS::Utils::GREEN_COLOR}R3EXS help json_rvdata2#{R3EXS::Utils::RESET_COLOR}'"
             rescue R3EXS::JsonDirError => e
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
-            rescue R3EXS::ScriptsDirError => e
-                $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
-                $stderr.puts "You are supposed to use '#{R3EXS::Utils::GREEN_COLOR}-s#{R3EXS::Utils::RESET_COLOR}' or '#{R3EXS::Utils::GREEN_COLOR}--scripts#{R3EXS::Utils::RESET_COLOR}' to enable serialization of Scripts in #{R3EXS::Utils::GREEN_COLOR}rvdata2_json#{R3EXS::Utils::RESET_COLOR} subcommand"
-                $stderr.puts "For more information, please enter '#{R3EXS::Utils::GREEN_COLOR}R3EXS help rvdata2_json#{R3EXS::Utils::RESET_COLOR}'"
             end
         end
     end
@@ -184,7 +176,7 @@ class App
 
         c.action do |global_options, options, args|
             begin
-                R3EXS.in_strings(args[0], options[:output_dir], options[:manualtransfile_path], options[:with_scripts])
+                R3EXS.in_strings(Pathname(args[0]), Pathname(options[:output_dir]), Pathname(options[:manualtransfile_path]), options[:with_scripts])
                 puts "#{R3EXS::Utils::GREEN_COLOR}All new JSON files have been written to #{options[:output_dir]}#{R3EXS::Utils::RESET_COLOR}"
             rescue R3EXS::R3EXSJsonFileError => e
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
@@ -193,13 +185,9 @@ class App
                 $stderr.puts "For more information, please enter '#{R3EXS::Utils::GREEN_COLOR}R3EXS help json_rvdata2#{R3EXS::Utils::RESET_COLOR}'"
             rescue R3EXS::JsonDirError => e
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
-            rescue R3EXS::ScriptsDirError => e
-                $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
-                $stderr.puts "You are supposed to use '#{R3EXS::Utils::GREEN_COLOR}-s#{R3EXS::Utils::RESET_COLOR}' or '#{R3EXS::Utils::GREEN_COLOR}--scripts#{R3EXS::Utils::RESET_COLOR}' to enable serialization of Scripts in #{R3EXS::Utils::GREEN_COLOR}rvdata2_json#{R3EXS::Utils::RESET_COLOR} subcommand"
-                $stderr.puts "For more information, please enter '#{R3EXS::Utils::GREEN_COLOR}R3EXS help rvdata2_json#{R3EXS::Utils::RESET_COLOR}'"
             rescue R3EXS::ScriptsInfoPathError => e
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
-                $stderr.puts "Make sure the Scripts_info.json is in the #{args[0]}/Scripts directory"
+                $stderr.puts "Make sure the Scripts_info.json is in the Scripts directory"
                 $stderr.puts "For more information, please enter '#{R3EXS::Utils::GREEN_COLOR}R3EXS help rvdata2_json#{R3EXS::Utils::RESET_COLOR}'"
             rescue R3EXS::ManualTransFilePathError => e
                 $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{e.message}#{R3EXS::Utils::RESET_COLOR}"
@@ -220,7 +208,9 @@ class App
     on_error do |exception|
         # Error logic here
         # return false to skip default error handling
-        true
+        $stderr.puts "#{R3EXS::Utils::RED_COLOR}#{exception.message}#{R3EXS::Utils::RESET_COLOR}"
+        $stderr.puts exception.backtrace
+        false
     end
 end
 
