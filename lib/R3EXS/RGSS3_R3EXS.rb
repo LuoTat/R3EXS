@@ -757,6 +757,7 @@ module R3EXS
         # 事件指令参数
         #
         # @note 当 '@code' 为 102 时, parameter 是一个字符串数组
+        #
         # @return [String] if @code != 102
         # @return [Array<String>] if @code == 102
         attr_accessor :parameter
