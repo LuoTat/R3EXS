@@ -838,7 +838,7 @@ module R3EXS
                     obj_r3exs = matched_class.new(obj, index, with_notes)
                     temp << obj_r3exs unless obj_r3exs.empty?
                 end
-            elsif object.is_a?(Hash) # 只有 RPG::MapInfo 是Hash
+            elsif object.is_a?(Hash) # 只有 RPG::MapInfo 是 Hash，且 key 为整数
                 temp = []
                 object.each do |key, obj|
                     next if obj.nil?
@@ -856,6 +856,7 @@ module R3EXS
         # @note 注意传入 block 的 object
         #       - 如果 object 是数组或哈希，则其中可能存在 nil 元素
         #       - 如果 object 是单独一个对象，则不可能为 nil
+        #
         # @param target_dir [Pathname] 目标目录
         #
         # @yieldparam object [Object] rvdata2 文件反序列化后的对象
@@ -899,6 +900,7 @@ module R3EXS
         # @note 注意传入 block 的 object
         #       - 在 module_name 为 RPG 时，如果 object 是数组或哈希，则其中可能存在 nil 元素。如果 object 是单独一个对象，则不可能为 nil
         #       - 在 module_name 为 R3EXS 时，object 不会为 nil
+        #
         # @param target_dir [Pathname] 目标目录
         # @param module_name [Symbol] 模块名
         #
@@ -948,15 +950,17 @@ module R3EXS
             end
         end
 
-        # 读取 target_dir 下的所有 CommonEvent JSON 文件，将其反序列化为对象，并调用 block
+        # 读取 target_dir 下的所有 CommonEvent JSON 文件，将其反序列化为对象数组，并调用 block
         #
         # @note 注意传入 block 的 object
-        #       - 在 module_name 为 RPG 时，如果 object 是数组或哈希，则其中可能存在 nil 元素。如果 object 是单独一个对象，则不可能为 nil
-        #       - 在 module_name 为 R3EXS 时，object 不会为 nil
+        #       - 在 module_name 为 RPG 时，object 可能存在 nil 元素
+        #       - 在 module_name 为 R3EXS 时，object 不可能存在 nil 元素
+        #
         # @param target_dir [Pathname] 目标目录
         # @param module_name [Symbol] 模块名
         #
-        # @yieldparam object [Object] CommonEvent JSON 文件反序列化后的数组
+        # @yieldparam commonevents [Array<Object>] CommonEvent JSON 文件反序列化后的数组
+        # @yieldparam commonevents_basenames [String] CommonEvent JSON 文件名数组（不包含扩展名）
         # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
         # @yieldreturn [void]
         #
@@ -970,20 +974,25 @@ module R3EXS
             # 检查 target_dir 目录是否存在
             target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
 
-            # 用一个Hash来存储每一个 CommonEvent_\d{5}.json 文件的父目录的路径
-            # 每一个父目录的路径对应的值是一个数组，存储该目录下的所有 CommonEvent_\d{5}.json 文件反序列化后的对象
-            commonevent_json_hash = Hash.new { |h, k| h[k] = [] }
+            # 用两个个Hash来存储每一个父目录下的所有的 CommonEvent_\d{5}.json 文件的反序列化后的对象数组以及其文件名数组
+            # Hash 的键是父目录的路径，值是一个数组，存储该目录下的所有 CommonEvent_\d{5}.json 文件的反序列化后的对象数组以及其文件名数组
+            commonevents_hash           = Hash.new { |h, k| h[k] = [] }
+            commonevents_basenames_hash = Hash.new { |h, k| h[k] = [] }
 
             # 递归获取 target_dir 下的所有 CommonEvent_\d{5}.json 文件
             target_dir.glob('**/CommonEvent_[0-9][0-9][0-9][0-9][0-9].json').each do |file_path|
                 print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
                 object     = Oj.load_file(file_path.to_s)
                 parent_dir = file_path.dirname
-                commonevent_json_hash[parent_dir] << object
+                commonevents_hash[parent_dir] << object
+                commonevents_basenames_hash[parent_dir] << file_path.basename('.json').to_s
             end
 
-            # 遍历 commonevent_json_hash 的每一个键值对
-            commonevent_json_hash.each do |parent_dir, commonevents|
+            # 遍历每一个父目录的路径
+            commonevents_hash.each_key do |parent_dir|
+                commonevents           = commonevents_hash[parent_dir]
+                commonevents_basenames = commonevents_basenames_hash[parent_dir]
+
                 case module_name
                 when :RPG
                     # 这里的类型检查要用紧凑模式，因为这是从 rvdata2 文件直接全部序列化后的 JSON 文件中读取的 object，其中可能存在 nil 元素
@@ -1003,15 +1012,18 @@ module R3EXS
                     raise ModuleNameError.new(module_name), "Invalid module name: #{module_name}"
                 end
 
-                yield commonevents, parent_dir.relative_path_from(target_dir)
+                yield commonevents, commonevents_basenames, parent_dir.relative_path_from(target_dir)
             end
         end
 
         # 读取 target_dir 下的所有 Ruby 源码文件，并调用 block
         #
+        # @note 注意这里以二进制方式读取文件，因为 Prism 里面的节点的位置是相对二进制下的位置
+        #
         # @param target_dir [Pathname] 目标目录
         #
-        # @yieldparam object [Object] 读取的 Ruby 源码文件数组
+        # @yieldparam scripts [Array<String>] 读取的 Ruby 源码文件数组
+        # @yieldparam scripts_basenames [Array<String>] Ruby 源码文件名数组（不包含扩展名）
         # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
         # @yieldreturn [void]
         #
@@ -1022,21 +1034,25 @@ module R3EXS
             # 检查 target_dir 目录是否存在
             target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
 
-            # 用一个Hash来存储每一个 \d{5}.rb 文件的父目录的路径
-            # 每一个父目录的路径对应的值是一个数组，存储该目录下的所有 \d{5}.rb 文件
-            rb_hash = Hash.new { |h, k| h[k] = [] }
+            # 用两个个Hash来存储每一个父目录下的所有的 \d{3}.rb 文件的反序列化后的对象数组以及其文件名数组
+            # Hash 的键是父目录的路径，值是一个数组，存储该目录下的所有 \d{3}.rb 文件的反序列化后的对象数组以及其文件名数组
+            scripts_hash           = Hash.new { |h, k| h[k] = [] }
+            scripts_basenames_hash = Hash.new { |h, k| h[k] = [] }
 
             # 递归获取 target_dir 下的所有 \d{5}.rb 文件
             target_dir.glob('**/[0-9][0-9][0-9].rb').each do |file_path|
                 print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
-                object     = file_path.read
+                object     = file_path.binread
                 parent_dir = file_path.dirname
-                rb_hash[parent_dir] << object
+                scripts_hash[parent_dir] << object
+                scripts_basenames_hash[parent_dir] << file_path.basename('.rb').to_s
             end
 
-            # 遍历 rb_hash 的每一个键值对
-            rb_hash.each do |parent_dir, scripts|
-                yield scripts, parent_dir.relative_path_from(target_dir)
+            # 遍历每一个父目录的路径
+            scripts_hash.each_key do |parent_dir|
+                scripts           = scripts_hash[parent_dir]
+                scripts_basenames = scripts_basenames_hash[parent_dir]
+                yield scripts, scripts_basenames, parent_dir.relative_path_from(target_dir)
             end
         end
 
