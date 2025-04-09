@@ -25,7 +25,7 @@ spec = Gem::Specification.new do |s|
     s.add_development_dependency('yard', '~> 0.9.37') # For documentation
     s.add_development_dependency('redcarpet', '~> 3.6.1') # For Markdown parsing
     s.add_development_dependency('ocran', '~>1.3.16') # For packaging
-    s.add_runtime_dependency('gli', '~> 2.22.1')
+    s.add_runtime_dependency('gli', '~> 2.22.2')
     s.add_runtime_dependency('oj', '~> 3.16.10') # For JSON parsing
     s.extensions << './ext/rgss3a_rvdata2/extconf.rb' # Add C extension
 end
