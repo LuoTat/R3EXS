@@ -1,5 +1,12 @@
 # [R3EXS]
 
+## [1.1.0] - 2025-04-09
+
+-   添加了递归搜索目标目录下的 \*.rvdata2 文件的功能
+-   修复了 R3EXS::EventCommand 类里面的 205 和 505 指令的处理问题
+-   修复了 StringsInjector 里面的逻辑错误，即在遍历 AST 时，错误地将翻译后的字符串放入 location 中
+-   gli 版本更新到 2.22.2
+
 ## [1.0.5] - 2025-03-12
 
 -   rb_in_strings 方法里面添加将 Scripts_info.json 文件拷贝至目标目录里面，以避免后续报错
