@@ -7,60 +7,27 @@ require_relative 'RGSS3_R3EXS'
 
 module R3EXS
 
-    # 将 Ruby 源码中的字符串和符号替换为指定的字符串
-    #
-    # @param target_dir [String] 目标目录
-    # @param output_dir [String] 输出目录
-    # @param hash [Hash]
-    #
-    # @raise [ScriptsDirError] Scripts 目录不存在
-    # @raise [ScriptsInfoPathError] Scripts_info.json 文件不存在
-    #
-    # @return [void]
-    def R3EXS.rb_in_strings(target_dir, output_dir, hash)
-        target_full_dir       = File.join(target_dir, 'Scripts')
-        output_full_dir       = File.join(output_dir, 'Scripts')
-        script_info_file_path = File.join(target_full_dir, 'Scripts_info.json')
-
-        FileUtils.mkdir(output_full_dir) unless Dir.exist?(output_full_dir)
-        Dir.exist?(target_full_dir) or raise ScriptsDirError.new(target_full_dir), "Scripts directory not found: #{target_full_dir}"
-        File.exist?(script_info_file_path) or raise ScriptsInfoPathError.new(script_info_file_path), "Scripts_info.json not found: #{script_info_file_path}"
-
-        print "#{Utils::ESCAPE}#{Utils::YELLOW_COLOR}Copying #{Utils::RESET_COLOR}Scripts_info.json to #{output_full_dir}...\r" if $global_options[:verbose]
-        FileUtils.cp(script_info_file_path, output_full_dir)
-
-        Dir.glob(File.join(target_full_dir, "*.rb")).each do |script_file_path|
-            output_script_file_dir = File.join(output_full_dir, File.basename(script_file_path))
-            print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Injecting to #{Utils::RESET_COLOR}#{output_script_file_dir}...\r" if $global_options[:verbose]
-
-            File.write(output_script_file_dir, StringsInjector.new(hash).rewrite(script_file_path, Prism.parse_file(script_file_path).value), mode: 'w')
-
-            print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Injected #{Utils::RESET_COLOR}#{output_script_file_dir}\n" if $global_options[:verbose]
-        end
-    end
-
     # 将指定目录下的所有已经序列化为 R3EXS 后的 JOSN 文件按照 ManualTransFile.json 翻译注入
     #
-    # @param target_dir [String] 目标目录
-    # @param output_dir [String] 输出目录
-    # @param manualtransfile_path [String] ManualTransFile.json 文件路径
+    # @param target_dir [Pathname] 目标目录
+    # @param output_dir [Pathname] 输出目录
+    # @param manualtransfile_path [Pathname] ManualTransFile.json 文件路径
     # @param with_scripts [Boolean] 是否包含脚本
     #
     # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
     # @raise [JsonDirError] target_dir 不存在
-    # @raise [ScriptsDirError] Scripts 目录不存在
     # @raise [ScriptsInfoPathError] Scripts_info.json 文件不存在
     # @raise [ManualTransFilePath] ManualTransFile.json 不存在
     #
     # @return [void]
     def R3EXS.in_strings(target_dir, output_dir, manualtransfile_path, with_scripts)
-        FileUtils.mkdir(output_dir) unless Dir.exist?(output_dir)
-        File.exist?(manualtransfile_path) or raise ManualTransFilePathError.new(manualtransfile_path), "ManualTransFile.json not found: #{manualtransfile_path}"
+        manualtransfile_path.exist? or raise ManualTransFilePathError.new(manualtransfile_path.to_s), "ManualTransFile.json not found: #{manualtransfile_path}"
 
-        manual_trans_hash = Oj.load_file(manualtransfile_path)
+        manual_trans_hash = Oj.load_file(manualtransfile_path.to_s)
 
-        Utils.all_json_files(target_dir, :R3EXS) do |object, file_basename|
-            file_path = File.join(output_dir, "#{file_basename}.json")
+        # 处理常规的 JSON 文件
+        Utils.all_json_files(target_dir, :R3EXS) do |object, file_basename, parent_relative_dir|
+            file_path = output_dir.join(parent_relative_dir, "#{file_basename}.json")
             print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Injecting to #{Utils::RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
             if object.is_a?(Array)
                 object.each do |obj|
@@ -70,11 +37,37 @@ module R3EXS
                 object.in_strings(manual_trans_hash)
             end
             Utils.object_json(object, file_path)
-            print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Injected #{Utils::RESET_COLOR}#{file_basename}\n" if $global_options[:verbose]
+            print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Injected #{Utils::RESET_COLOR}#{file_path}\n" if $global_options[:verbose]
         end
 
+        # 处理 CommonEvent_\d{5}.json 文件
+        Utils.all_commonevent_json_files(target_dir, :R3EXS) do |commonevents, commonevents_basenames, parent_relative_dir|
+            commonevents.zip(commonevents_basenames).each do |commonevent, commonevent_basename|
+                file_path = output_dir.join(parent_relative_dir, "#{commonevent_basename}.json")
+                print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Injecting to #{Utils::RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
+                commonevent.in_strings(manual_trans_hash)
+                Utils.object_json(commonevent, file_path)
+                print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Injected #{Utils::RESET_COLOR}#{file_path}\n" if $global_options[:verbose]
+            end
+        end
+
+        # 处理 \d{5}.rb 文件
         if with_scripts
-            rb_in_strings(target_dir, output_dir, manual_trans_hash)
+            Utils.all_rb_files(target_dir) do |scripts, scripts_basenames, parent_relative_dir|
+                full_output_dir = output_dir.join(parent_relative_dir)
+                full_output_dir.mkdir unless full_output_dir.exist?
+
+                script_info_file_path = target_dir.join(parent_relative_dir, 'Scripts_info.json')
+                script_info_file_path.exist? or raise ScriptsInfoPathError.new(script_info_file_path.to_s), "Scripts_info.json not found: #{script_info_file_path}"
+                # 记得把 Scripts_info.json  也复制过去
+                FileUtils.cp(script_info_file_path, full_output_dir)
+
+                scripts.zip(scripts_basenames).each do |script, script_basename|
+                    output_file_path = full_output_dir.join("#{script_basename}.rb")
+                    output_file_path.binwrite(StringsInjector.new(manual_trans_hash).rewrite(script, Prism.parse(script).value))
+                    print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Injected #{Utils::RESET_COLOR}#{output_file_path}\n" if $global_options[:verbose]
+                end
+            end
         end
     end
 
