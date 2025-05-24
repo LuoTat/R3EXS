@@ -2,7 +2,7 @@ require 'bundler/gem_tasks'
 require 'rake/extensiontask'
 
 # 添加 C 扩展构建任务
-Rake::ExtensionTask.new('rgss3a_rvdata2') do |ext|
+Rake::ExtensionTask.new('R3EXS') do |ext|
     ext.lib_dir = "lib/R3EXS"
 end
 

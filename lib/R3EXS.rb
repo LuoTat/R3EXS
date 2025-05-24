@@ -8,5 +8,6 @@ module R3EXS
     require_relative 'R3EXS/json_rvdata2'
     require_relative 'R3EXS/extract_strings'
     require_relative 'R3EXS/inject_strings'
-    require_relative 'R3EXS/rgss3a_rvdata2.so'
+
+    require_relative 'R3EXS/R3EXS' # C extension
 end

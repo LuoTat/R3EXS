@@ -8,7 +8,7 @@ unsigned short wchar_arr_size = 0;
  * 将指定长度的 UTF-8 字符串转换为 wchar 字符串
  * wchar 字符串会被存储在 wchar_arr 中
  * 同时更新 wchar_arr_size
- * 
+ *
  * @param utf8char UTF-8 字符串
  * @param n 字符串长度
  * @return 0 成功，-1 失败
@@ -68,10 +68,10 @@ unsigned short char_arr_size = 0;
  * @param n 字符串长度
  * @return 0 成功，-1 失败
  */
-static int utf8tomb(const char* utf8char, size_t n)
+static int utf8tomb(const char* utf8char, const size_t n)
 {
     // 计算转换为 char 所需的缓冲区大小，包括结尾的 '\0'
-    int mb_size = n + 1;
+    const size_t mb_size = n + 1;
     if (mb_size > char_arr_size)
     {
         char* char_arr_new = (char*)realloc(char_arr, sizeof(char) * mb_size);
@@ -136,12 +136,12 @@ enum RGSSAD_DECRYPT_TYPE
  * @param magickey 解密密钥
  * @return [void]
  */
-static void decrypt_file_name(unsigned char* data, size_t n, unsigned int magickey)
+static void decrypt_file_name(unsigned char* data, const size_t n, const unsigned int magickey)
 {
-    size_t        q      = n >> 2;
-    char          r      = n & MOD_4_MASK;
+    const size_t  q      = n >> 2;
+    const char    r      = n & MOD_4_MASK;
     unsigned int* data_p = (unsigned int*)data;
-    for (; data_p < (unsigned int*)(data + q * 4); ++data_p) *data_p ^= magickey;
+    for (; data_p < (unsigned int*)(data + q * sizeof(int)); ++data_p) *data_p ^= magickey;
     switch (r)
     {
         case 1 : *data_p ^= (magickey & MASK_KEY_1); break;
@@ -158,12 +158,12 @@ static void decrypt_file_name(unsigned char* data, size_t n, unsigned int magick
  * @param magickey 解密密钥
  * @return [void]
  */
-static void decrypt_file_data(unsigned char* data, size_t n, unsigned int magickey)
+static void decrypt_file_data(unsigned char* data, const size_t n, unsigned int magickey)
 {
-    size_t        q      = n >> 2;
+    const size_t  q      = n >> 2;
     char          r      = n & MOD_4_MASK;
     unsigned int* data_p = (unsigned int*)data;
-    for (; data_p < (unsigned int*)(data + q * 4); ++data_p)
+    for (; data_p < (unsigned int*)(data + q * sizeof(int)); ++data_p)
     {
         *data_p  ^= magickey;
         magickey  = magickey * 7 + 3;
@@ -273,9 +273,9 @@ static void fclose_error_handler(const char* path)
  * @raise [SystemCallError] 系统调用失败
  * @return [void]
  */
-static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALUE verbose)
+static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, const VALUE verbose)
 {
-    bool verbose_bool   = RTEST(verbose);
+    bool verbose_bool = RTEST(verbose);
     // 首先将 Ruby 的 VALUE 转换为 C 的字符串
     char* target_path_C = StringValueCStr(target_path);
     char* output_dir_C  = StringValueCStr(output_dir);
@@ -295,10 +295,7 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 #endif
 #ifdef __linux__
     if (mkdir(output_dir_C, 0755) == -1 && errno != EEXIST)
-    {
-        free(char_arr);
         mkdir_error_handler(output_dir_C);
-    }
 #endif
 
     // 打开文件
@@ -318,10 +315,7 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 #ifdef __linux__
     FILE* Rgss3a_file = fopen(target_path_C, "rb");
     if (!Rgss3a_file)
-    {
-        free(char_arr);
         fopen_error_handler(target_path_C);
-    }
 #endif
 
     // 获取文件大小
@@ -329,9 +323,6 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
     {
 #ifdef _WIN32
         free(wchar_arr);
-#endif
-#ifdef __linux__
-        free(char_arr);
 #endif
         if (fclose(Rgss3a_file) == EOF)
             fclose_error_handler(target_path_C);
@@ -343,9 +334,6 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 #ifdef _WIN32
         free(wchar_arr);
 #endif
-#ifdef __linux__
-        free(char_arr);
-#endif
         if (fclose(Rgss3a_file) == EOF)
             fclose_error_handler(target_path_C);
         ftell_error_handler(target_path_C);
@@ -354,9 +342,6 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
     {
 #ifdef _WIN32
         free(wchar_arr);
-#endif
-#ifdef __linux__
-        free(char_arr);
 #endif
         if (fclose(Rgss3a_file) == EOF)
             fclose_error_handler(target_path_C);
@@ -370,9 +355,6 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 #ifdef _WIN32
         free(wchar_arr);
 #endif
-#ifdef __linux__
-        free(char_arr);
-#endif
         if (fclose(Rgss3a_file) == EOF)
             fclose_error_handler(target_path_C);
         malloc_error_handler();
@@ -384,9 +366,6 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
     {
 #ifdef _WIN32
         free(wchar_arr);
-#endif
-#ifdef __linux__
-        free(char_arr);
 #endif
         free(Rgss3a_data);
         if (fclose(Rgss3a_file) == EOF)
@@ -424,13 +403,10 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 #ifdef _WIN32
         free(wchar_arr);
 #endif
-#ifdef __linux__
-        free(char_arr);
-#endif
         // 不支持的 RGSS3A 加密格式
         free(Rgss3a_data);
-        VALUE error_message = rb_sprintf("Unknown RGSS3A file decrypted type: %+" PRIsVALUE, target_path);
-        VALUE exception     = rb_funcall(r3exs_RGSS3AFileError_class, r3exs_new_id, 1, error_message);
+        const VALUE error_message = rb_sprintf("Unknown RGSS3A file decrypted type: %+" PRIsVALUE, target_path);
+        const VALUE exception     = rb_funcall(r3exs_RGSS3AFileError_class, r3exs_new_id, 1, error_message);
         rb_exc_raise(exception);
     }
 
@@ -453,11 +429,11 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
         // 读取数据段偏移量
         unsigned int data_offset = *(unsigned int*)Rgss3a_p ^ magickey;
         if (data_offset == 0) break;
-        Rgss3a_p                   += 4;
+        Rgss3a_p += 4;
 
         // 读取数据段长度
-        unsigned int data_size      = *(unsigned int*)Rgss3a_p ^ magickey;
-        Rgss3a_p                   += 4;
+        unsigned int data_size  = *(unsigned int*)Rgss3a_p ^ magickey;
+        Rgss3a_p               += 4;
 
         // 读取数据段 magicKey
         unsigned int data_magickey  = *(unsigned int*)Rgss3a_p ^ magickey;
@@ -588,23 +564,23 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 }
 
 /*
- * 初始化 R3EXS 模块方法 rgss3a_rvdata2
+ * 初始化 R3EXS 模块
  *
  * @return [void]
  */
-void Init_rgss3a_rvdata2()
+void Init_R3EXS()
 {
     // 定义 R3EXS 模块
-    R3EXS                       = rb_define_module("R3EXS");
+    R3EXS = rb_define_module("R3EXS");
     // 定义 ID
-    r3exs_RGSS3AFileError_id    = rb_intern("RGSS3AFileError");
-    r3exs_File_id               = rb_intern("File");
-    r3exs_FileUtils_id          = rb_intern("FileUtils");
-    r3exs_Dir_id                = rb_intern("Dir");
-    r3exs_join_id               = rb_intern("join");
-    r3exs_dirname_id            = rb_intern("dirname");
-    r3exs_exist_id              = rb_intern("exist?");
-    r3exs_mkdir_p_id            = rb_intern("mkdir_p");
+    r3exs_RGSS3AFileError_id = rb_intern("RGSS3AFileError");
+    r3exs_File_id            = rb_intern("File");
+    r3exs_FileUtils_id       = rb_intern("FileUtils");
+    r3exs_Dir_id             = rb_intern("Dir");
+    r3exs_join_id            = rb_intern("join");
+    r3exs_dirname_id         = rb_intern("dirname");
+    r3exs_exist_id           = rb_intern("exist?");
+    r3exs_mkdir_p_id         = rb_intern("mkdir_p");
 
     // 定义模块和类
     r3exs_RGSS3AFileError_class = rb_const_get(R3EXS, r3exs_RGSS3AFileError_id);
