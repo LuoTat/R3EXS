@@ -1,5 +1,5 @@
 # Ensure we require the local version and not one we might have installed already.
-require File.join([File.dirname(__FILE__), 'lib', 'R3EXS', 'version.rb'])
+require File.join(__dir__, 'lib', 'R3EXS', 'version.rb')
 spec = Gem::Specification.new do |s|
     s.name     = 'R3EXS'
     s.version  = R3EXS::VERSION
@@ -9,23 +9,23 @@ spec = Gem::Specification.new do |s|
     s.email    = 'LuoTat.s@gmail.com'
     s.homepage = 'https://github.com/LuoTat/R3EXS'
     s.metadata = {
-      'bug_tracker_uri'   => 'https://github.com/LuoTat/R3EXS/issues',
-      'changelog_uri'     => 'https://github.com/LuoTat/R3EXS/blob/main/CHANGELOG.md',
-      'documentation_uri' => 'https://rubydoc.info/gems/R3EXS',
-      'source_code_uri'   => 'https://github.com/LuoTat/R3EXS',
+        'bug_tracker_uri'   => 'https://github.com/LuoTat/R3EXS/issues',
+        'changelog_uri'     => 'https://github.com/LuoTat/R3EXS/blob/main/CHANGELOG.md',
+        'documentation_uri' => 'https://rubydoc.info/gems/R3EXS',
+        'source_code_uri'   => 'https://github.com/LuoTat/R3EXS',
     }
-    s.files    = Dir['bin/R3EXS', 'ext/rgss3a_rvdata2/*', 'lib/**/*.rb', '.yardopts', 'CHANGELOG.md', 'LICENSE', 'README.md', 'README_EN.md']
+    s.files    = Dir['bin/R3EXS', '{lib,ext}/**/*.{rb,h,c}', '.yardopts', 'CHANGELOG.md', 'LICENSE', 'README.md', 'README_EN.md']
     s.bindir   = 'bin'
     s.executables << 'R3EXS'
     s.platform              = Gem::Platform::RUBY
     s.required_ruby_version = '>= 3.4.1'
-    s.require_paths << 'lib'
     s.add_development_dependency('rake', '~> 13.2.1')
-    s.add_development_dependency('rake-compiler', '~> 1.2.9') # For building C extension
+    s.add_development_dependency('rake-compiler', '~> 1.3.0') # For building C extension
     s.add_development_dependency('yard', '~> 0.9.37') # For documentation
     s.add_development_dependency('redcarpet', '~> 3.6.1') # For Markdown parsing
-    s.add_development_dependency('ocran', '~>1.3.16') # For packaging
+    s.add_development_dependency('ocran', '~>1.3.17') # For packaging
     s.add_runtime_dependency('gli', '~> 2.22.2')
     s.add_runtime_dependency('oj', '~> 3.16.10') # For JSON parsing
-    s.extensions << './ext/rgss3a_rvdata2/extconf.rb' # Add C extension
+    s.add_runtime_dependency('ruby-openai', '~> 8.1.0') # For OpenAI API
+    s.extensions << './ext/R3EXS/extconf.rb' # Add C extension
 end
