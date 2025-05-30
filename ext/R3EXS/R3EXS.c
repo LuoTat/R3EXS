@@ -116,17 +116,25 @@ VALUE r3exs_File_module;
 VALUE r3exs_FileUtils_module;
 VALUE r3exs_Dir_module;
 
-#define MOD_4_MASK 0b11
-#define MASK_KEY_1 0x000000FF
-#define MASK_KEY_2 0x0000FFFF
-#define MASK_KEY_3 0x00FFFFFF
-
 // 解码文件类型
 enum RGSSAD_DECRYPT_TYPE
 {
     RGSSAD,
     Fux2Pack2
 };
+
+#if defined(__AVX512F__)
+    #include <immintrin.h>
+    #define MOD_64_MASK 0b111111
+#elif defined(__AVX2__)
+    #include <immintrin.h>
+    #define MOD_32_MASK 0b11111
+#endif
+
+#define MOD_4_MASK 0b11
+#define MASK_KEY_1 0x000000FF
+#define MASK_KEY_2 0x0000FFFF
+#define MASK_KEY_3 0x00FFFFFF
 
 /*
  * 解码文件名
@@ -136,12 +144,13 @@ enum RGSSAD_DECRYPT_TYPE
  * @param magickey 解密密钥
  * @return [void]
  */
-static void decrypt_file_name(unsigned char* data, const size_t n, const unsigned int magickey)
+static void decrypt_file_name(uint8_t* data, const size_t n, const uint32_t magickey)
 {
-    const size_t  q      = n >> 2;
-    const char    r      = n & MOD_4_MASK;
-    unsigned int* data_p = (unsigned int*)data;
-    for (; data_p < (unsigned int*)(data + q * sizeof(int)); ++data_p) *data_p ^= magickey;
+    const size_t q      = n >> 2;
+    const char   r      = n & MOD_4_MASK;
+    uint32_t*    data_p = (uint32_t*)data;
+    for (; data_p < (uint32_t*)(data + q * sizeof(uint32_t)); ++data_p)
+        *data_p ^= magickey;
     switch (r)
     {
         case 1 : *data_p ^= (magickey & MASK_KEY_1); break;
@@ -150,20 +159,12 @@ static void decrypt_file_name(unsigned char* data, const size_t n, const unsigne
     }
 }
 
-/*
- * 解码数据段
- *
- * @param data 数据段指针
- * @param n 数据段长度
- * @param magickey 解密密钥
- * @return [void]
- */
-static void decrypt_file_data(unsigned char* data, const size_t n, unsigned int magickey)
+static void decrypt_file_data_scalar(uint8_t* data, const size_t n, uint32_t magickey)
 {
-    const size_t  q      = n >> 2;
-    char          r      = n & MOD_4_MASK;
-    unsigned int* data_p = (unsigned int*)data;
-    for (; data_p < (unsigned int*)(data + q * sizeof(int)); ++data_p)
+    const size_t q      = n >> 2;
+    char         r      = n & MOD_4_MASK;
+    uint32_t*    data_p = (uint32_t*)data;
+    for (; data_p < (uint32_t*)(data + q * sizeof(uint32_t)); ++data_p)
     {
         *data_p  ^= magickey;
         magickey  = magickey * 7 + 3;
@@ -174,6 +175,87 @@ static void decrypt_file_data(unsigned char* data, const size_t n, unsigned int 
         case 2 : *data_p ^= (magickey & MASK_KEY_2); break;
         case 3 : *data_p ^= (magickey & MASK_KEY_3); break;
     }
+}
+
+#if defined(__AVX512F__)
+static void decrypt_file_data_avx512(uint8_t* data, const size_t n, uint32_t magickey)
+{
+    const size_t q      = n >> 6;    // 64 字节为一组
+    const char   r      = n & MOD_64_MASK;
+    __m512i*     data_p = (__m512i*)data;
+    for (; data_p < (__m512i*)(data + q * sizeof(__m512i)); ++data_p)
+    {
+        // 每次循环以当前 magickey 生成 16 个连续密钥 k0..k15
+        uint32_t ks[16];
+        ks[0] = magickey;
+        for (int i = 1; i < 16; ++i)
+            ks[i] = ks[i - 1] * 7 + 3;
+        // 下一轮初始 magickey
+        magickey = ks[15] * 7 + 3;
+
+        __m512i v_magickey = _mm512_setr_epi32(
+            ks[0], ks[1], ks[2], ks[3],
+            ks[4], ks[5], ks[6], ks[7],
+            ks[8], ks[9], ks[10], ks[11],
+            ks[12], ks[13], ks[14], ks[15]);
+        // 加载 64 字节
+        __m512i tmp = _mm512_loadu_si512(data_p);
+        // 并行异或
+        tmp = _mm512_xor_si512(tmp, v_magickey);
+        // 写回
+        _mm512_storeu_si512(data_p, tmp);
+    }
+    // 处理剩余 r 字节
+    decrypt_file_data_scalar((uint8_t*)data_p, r, magickey);
+}
+#elif defined(__AVX2__)
+static void decrypt_file_data_avx2(uint8_t* data, const size_t n, uint32_t magickey)
+{
+    const size_t q      = n >> 5;    // 32 字节为一组
+    const char   r      = n & MOD_32_MASK;
+    __m256i*     data_p = (__m256i*)data;
+    for (; data_p < (__m256i*)(data + q * sizeof(__m256i)); ++data_p)
+    {
+        // 每次循环以当前 magickey 生成 8 个连续密钥 k0..k7
+        uint32_t ks[8];
+        ks[0] = magickey;
+        for (int i = 1; i < 8; ++i)
+            ks[i] = ks[i - 1] * 7 + 3;
+        // 下一轮初始 magickey
+        magickey = ks[7] * 7 + 3;
+
+        __m256i v_magickey = _mm256_setr_epi32(
+            ks[0], ks[1], ks[2], ks[3],
+            ks[4], ks[5], ks[6], ks[7]);
+        // 加载 32 字节
+        __m256i tmp = _mm256_loadu_si256(data_p);
+        // 并行异或
+        tmp = _mm256_xor_si256(tmp, v_magickey);
+        // 写回
+        _mm256_storeu_si256(data_p, tmp);
+    }
+    // 处理剩余 r 字节
+    decrypt_file_data_scalar((uint8_t*)data_p, r, magickey);
+}
+#endif
+
+/*
+ * 解码数据段
+ *
+ * @param data 数据段指针
+ * @param n 数据段长度
+ * @param magickey 解密密钥
+ * @return [void]
+ */
+inline static void decrypt_file_data_dispatch(uint8_t* data, size_t n, uint32_t key)
+{
+#if defined(__AVX512F__)
+    decrypt_file_data_avx512(data, n, key);
+#elif defined(__AVX2__)
+    decrypt_file_data_avx2(data, n, key);
+#else
+    decrypt_file_data_scalar(data, n, key);
+#endif
 }
 
 /*
@@ -386,7 +468,7 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 #endif
 
     // 设置文件指针索引
-    unsigned char* Rgss3a_p = Rgss3a_data;
+    uint8_t* Rgss3a_p = Rgss3a_data;
 
     // 判断加密类型
     enum RGSSAD_DECRYPT_TYPE decrypt_type;
@@ -412,14 +494,14 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 
     // 读取 MagicKey
     Rgss3a_p += 8;
-    unsigned int magickey;
+    uint32_t magickey;
     switch (decrypt_type)
     {
         case RGSSAD :
-            magickey = *(unsigned int*)Rgss3a_p * 9 + 3;
+            magickey = *(uint32_t*)Rgss3a_p * 9 + 3;
             break;
         case Fux2Pack2 :
-            magickey = *(unsigned int*)Rgss3a_p;
+            magickey = *(uint32_t*)Rgss3a_p;
             break;
     }
     Rgss3a_p += 4;
@@ -427,21 +509,22 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
     while (1)
     {
         // 读取数据段偏移量
-        unsigned int data_offset = *(unsigned int*)Rgss3a_p ^ magickey;
-        if (data_offset == 0) break;
+        uint32_t data_offset = *(uint32_t*)Rgss3a_p ^ magickey;
+        if (data_offset == 0)
+            break;
         Rgss3a_p += 4;
 
         // 读取数据段长度
-        unsigned int data_size  = *(unsigned int*)Rgss3a_p ^ magickey;
-        Rgss3a_p               += 4;
+        uint32_t data_size  = *(uint32_t*)Rgss3a_p ^ magickey;
+        Rgss3a_p           += 4;
 
         // 读取数据段 magicKey
-        unsigned int data_magickey  = *(unsigned int*)Rgss3a_p ^ magickey;
-        Rgss3a_p                   += 4;
+        uint32_t data_magickey  = *(uint32_t*)Rgss3a_p ^ magickey;
+        Rgss3a_p               += 4;
 
         // 读取文件名长度
-        unsigned int filename_size  = *(unsigned int*)Rgss3a_p ^ magickey;
-        Rgss3a_p                   += 4;
+        uint32_t filename_size  = *(uint32_t*)Rgss3a_p ^ magickey;
+        Rgss3a_p               += 4;
 
         // 解码文件名
         if (verbose_bool)
@@ -449,7 +532,7 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
         decrypt_file_name(Rgss3a_p, filename_size, magickey);
 
         // 将文件名中的 '\\' 替换为 '/'
-        for (unsigned int i = 0; i < filename_size; ++i)
+        for (uint32_t i = 0; i < filename_size; ++i)
         {
             if (Rgss3a_p[i] == '\\')
                 Rgss3a_p[i] = '/';
@@ -482,7 +565,7 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
         if (verbose_bool)
             printf("\e[2K\e[32mDecrypting \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m...\r", char_arr, data_offset, data_size, data_magickey);
 #endif
-        decrypt_file_data(Rgss3a_data + data_offset, data_size, data_magickey);
+        decrypt_file_data_dispatch(Rgss3a_data + data_offset, data_size, data_magickey);
 #ifdef _WIN32
         if (verbose_bool)
             printf("\e[2K\e[32mDecrypted \e[0m%ls \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m\n", wchar_arr, data_offset, data_size, data_magickey);
@@ -496,7 +579,7 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
         // 先将 output_dir 和文件名拼接得到 output_full_path
         // 再通过 File.dirname(output_full_path) 获得 output_full_dir
         // 最后通过 FileUtils.mkdir_p(output_full_dir) 递归创建目录
-        VALUE output_full_path   = rb_funcall(r3exs_File_module, r3exs_join_id, 2, output_dir, rb_utf8_str_new(Rgss3a_p, filename_size));
+        VALUE output_full_path   = rb_funcall(r3exs_File_module, r3exs_join_id, 2, output_dir, rb_utf8_str_new((char*)Rgss3a_p, filename_size));
         VALUE output_full_dir    = rb_funcall(r3exs_File_module, r3exs_dirname_id, 1, output_full_path);
         char* output_full_path_C = StringValueCStr(output_full_path);
         // 创建目录
