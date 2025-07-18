@@ -2,7 +2,6 @@
 
 require 'zlib'
 require_relative 'utils'
-require_relative 'RGSS3_R3EXS'
 
 module R3EXS
 

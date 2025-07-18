@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'oj'
+require_relative 'RGSS3'
 require_relative 'RGSS3_R3EXS'
 
 module R3EXS
@@ -207,7 +208,7 @@ module R3EXS
                                                                                                           |--[int:3(Game Data)]--|
                                                                                                           |                      |--[int:5(Character)]---[int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int:{0:Map X, 1:Map Y, 2:Direction, 3:Screen X ,4:Screen Y}]---END
                                                                                                           |                      |
-                                                                                                          |                      |--[int:6(Party)]---[int:{0~7}(Member ID)]---[int:0]---END('s Actor ID)
+                                                                                                          |                      |--[int:6(Party)]---[int:{0~7}(Member ID)]---[int:0]---END
                                                                                                           |                      |
                                                                                                           |                      |--[int:7(Other)]---[int:{0(Map ID), 1(Party Members), 2(Gold), 3(Steps), 4(Play Time), 5(Timer), 6(Save Count), 7(Battle Count)}]---[int:0]---END
                                                                                                           |
@@ -320,7 +321,7 @@ module R3EXS
                                                 |                                                                                                                       |
     [int:{0:This Event, 1:EV001, ...}]----------|--[int:1(Designation with Variables)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|--[int:{0:Retain, 2:Down, 4:Left, 6:Right, 8:Up}(Direction)]---END
                                                 |                                                                                                                       |
-                                                |--[int:2(Exchange with Another Event)]---[int(Exchanged Event ID)]---[int:0]----------------------------------------- |
+                                                |--[int:2(Exchange with Another Event)]---[int(Exchanged Event ID)]---[int:0]-------------------------------------------|
 =end
             203 => 'SetEventLocation',
 
@@ -1060,6 +1061,7 @@ module R3EXS
         #
         # @param object [Object] 待序列化的对象
         # @param output_file [Pathname] 输出文件路径
+        #
         # @return [void]
         def Utils.object_json(object, output_file)
             output_file.dirname.mkpath unless output_file.dirname.exist?
@@ -1070,6 +1072,7 @@ module R3EXS
         #
         # @param object [Object] 待序列化的对象
         # @param output_file [Pathname] 输出文件路径
+        #
         # @return [void]
         def Utils.object_rvdata2(object, output_file)
             output_file.dirname.mkpath unless output_file.dirname.exist?

@@ -2,7 +2,6 @@
 
 require 'zlib'
 require_relative 'utils'
-require_relative 'RGSS3_R3EXS'
 
 module R3EXS
 
@@ -10,6 +9,7 @@ module R3EXS
     #
     # @param scripts [Array<Object>] 待转换的 Script 对象数组
     # @param output_dir [Pathname] 输出目录
+    #
     # @return [void]
     def R3EXS.scripts_rb(scripts, output_dir)
         output_dir.mkpath unless output_dir.exist?
@@ -38,6 +38,7 @@ module R3EXS
     # @param output_dir [Pathname] 输出目录
     # @param complete [Boolean] 是否序列化所有内容
     # @param with_notes [Boolean] 是否包含备注
+    #
     # @return [void]
     def R3EXS.commonevents_json(commonevents, output_dir, complete, with_notes)
         full_dir = output_dir.join('CommonEvents')

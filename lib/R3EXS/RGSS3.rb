@@ -3,6 +3,26 @@
 # RPG Maker VX Ace Color 类
 class Color
 
+    # red 通道的值
+    #
+    # @return [Integer]
+    attr_reader :red
+
+    # green 通道的值
+    #
+    # @return [Integer]
+    attr_reader :green
+
+    # blue 通道的值
+    #
+    # @return [Integer]
+    attr_reader :blue
+
+    # alpha 通道的值
+    #
+    # @return [Integer]
+    attr_reader :alpha
+
     # 初始化时接受以下几种参数情况：
     # - 无参数时，默认 (0, 0, 0, 0)
     # - 3 个参数时，默认为 (red, green, blue, 255)
@@ -13,6 +33,7 @@ class Color
     #        - green: 绿色通道的值 (0-255)
     #        - blue: 蓝色通道的值 (0-255)
     #        - alpha: 可选，透明度通道的值 (0-255)，默认为 255
+    #
     # @return [Color]
     def initialize(*args)
         case args.length
@@ -37,6 +58,7 @@ class Color
     #        - green: 绿色通道的值 (0-255)
     #        - blue: 蓝色通道的值 (0-255)
     #        - alpha: 可选，透明度通道的值 (0-255)，默认为 255
+    #
     # @return [void]
     def set(*args)
         case args.length
@@ -68,6 +90,7 @@ class Color
     # 序列化 Color 对象
     #
     # @param level [Integer] 序列化的级别
+    #
     # @return [String]
     def _dump(level)
         [@red, @green, @blue, @alpha].pack('D4')
@@ -76,6 +99,7 @@ class Color
     # 反序列化 Color 对象
     #
     # @param obj [String] 序列化后的字符串
+    #
     # @return [Color]
     def Color._load(obj)
         new(*obj.unpack('D4'))
@@ -84,6 +108,7 @@ class Color
     # 设置 red 通道的值，限制在 0 到 255 之间
     #
     # @param value [Float] 新的 red 通道值
+    #
     # @return [void]
     def red=(value)
         @red = [[value, 0.0].max, 255.0].min.to_i
@@ -92,6 +117,7 @@ class Color
     # 设置 green 通道的值，限制在 0 到 255 之间
     #
     # @param value [Float] 新的 green 通道值
+    #
     # @return [void]
     def green=(value)
         @green = [[value, 0.0].max, 255.0].min.to_i
@@ -100,6 +126,7 @@ class Color
     # 设置 blue 通道的值，限制在 0 到 255 之间
     #
     # @param value [Float] 新的 blue 通道值
+    #
     # @return [void]
     def blue=(value)
         @blue = [[value, 0.0].max, 255.0].min.to_i
@@ -108,10 +135,15 @@ class Color
     # 设置 alpha 通道的值，限制在 0 到 255 之间
     #
     # @param value [Float] 新的 alpha 通道值
+    #
     # @return [void]
     def alpha=(value)
         @alpha = [[value, 0.0].max, 255.0].min
     end
+end
+
+# RPG Maker VX Ace Tone 类
+class Tone
 
     # red 通道的值
     #
@@ -128,14 +160,10 @@ class Color
     # @return [Integer]
     attr_reader :blue
 
-    # alpha 通道的值
+    # gray 通道的值
     #
     # @return [Integer]
-    attr_reader :alpha
-end
-
-# RPG Maker VX Ace Tone 类
-class Tone
+    attr_reader :gray
 
     # 初始化时接受以下几种参数情况：
     # - 无参数时，默认 (0, 0, 0, 0)
@@ -147,6 +175,7 @@ class Tone
     #        - green: 绿色通道的值 (-255-255)
     #        - blue: 蓝色通道的值 (-255-255)
     #        - gray: 可选，灰度通道的值 (0-255)，默认为 0
+    #
     # @return [Tone]
     def initialize(*args)
         case args.length
@@ -171,6 +200,7 @@ class Tone
     #        - green: 绿色通道的值 (-255-255)
     #        - blue: 蓝色通道的值 (-255-255)
     #        - gray: 可选，透明度通道的值 (0-255)，默认为 0
+    #
     # @return [void]
     def set(*args)
         case args.length
@@ -201,6 +231,7 @@ class Tone
     # 序列化 Tone 对象
     #
     # @param level [Integer] 序列化的级别
+    #
     # @return [String]
     def _dump(level)
         [@red, @green, @blue, @gray].pack('D4')
@@ -209,6 +240,7 @@ class Tone
     # 反序列化 Tone 对象
     #
     # @param obj [String] 序列化后的字符串
+    #
     # @return [Tone]
     def Tone._load(obj)
         new(*obj.unpack('D4'))
@@ -217,6 +249,7 @@ class Tone
     # 设置 red 通道的值，限制在 -255 到 255 之间
     #
     # @param value [Float] 新的 red 通道值
+    #
     # @return [void]
     def red=(value)
         @red = [[value, -255.0].max, 255.0].min.to_i
@@ -225,6 +258,7 @@ class Tone
     # 设置 green 通道的值，限制在 -255 到 255 之间
     #
     # @param value [Float] 新的 green 通道值
+    #
     # @return [void]
     def green=(value)
         @green = [[value, -255.0].max, 255.0].min.to_i
@@ -233,6 +267,7 @@ class Tone
     # 设置 blue 通道的值，限制在 -255 到 255 之间
     #
     # @param value [Float] 新的 blue 通道值
+    #
     # @return [void]
     def blue=(value)
         @blue = [[value, -255.0].max, 255.0].min.to_i
@@ -241,31 +276,11 @@ class Tone
     # 设置 alpha 通道的值，限制在 0 到 255 之间
     #
     # @param value [Float] 新的 alpha 通道值
+    #
     # @return [void]
     def gray=(value)
         @gray = [[value, 0.0].max, 255.0].min.to_i
     end
-
-    # red 通道的值
-    #
-    # @return [Integer]
-    attr_reader :red
-
-    # green 通道的值
-    #
-    # @return [Integer]
-    attr_reader :green
-
-    # blue 通道的值
-    #
-    # @return [Integer]
-    attr_reader :blue
-
-    # gray 通道的值
-    #
-    # @return [Integer]
-    attr_reader :gray
-
 end
 
 # RPG Maker VX Ace Table 类
@@ -274,107 +289,6 @@ end
 #
 # Ruby Array 类在处理大量信息时效率很差，因此使用了此类。
 class Table
-
-    # 初始化 Table 对象，指定多维数组各维的长度。生成的数组可以是 1~3 维，甚至是没有元素的数组。
-    #
-    # 初始化时传入的参数个数决定了生成的数组维度：
-    # - 最少 1 维，最多 3 维。
-    # - `ysize` 和 `zsize` 参数可以省略，默认值为 1。
-    #
-    # 注意：该类没有参数检查，请确保 `ysize` 和 `zsize` 的值在 `[-32768, 32767]` 范围内。
-    #
-    # @param xsize [Integer] 第一维的长度（必需）
-    # @param ysize [Integer, nil] 第二维的长度（可选，默认值为 nil)
-    # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
-    # @return [Table]
-    def initialize(xsize, ysize = nil, zsize = nil)
-        init_attr(xsize, ysize, zsize)
-    end
-
-    # 设置各维的长度
-    #
-    # @param xsize [Integer] 第一维的长度
-    # @param ysize [Integer, nil] 第二维的长度（如果为 nil，则默认为 1）
-    # @param zsize [Integer, nil] 第三维的长度（如果为 nil，则默认为 1）
-    # @return [void]
-    def init_attr(xsize, ysize, zsize)
-        @dim   = 1 + (ysize.nil? ? 0 : 1) + (zsize.nil? ? 0 : 1)
-        @xsize = xsize
-        @ysize = ysize.nil? ? 1 : ysize
-        @zsize = zsize.nil? ? 1 : zsize
-        @data  = Array.new(@xsize * @ysize * @zsize, 0)
-    end
-
-    # 获取指定位置的元素值
-    #
-    # @param x [Integer] 第一维的长度（必需）
-    # @param y [Integer] 第二维的长度（可选，默认值为 0)
-    # @param z [Integer] 第三维的长度（可选，默认值为 0)
-    # @return [Integer]
-    def [](x, y = 0, z = 0)
-        @data[x + y * @xsize + z * @xsize * @ysize]
-    end
-
-    # 设置指定位置的元素值
-    #
-    # @param args [Array<Integer>] x, y, z, v
-    #   - x: 第一维的长度（必需）
-    #   - y: 第二维的长度（可选，默认值为 nil)
-    #   - z: 第三维的长度（可选，默认值为 nil)
-    #   - v: 新的元素值
-    # @return [void]
-    def []=(*args)
-        v                                           = args.pop
-        x, y, z                                     = args
-        y                                           ||= 0
-        z                                           ||= 0
-        @data[x + y * @xsize + z * @xsize * @ysize] = v
-    end
-
-    # 扩容 Table 对象，保留原有数据
-    #
-    # @param xsize [Integer] 第一维的长度（必需）
-    # @param ysize [Integer, nil] 第二维的长度（可选，默认值为 nil)
-    # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
-    # @return [void]
-    def resize(xsize, ysize = nil, zsize = nil)
-        old_data                        = @data.dup
-        old_xsize, old_ysize, old_zsize = @xsize, @ysize, @zsize
-        init_attr(xsize, ysize, zsize)
-        (0...[old_xsize, @xsize].min).each { |x|
-            (0...[old_ysize, @ysize].min).each { |y|
-                (0...[old_zsize, @zsize].min).each { |z|
-                    @data[x + y * @xsize + z * @xsize * @ysize] = old_data[x + y * old_xsize + z * old_xsize * old_ysize]
-                }
-            }
-        }
-    end
-
-    # 序列化 Table 对象
-    #
-    # @param level [Integer] 序列化的级别
-    # @return [String]
-    def _dump(level)
-        s = [@dim, @xsize, @ysize, @zsize, @xsize * @ysize * @zsize].pack('LLLLL')
-        @data.each do |d|
-            s << [d].pack('s')
-        end
-        s
-    end
-
-    # 反序列化 Table 对象
-    #
-    # @param obj [String] 序列化后的字符串
-    # @return [Table]
-    def Table._load(obj)
-        # 从序列化字符串中解包维度信息
-        dim, xsize, ysize, zsize, total_size = *obj[0, 20].unpack('LLLLL')
-        # 初始化 Table 对象
-        table      = Table.new(*[xsize, ysize, zsize].first(dim))
-        table.data = obj[20, total_size * 2].unpack("s#{total_size}")
-        # 现在 @data 已经从序列化字符串中完整提取
-        table
-    end
 
     # 数据数组
     #
@@ -400,6 +314,114 @@ class Table
     #
     # @return [Integer]
     attr_accessor :zsize
+
+    # 初始化 Table 对象，指定多维数组各维的长度。生成的数组可以是 1~3 维，甚至是没有元素的数组。
+    #
+    # 初始化时传入的参数个数决定了生成的数组维度：
+    # - 最少 1 维，最多 3 维。
+    # - `ysize` 和 `zsize` 参数可以省略，默认值为 1。
+    #
+    # 注意：该类没有参数检查，请确保 `ysize` 和 `zsize` 的值在 `[-32768, 32767]` 范围内。
+    #
+    # @param xsize [Integer] 第一维的长度（必需）
+    # @param ysize [Integer, nil] 第二维的长度（可选，默认值为 nil)
+    # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
+    #
+    # @return [Table]
+    def initialize(xsize, ysize = nil, zsize = nil)
+        init_attr(xsize, ysize, zsize)
+    end
+
+    # 设置各维的长度
+    #
+    # @param xsize [Integer] 第一维的长度
+    # @param ysize [Integer, nil] 第二维的长度（如果为 nil，则默认为 1）
+    # @param zsize [Integer, nil] 第三维的长度（如果为 nil，则默认为 1）
+    #
+    # @return [void]
+    def init_attr(xsize, ysize, zsize)
+        @dim   = 1 + (ysize.nil? ? 0 : 1) + (zsize.nil? ? 0 : 1)
+        @xsize = xsize
+        @ysize = ysize.nil? ? 1 : ysize
+        @zsize = zsize.nil? ? 1 : zsize
+        @data  = Array.new(@xsize * @ysize * @zsize, 0)
+    end
+
+    # 获取指定位置的元素值
+    #
+    # @param x [Integer] 第一维的长度（必需）
+    # @param y [Integer] 第二维的长度（可选，默认值为 0)
+    # @param z [Integer] 第三维的长度（可选，默认值为 0)
+    #
+    # @return [Integer]
+    def [](x, y = 0, z = 0)
+        @data[x + y * @xsize + z * @xsize * @ysize]
+    end
+
+    # 设置指定位置的元素值
+    #
+    # @param args [Array<Integer>] x, y, z, v
+    #   - x: 第一维的长度（必需）
+    #   - y: 第二维的长度（可选，默认值为 nil)
+    #   - z: 第三维的长度（可选，默认值为 nil)
+    #   - v: 新的元素值
+    #
+    # @return [void]
+    def []=(*args)
+        v                                           = args.pop
+        x, y, z                                     = args
+        y                                           ||= 0
+        z                                           ||= 0
+        @data[x + y * @xsize + z * @xsize * @ysize] = v
+    end
+
+    # 扩容 Table 对象，保留原有数据
+    #
+    # @param xsize [Integer] 第一维的长度（必需）
+    # @param ysize [Integer, nil] 第二维的长度（可选，默认值为 nil)
+    # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
+    #
+    # @return [void]
+    def resize(xsize, ysize = nil, zsize = nil)
+        old_data                        = @data.dup
+        old_xsize, old_ysize, old_zsize = @xsize, @ysize, @zsize
+        init_attr(xsize, ysize, zsize)
+        (0...[old_xsize, @xsize].min).each { |x|
+            (0...[old_ysize, @ysize].min).each { |y|
+                (0...[old_zsize, @zsize].min).each { |z|
+                    @data[x + y * @xsize + z * @xsize * @ysize] = old_data[x + y * old_xsize + z * old_xsize * old_ysize]
+                }
+            }
+        }
+    end
+
+    # 序列化 Table 对象
+    #
+    # @param level [Integer] 序列化的级别
+    #
+    # @return [String]
+    def _dump(level)
+        s = [@dim, @xsize, @ysize, @zsize, @xsize * @ysize * @zsize].pack('LLLLL')
+        @data.each do |d|
+            s << [d].pack('s')
+        end
+        s
+    end
+
+    # 反序列化 Table 对象
+    #
+    # @param obj [String] 序列化后的字符串
+    #
+    # @return [Table]
+    def Table._load(obj)
+        # 从序列化字符串中解包维度信息
+        dim, xsize, ysize, zsize, total_size = *obj[0, 20].unpack('LLLLL')
+        # 初始化 Table 对象
+        table      = Table.new(*[xsize, ysize, zsize].first(dim))
+        table.data = obj[20, total_size * 2].unpack("s#{total_size}")
+        # 现在 @data 已经从序列化字符串中完整提取
+        table
+    end
 end
 
 # RPG Maker VX Ace 的RPG 模块
@@ -692,7 +714,7 @@ module RPG
             acc_a = @exp_params[2].to_f
             acc_b = @exp_params[3].to_f
             return (basis * ((lv - 1) ** (0.9 + acc_a / 250)) * lv * (lv + 1) /
-              (6 + lv ** 2 / 50 / acc_b) + (lv - 1) * extra).round.to_i
+                (6 + lv ** 2 / 50 / acc_b) + (lv - 1) * extra).round.to_i
         end
 
         attr_accessor :exp_params

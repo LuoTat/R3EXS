@@ -7,8 +7,21 @@ module R3EXS
     # 用来提取源码生成的 AST 中的字符串和符号
     class StringsExtractor < Prism::Visitor
 
+        # 提取后存储的字符串数组
+        #
+        # @return [Array<String>]
+        attr_reader :strings
+
+        # 是否包含脚本中的符号
+        #
+        # @return [Boolean]
+        attr_reader :with_symbol
+
+        # 初始化 StringsExtractor
+        #
         # @param strings [Array<String>] 存储提取出的字符串的数组
         # @param with_symbol [Boolean] 是否包含脚本中的符号
+        #
         # @return [StringsExtractor]
         def initialize(strings, with_symbol)
             @strings     = strings
@@ -18,6 +31,7 @@ module R3EXS
         # 处理类型为 StringNode 的节点
         #
         # @param node [Prism::StringNode] AST 节点
+        #
         # @return [void]
         def visit_string_node(node)
             @strings << node.content
@@ -27,22 +41,12 @@ module R3EXS
         # 处理类型为 SymbolNode 的节点
         #
         # @param node [Prism::SymbolNode] AST 节点
+        #
         # @return [void]
         def visit_symbol_node(node)
             @strings << node.value if @with_symbol
             super
         end
-
-        # 提取后存储的字符串数组
-        #
-        # @return [Array<String>]
-        attr_accessor :strings
-
-        # 是否包含脚本中的符号
-        #
-        # @return [Boolean]
-        attr_accessor :with_symbol
-
     end
 
     # 用来替换源码里面的字符串和符号
@@ -50,18 +54,6 @@ module R3EXS
 
         # 用来记录字符串的位置
         class Location
-
-            # @note start_offset 是字符串在二进制下打开时的位置
-            #
-            # @param start_offset [Integer] 字符串在源文件中的起始位置
-            # @param length [Integer] 字符串的长度
-            # @param content [String] 字符串内容
-            # @return [Location]
-            def initialize(start_offset, length, content)
-                @start_offset = start_offset
-                @length       = length
-                @content      = content
-            end
 
             # 字符串在二进制源文件中的起始位置
             #
@@ -78,9 +70,24 @@ module R3EXS
             # @return [String]
             attr_reader :content
 
+            # @note start_offset 是字符串在二进制下打开时的位置
+            #
+            # @param start_offset [Integer] 字符串在源文件中的起始位置
+            # @param length [Integer] 字符串的长度
+            # @param content [String] 字符串内容
+            #
+            # @return [Location]
+            def initialize(start_offset, length, content)
+                @start_offset = start_offset
+                @length       = length
+                @content      = content
+            end
         end
 
+        # 初始化 StringsInjector
+        #
         # @param hash [Hash<String, String>] 字符串翻译表
+        #
         # @return [StringsInjector]
         def initialize(hash)
             @strings_hash = hash
@@ -91,6 +98,7 @@ module R3EXS
         # 处理类型为 StringNode 的节点
         #
         # @param node [Prism::StringNode] AST 节点
+        #
         # @return [void]
         def visit_string_node(node)
             location = node.content_loc
@@ -104,6 +112,7 @@ module R3EXS
         # 处理类型为 SymbolNode 的节点
         #
         # @param node [Prism::SymbolNode] AST 节点
+        #
         # @return [void]
         def visit_symbol_node(node)
             location = node.value_loc
@@ -121,6 +130,7 @@ module R3EXS
         #
         # @param script [String] Ruby 源码，以二进制编码打开
         # @param ast_root [Prism::ProgramNode] AST 树根节点
+        #
         # @return [String]
         def rewrite(script, ast_root)
             # 首先遍历一遍，找到所有需要替换的字符串的位置
@@ -143,7 +153,6 @@ module R3EXS
             @code.map! { |str| str.force_encoding('ASCII-8BIT') unless str.nil? }
             @code.join
         end
-
     end
 
 end

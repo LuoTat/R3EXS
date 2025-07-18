@@ -11,6 +11,7 @@ unsigned short wchar_arr_size = 0;
  *
  * @param utf8char UTF-8 字符串
  * @param n 字符串长度
+ *
  * @return 0 成功，-1 失败
  */
 static int utf8towc(const char* utf8char, size_t n)
@@ -66,6 +67,7 @@ unsigned short char_arr_size = 0;
  *
  * @param utf8char UTF-8 字符串
  * @param n 字符串长度
+ *
  * @return 0 成功，-1 失败
  */
 static int utf8tomb(const char* utf8char, const size_t n)
@@ -142,6 +144,7 @@ enum RGSSAD_DECRYPT_TYPE
  * @param data 文件名指针
  * @param n 文件名长度
  * @param magickey 解密密钥
+ *
  * @return [void]
  */
 static void decrypt_file_name(uint8_t* data, const size_t n, const uint32_t magickey)
@@ -245,6 +248,7 @@ static void decrypt_file_data_avx2(uint8_t* data, const size_t n, uint32_t magic
  * @param data 数据段指针
  * @param n 数据段长度
  * @param magickey 解密密钥
+ *
  * @return [void]
  */
 inline static void decrypt_file_data_dispatch(uint8_t* data, size_t n, uint32_t key)
@@ -262,6 +266,7 @@ inline static void decrypt_file_data_dispatch(uint8_t* data, size_t n, uint32_t 
  * 处理 mkdir 错误
  *
  * @param dir 目录
+ *
  * @return [void]
  */
 static void mkdir_error_handler(const char* dir)
@@ -283,6 +288,7 @@ static void malloc_error_handler(void)
  * 处理 fopen 错误
  *
  * @param path 文件路径
+ *
  * @return [void]
  */
 static void fopen_error_handler(const char* path)
@@ -294,6 +300,7 @@ static void fopen_error_handler(const char* path)
  * 处理 fseek 错误
  *
  * @param path 文件路径
+ *
  * @return [void]
  */
 static void fseek_error_handler(const char* path)
@@ -305,6 +312,7 @@ static void fseek_error_handler(const char* path)
  * 处理 ftell 错误
  *
  * @param path 文件路径
+ *
  * @return [void]
  */
 static void ftell_error_handler(const char* path)
@@ -316,6 +324,7 @@ static void ftell_error_handler(const char* path)
  * 处理 fread 错误
  *
  * @param path 文件路径
+ *
  * @return [void]
  */
 static void fread_error_handler(const char* path)
@@ -327,6 +336,7 @@ static void fread_error_handler(const char* path)
  * 处理 fwrite 错误
  *
  * @param path 文件路径
+ *
  * @return [void]
  */
 static void fwrite_error_handler(const char* path)
@@ -338,6 +348,7 @@ static void fwrite_error_handler(const char* path)
  * 处理 fclose 错误
  *
  * @param path 文件路径
+ *
  * @return [void]
  */
 static void fclose_error_handler(const char* path)
@@ -353,6 +364,7 @@ static void fclose_error_handler(const char* path)
  * @param verbose 是否输出详细信息
  * @raise [RGSS3AFileError] 未知的 RGSS3A 文件加密类型
  * @raise [SystemCallError] 系统调用失败
+ *
  * @return [void]
  */
 static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, const VALUE verbose)
