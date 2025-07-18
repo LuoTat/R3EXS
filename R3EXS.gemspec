@@ -24,8 +24,7 @@ spec = Gem::Specification.new do |s|
     s.add_development_dependency('yard', '~> 0.9.37') # For documentation
     s.add_development_dependency('redcarpet', '~> 3.6.1') # For Markdown parsing
     s.add_development_dependency('ocran', '~>1.3.17') # For packaging
-    s.add_runtime_dependency('gli', '~> 2.22.2')
+    s.add_runtime_dependency('gli', '~> 2.22.2') # For command line interface
     s.add_runtime_dependency('oj', '~> 3.16.10') # For JSON parsing
-    s.add_runtime_dependency('ruby-openai', '~> 8.1.0') # For OpenAI API
     s.extensions << './ext/R3EXS/extconf.rb' # Add C extension
 end
