@@ -1,24 +1,28 @@
+#include <fcntl.h>
 #include "ruby.h"
 
+#define likely(x)   __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+
 #ifdef _WIN32
-wchar_t*       wchar_arr      = NULL;
-unsigned short wchar_arr_size = 0;
+wchar_t*       filename_arr = NULL;
+unsigned short filename_len = 0;
 
 /*
  * 将指定长度的 UTF-8 字符串转换为 wchar 字符串
- * wchar 字符串会被存储在 wchar_arr 中
- * 同时更新 wchar_arr_size
+ * wchar 字符串会被存储在 filename_arr 中
+ * 同时更新 filename_len
  *
- * @param utf8char UTF-8 字符串
- * @param n 字符串长度
+ * @param utf8char [const char*] UTF-8 字符串
+ * @param n [size_t] 字符串长度
  *
- * @return 0 成功，-1 失败
+ * @return [int] 0 成功，-1 失败
  */
 static int utf8towc(const char* utf8char, size_t n)
 {
     // 计算转换为 wchar 所需的缓冲区大小，包括结尾的 '\0'
     int wc_size = MultiByteToWideChar(CP_UTF8, 0, utf8char, n, NULL, 0) + 1;
-    if (wc_size == 1)    // 转换失败
+    if (unlikely(wc_size == 1))    // 转换失败
     {
         if (GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
         {
@@ -26,47 +30,38 @@ static int utf8towc(const char* utf8char, size_t n)
             return -1;
         }
     }
-    if (wc_size > wchar_arr_size)
+    if (wc_size > filename_len)
     {
-        wchar_t* wchar_arr_new = (wchar_t*)realloc(wchar_arr, sizeof(wchar_t) * wc_size);
-        if (!wchar_arr_new)
+        wchar_t* wchar_arr_new = (wchar_t*)realloc(filename_arr, sizeof(wchar_t) * wc_size);
+        if (unlikely(!wchar_arr_new))
         {
             errno = ENOMEM;
             return -1;
         }
-        wchar_arr      = wchar_arr_new;
-        wchar_arr_size = wc_size;
+        filename_arr = wchar_arr_new;
+        filename_len = wc_size;
     }
 
     // 执行从 UTF-8 到 wchar 的转换
-    MultiByteToWideChar(CP_UTF8, 0, utf8char, n, wchar_arr, wchar_arr_size);
+    MultiByteToWideChar(CP_UTF8, 0, utf8char, n, filename_arr, filename_len);
     // 添加结尾的 '\0'
-    wchar_arr[wc_size - 1] = L'\0';
+    filename_arr[wc_size - 1] = L'\0';
     return 0;
-}
-
-/*
- * 处理 utf8towc 错误
- *
- * @return [void]
- */
-static void utf8towc_error_handler(void)
-{
-    rb_sys_fail("Failed to convert UTF-8 to wchar");
 }
 #endif
 
 #ifdef __linux__
-char*          char_arr      = NULL;
-unsigned short char_arr_size = 0;
+    #include <sys/mman.h>
+char*          filename_arr = NULL;
+unsigned short filename_len = 0;
 
 /*
  * 将指定长度的 UTF-8 字符串 转换为 char 字符串
  * char 字符串会被存储在 char_arr 中
  * 同时更新 char_arr_size
  *
- * @param utf8char UTF-8 字符串
- * @param n 字符串长度
+ * @param utf8char [char*] UTF-8 字符串
+ * @param n [size_t] 字符串长度
  *
  * @return 0 成功，-1 失败
  */
@@ -74,30 +69,22 @@ static int utf8tomb(const char* utf8char, const size_t n)
 {
     // 计算转换为 char 所需的缓冲区大小，包括结尾的 '\0'
     const size_t mb_size = n + 1;
-    if (mb_size > char_arr_size)
+    if (mb_size > filename_len)
     {
-        char* char_arr_new = (char*)realloc(char_arr, sizeof(char) * mb_size);
-        if (!char_arr_new)
+        char* char_arr_new = (char*)realloc(filename_arr, sizeof(char) * mb_size);
+        if (unlikely(!char_arr_new))
         {
             errno = ENOMEM;
             return -1;
         }
-        char_arr      = char_arr_new;
-        char_arr_size = mb_size;
+        filename_arr = char_arr_new;
+        filename_len = mb_size;
     }
-    memcpy(char_arr, utf8char, n);
-    char_arr[mb_size - 1] = '\0';
+    // 注意此处不能使用 strcpy
+    // 因为 utf8char 不是 '\0' 结尾字符串
+    memcpy(filename_arr, utf8char, n);
+    filename_arr[mb_size - 1] = '\0';
     return 0;
-}
-
-/*
- * 处理 utf8tomb 错误
- *
- * @return [void]
- */
-static void utf8tomb_error_handler(void)
-{
-    rb_sys_fail("Failed to convert UTF-8 to char");
 }
 #endif
 
@@ -107,7 +94,6 @@ ID r3exs_RGSS3AFileError_id;
 ID r3exs_File_id;
 ID r3exs_FileUtils_id;
 ID r3exs_Dir_id;
-ID r3exs_new_id;
 ID r3exs_join_id;
 ID r3exs_dirname_id;
 ID r3exs_exist_id;
@@ -125,10 +111,10 @@ enum RGSSAD_DECRYPT_TYPE
     Fux2Pack2
 };
 
-#if defined(__AVX512F__)
+#ifdef __AVX512F__
     #include <immintrin.h>
     #define MOD_64_MASK 0b111111
-#elif defined(__AVX2__)
+#elifdef __AVX2__
     #include <immintrin.h>
     #define MOD_32_MASK 0b11111
 #endif
@@ -141,9 +127,9 @@ enum RGSSAD_DECRYPT_TYPE
 /*
  * 解码文件名
  *
- * @param data 文件名指针
- * @param n 文件名长度
- * @param magickey 解密密钥
+ * @param data [uint8_t*] 文件名指针
+ * @param n [size_t] 文件名长度
+ * @param magickey [uint32_t] 解密密钥
  *
  * @return [void]
  */
@@ -180,7 +166,7 @@ static void decrypt_file_data_scalar(uint8_t* data, const size_t n, uint32_t mag
     }
 }
 
-#if defined(__AVX512F__)
+#ifdef __AVX512F__
 static void decrypt_file_data_avx512(uint8_t* data, const size_t n, uint32_t magickey)
 {
     const size_t q      = n >> 6;    // 64 字节为一组
@@ -211,7 +197,7 @@ static void decrypt_file_data_avx512(uint8_t* data, const size_t n, uint32_t mag
     // 处理剩余 r 字节
     decrypt_file_data_scalar((uint8_t*)data_p, r, magickey);
 }
-#elif defined(__AVX2__)
+#elifdef __AVX2__
 static void decrypt_file_data_avx2(uint8_t* data, const size_t n, uint32_t magickey)
 {
     const size_t q      = n >> 5;    // 32 字节为一组
@@ -245,17 +231,17 @@ static void decrypt_file_data_avx2(uint8_t* data, const size_t n, uint32_t magic
 /*
  * 解码数据段
  *
- * @param data 数据段指针
- * @param n 数据段长度
- * @param magickey 解密密钥
+ * @param data [uint8_t*] 数据段指针
+ * @param n [size_t] 数据段长度
+ * @param magickey [uint32_t] 解密密钥
  *
  * @return [void]
  */
 inline static void decrypt_file_data_dispatch(uint8_t* data, size_t n, uint32_t key)
 {
-#if defined(__AVX512F__)
+#ifdef __AVX512F__
     decrypt_file_data_avx512(data, n, key);
-#elif defined(__AVX2__)
+#elifdef __AVX2__
     decrypt_file_data_avx2(data, n, key);
 #else
     decrypt_file_data_scalar(data, n, key);
@@ -263,97 +249,81 @@ inline static void decrypt_file_data_dispatch(uint8_t* data, size_t n, uint32_t 
 }
 
 /*
- * 处理 mkdir 错误
+ * 释放 mmap 创建的内存映射
  *
- * @param dir 目录
+ * @param addr [void*] 内存映射的地址
+ * @param len [size_t] 内存映射的大小
  *
- * @return [void]
+ * @return [int] 0 munmap成功, -1 munmap失败
  */
-static void mkdir_error_handler(const char* dir)
+inline static int munmap_wrapper(void* addr, size_t len)
 {
-    rb_sys_fail(dir);
+#ifdef _WIN32
+    return UnmapViewOfFile(addr) ? 0 : -1;
+#elif defined(__linux__)
+    return munmap(addr, len);
+#endif
+}
+
+/* 创建 mmap 内存映射
+ *
+ * @param fd [int] 文件描述符
+ * @param len [size_t] 内存映射的大小
+ *
+ * @return [void*] MAP_FAILED 失败
+ */
+inline static void* mmap_wapper(int fd, size_t len)
+{
+#ifdef _WIN32
+    HANDLE hFile = (HANDLE)_get_osfhandle(fd);
+    if (unlikely(hFile == INVALID_HANDLE_VALUE)) return MAP_FAILED;
+
+    HANDLE hMap = CreateFileMappingW(hFile, NULL, PAGE_WRITECOPY, 0, 0, NULL);
+    if (unlikely(!hMap)) return MAP_FAILED;
+
+    void* mapped = MapViewOfFile(hMap, FILE_MAP_COPY, 0, 0, 0);
+    CloseHandle(hMap);
+
+    return likely(mapped) ? mapped : MAP_FAILED;
+#elifdef __linux__
+    return mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+#endif
 }
 
 /*
- * 处理 malloc 错误
+ * 获取文件描述符
  *
- * @return [void]
+ * @param dir [const char*] UTF-8 字符串文件路径
+ *
+ * @return [int] -1 open失败, -2 utf8towc失败
  */
-static void malloc_error_handler(void)
+inline static int open_wapper(const char* dir)
 {
-    rb_sys_fail("Failed to allocate memory");
+#ifdef _WIN32
+    if (unlikely(utf8towc(dir, strlen(dir)) == -1))
+        return -2;
+    return _wopen(filename_arr, O_RDONLY | O_BINARY);
+#elifdef __linux__
+    return open(dir, O_RDONLY);
+#endif
 }
 
 /*
- * 处理 fopen 错误
+ * 创建文件夹
  *
- * @param path 文件路径
+ * @param dir UTF-8 字符串文件路径
  *
- * @return [void]
+ * @return [int] -1 mkdir失败, -2 utf8towc失败
  */
-static void fopen_error_handler(const char* path)
+inline static int mkdir_wapper(const char* dir)
 {
-    rb_sys_fail(path);
-}
-
-/*
- * 处理 fseek 错误
- *
- * @param path 文件路径
- *
- * @return [void]
- */
-static void fseek_error_handler(const char* path)
-{
-    rb_sys_fail(path);
-}
-
-/*
- * 处理 ftell 错误
- *
- * @param path 文件路径
- *
- * @return [void]
- */
-static void ftell_error_handler(const char* path)
-{
-    rb_sys_fail(path);
-}
-
-/*
- * 处理 fread 错误
- *
- * @param path 文件路径
- *
- * @return [void]
- */
-static void fread_error_handler(const char* path)
-{
-    rb_sys_fail(path);
-}
-
-/*
- * 处理 fwrite 错误
- *
- * @param path 文件路径
- *
- * @return [void]
- */
-static void fwrite_error_handler(const char* path)
-{
-    rb_sys_fail(path);
-}
-
-/*
- * 处理 fclose 错误
- *
- * @param path 文件路径
- *
- * @return [void]
- */
-static void fclose_error_handler(const char* path)
-{
-    rb_sys_fail(path);
+#ifdef _WIN32
+    if (unlikely(utf8towc(dir, strlen(dir)) == -1))
+        return -2;
+    return _wmkdir(filename_arr);
+#elifdef __linux__
+    return mkdir(dir, 0755);
+#endif
 }
 
 /*
@@ -375,108 +345,72 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
     char* output_dir_C  = StringValueCStr(output_dir);
 
     // 创建 output_dir
+    int result = mkdir_wapper(output_dir_C);
 #ifdef _WIN32
-    if (utf8towc(output_dir_C, strlen(output_dir_C)) == -1)
+    if (unlikely(result == -2))
     {
-        free(wchar_arr);
-        utf8towc_error_handler();
+        free(filename_arr);
+        rb_sys_fail("Failed to convert UTF-8 to wchar");
     }
-    if (_wmkdir(wchar_arr) == -1 && errno != EEXIST)
+    if (unlikely(result == -1 && errno != EEXIST))
     {
-        free(wchar_arr);
-        mkdir_error_handler(output_dir_C);
+        free(filename_arr);
+        rb_sys_fail(output_dir_C);
     }
-#endif
-#ifdef __linux__
-    if (mkdir(output_dir_C, 0755) == -1 && errno != EEXIST)
-        mkdir_error_handler(output_dir_C);
+#elifdef __linux__
+    if (unlikely(result == -1 && errno != EEXIST))
+        rb_sys_fail(output_dir_C);
 #endif
 
-    // 打开文件
+    // 获取文件描述符
+    int fd = open_wapper(target_path_C);
 #ifdef _WIN32
-    if (utf8towc(target_path_C, strlen(target_path_C)) == -1)
+    if (unlikely(fd == -2))
     {
-        free(wchar_arr);
-        utf8towc_error_handler();
+        free(filename_arr);
+        rb_sys_fail("Failed to convert UTF-8 to wchar");
     }
-    FILE* Rgss3a_file = _wfopen(wchar_arr, L"rb");
-    if (!Rgss3a_file)
+    if (unlikely(fd == -1))
     {
-        free(wchar_arr);
-        fopen_error_handler(target_path_C);
+        free(filename_arr);
+        rb_sys_fail(target_path_C);
     }
-#endif
-#ifdef __linux__
-    FILE* Rgss3a_file = fopen(target_path_C, "rb");
-    if (!Rgss3a_file)
-        fopen_error_handler(target_path_C);
+#elifdef __linux__
+    if (unlikely(fd == -1))
+        rb_sys_fail(target_path_C);
 #endif
 
     // 获取文件大小
-    if (fseek(Rgss3a_file, 0, SEEK_END) == -1)
+    struct stat sb;
+    if (unlikely(fstat(fd, &sb) == -1))
     {
 #ifdef _WIN32
-        free(wchar_arr);
+        free(filename_arr);
 #endif
-        if (fclose(Rgss3a_file) == EOF)
-            fclose_error_handler(target_path_C);
-        fseek_error_handler(target_path_C);
+        close(fd);
+        rb_sys_fail(target_path_C);
     }
-    long int Rgss3a_file_size = ftell(Rgss3a_file);
-    if (Rgss3a_file_size == -1)
+    off_t Rgss3a_file_size = sb.st_size;
+
+    // 使用 mmap 映射文件
+    uint8_t* Rgss3a_data = mmap_wapper(fd, Rgss3a_file_size);
+    if (unlikely(Rgss3a_data == MAP_FAILED))
     {
 #ifdef _WIN32
-        free(wchar_arr);
+        free(filename_arr);
 #endif
-        if (fclose(Rgss3a_file) == EOF)
-            fclose_error_handler(target_path_C);
-        ftell_error_handler(target_path_C);
-    }
-    if (fseek(Rgss3a_file, 0, SEEK_SET) == -1)
-    {
-#ifdef _WIN32
-        free(wchar_arr);
-#endif
-        if (fclose(Rgss3a_file) == EOF)
-            fclose_error_handler(target_path_C);
-        fseek_error_handler(target_path_C);
+        close(fd);
+        rb_sys_fail("Failed to mmap file");
     }
 
-    // 分配内存
-    unsigned char* Rgss3a_data = (unsigned char*)malloc(sizeof(unsigned char) * Rgss3a_file_size);
-    if (!Rgss3a_data)
-    {
+    // 关闭文件描述符
+    close(fd);
 #ifdef _WIN32
-        free(wchar_arr);
-#endif
-        if (fclose(Rgss3a_file) == EOF)
-            fclose_error_handler(target_path_C);
-        malloc_error_handler();
-    }
-
-    // 把整个文件读到内存中
-    size_t result = fread(Rgss3a_data, sizeof(unsigned char), Rgss3a_file_size, Rgss3a_file);
-    if (result < Rgss3a_file_size)
-    {
-#ifdef _WIN32
-        free(wchar_arr);
-#endif
-        free(Rgss3a_data);
-        if (fclose(Rgss3a_file) == EOF)
-            fclose_error_handler(target_path_C);
-        fread_error_handler(target_path_C);
-    }
-
-    // 关闭文件
-    if (fclose(Rgss3a_file) == EOF)
-        fclose_error_handler(target_path_C);
-#ifdef _WIN32
-    if (verbose_bool)
-        printf("\e[2K\e[32mReaded \e[0m%ls\n", wchar_arr);
-#endif
-#ifdef __linux__
-    if (verbose_bool)
-        printf("\e[2K\e[32mReaded \e[0m%s\n", target_path_C);
+    if (unlikely(verbose_bool))
+        printf("\e[2K\e[32mMmapped \e[0m%ls\n", filename_arr);
+#elifdef __linux__
+    if (unlikely(verbose_bool))
+        printf("\e[2K\e[32mMmapped \e[0m%s\n", target_path_C);
 #endif
 
     // 设置文件指针索引
@@ -484,7 +418,7 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 
     // 判断加密类型
     enum RGSSAD_DECRYPT_TYPE decrypt_type;
-    if (memcmp(Rgss3a_p, "RGSSAD\x00\x03", 8) == 0)
+    if (likely(memcmp(Rgss3a_p, "RGSSAD\x00\x03", 8) == 0))
     {
         decrypt_type = RGSSAD;
     }
@@ -495,13 +429,11 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
     else
     {
 #ifdef _WIN32
-        free(wchar_arr);
+        free(filename_arr);
 #endif
         // 不支持的 RGSS3A 加密格式
-        free(Rgss3a_data);
-        const VALUE error_message = rb_sprintf("Unknown RGSS3A file decrypted type: %+" PRIsVALUE, target_path);
-        const VALUE exception     = rb_funcall(r3exs_RGSS3AFileError_class, r3exs_new_id, 1, error_message);
-        rb_exc_raise(exception);
+        munmap_wrapper(Rgss3a_data, Rgss3a_file_size);
+        rb_raise(r3exs_RGSS3AFileError_class, "Unknown RGSS3A file decrypted type: %+" PRIsVALUE, target_path);
     }
 
     // 读取 MagicKey
@@ -518,11 +450,11 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
     }
     Rgss3a_p += 4;
 
-    while (1)
+    while (true)
     {
         // 读取数据段偏移量
         uint32_t data_offset = *(uint32_t*)Rgss3a_p ^ magickey;
-        if (data_offset == 0)
+        if (unlikely(data_offset == 0))
             break;
         Rgss3a_p += 4;
 
@@ -539,7 +471,7 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
         Rgss3a_p               += 4;
 
         // 解码文件名
-        if (verbose_bool)
+        if (unlikely(verbose_bool))
             printf("\e[34mDecrypting DataName...\r");
         decrypt_file_name(Rgss3a_p, filename_size, magickey);
 
@@ -552,39 +484,35 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 
         // 读取文件名
 #ifdef _WIN32
-        if (utf8towc((char*)Rgss3a_p, filename_size) == -1)
-        {
-            free(wchar_arr);
-            free(Rgss3a_data);
-            utf8towc_error_handler();
-        }
+        if (unlikely(utf8towc((char*)Rgss3a_p, filename_size) == -1))
+#elifdef __linux__
+        if (unlikely(utf8tomb((char*)Rgss3a_p, filename_size) == -1))
 #endif
-#ifdef __linux__
-        if (utf8tomb((char*)Rgss3a_p, filename_size) == -1)
         {
-            free(char_arr);
-            free(Rgss3a_data);
-            utf8tomb_error_handler();
-        }
+            free(filename_arr);
+            munmap_wrapper(Rgss3a_data, Rgss3a_file_size);
+#ifdef _WIN32
+            rb_sys_fail("Failed to convert UTF-8 to wchar");
+#elifdef __linux__
+            rb_sys_fail("Failed to convert UTF-8 to char");
 #endif
+        }
 
         // 解码数据段
 #ifdef _WIN32
-        if (verbose_bool)
-            printf("\e[2K\e[32mDecrypting \e[0m%ls \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m...\r", wchar_arr, data_offset, data_size, data_magickey);
-#endif
-#ifdef __linux__
-        if (verbose_bool)
-            printf("\e[2K\e[32mDecrypting \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m...\r", char_arr, data_offset, data_size, data_magickey);
+        if (unlikely(verbose_bool))
+            printf("\e[2K\e[32mDecrypting \e[0m%ls \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m...\r", filename_arr, data_offset, data_size, data_magickey);
+#elifdef __linux__
+        if (unlikely(verbose_bool))
+            printf("\e[2K\e[32mDecrypting \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m...\r", filename_arr, data_offset, data_size, data_magickey);
 #endif
         decrypt_file_data_dispatch(Rgss3a_data + data_offset, data_size, data_magickey);
 #ifdef _WIN32
-        if (verbose_bool)
-            printf("\e[2K\e[32mDecrypted \e[0m%ls \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m\n", wchar_arr, data_offset, data_size, data_magickey);
-#endif
-#ifdef __linux__
-        if (verbose_bool)
-            printf("\e[2K\e[32mDecrypted \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m\n", char_arr, data_offset, data_size, data_magickey);
+        if (unlikely(verbose_bool))
+            printf("\e[2K\e[32mDecrypted \e[0m%ls \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m\n", filename_arr, data_offset, data_size, data_magickey);
+#elifdef __linux__
+        if (unlikely(verbose_bool))
+            printf("\e[2K\e[32mDecrypted \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m\n", filename_arr, data_offset, data_size, data_magickey);
 #endif
 
         // 写入解密后的数据到文件
@@ -598,63 +526,49 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
         rb_funcall(r3exs_FileUtils_module, r3exs_mkdir_p_id, 1, output_full_dir);
 
 #ifdef _WIN32
-        utf8towc(output_full_path_C, strlen(output_full_path_C));
-        if (verbose_bool)
-            printf("\e[34mWriting \e[0m%ls...\r", wchar_arr);
-        FILE* output_file = _wfopen(wchar_arr, L"wb");
-        if (!output_file)
+        if (unlikely(utf8towc(output_full_path_C, strlen(output_full_path_C)) == -1))
         {
-            free(wchar_arr);
-            free(Rgss3a_data);
-            fopen_error_handler(output_full_path_C);
+            free(filename_arr);
+            munmap_wrapper(Rgss3a_data, Rgss3a_file_size);
+            rb_sys_fail("Failed to convert UTF-8 to wchar");
         }
-#endif
-#ifdef __linux__
-        if (verbose_bool)
+        if (unlikely(verbose_bool))
+            printf("\e[34mWriting \e[0m%ls...\r", filename_arr);
+        FILE* output_file = _wfopen(filename_arr, L"wb");
+#elifdef __linux__
+        if (unlikely(verbose_bool))
             printf("\e[34mWriting \e[0m%s...\r", output_full_path_C);
         FILE* output_file = fopen(output_full_path_C, "wb");
-        if (!output_file)
-        {
-            free(char_arr);
-            free(Rgss3a_data);
-            fopen_error_handler(output_full_path_C);
-        }
 #endif
+        if (unlikely(!output_file))
+        {
+            free(filename_arr);
+            munmap_wrapper(Rgss3a_data, Rgss3a_file_size);
+            rb_sys_fail(output_full_path_C);
+        }
+
         // 写入文件
-        result = fwrite(Rgss3a_data + data_offset, sizeof(unsigned char), data_size, output_file);
-        if (result < data_size)
+        size_t result = fwrite(Rgss3a_data + data_offset, sizeof(uint8_t), data_size, output_file);
+        if (unlikely(result < data_size))
         {
-#ifdef _WIN32
-            free(wchar_arr);
-#endif
-#ifdef __linux__
-            free(char_arr);
-#endif
-            free(Rgss3a_data);
-            if (fclose(output_file) == EOF)
-                fclose_error_handler(output_full_path_C);
-            fwrite_error_handler(output_full_path_C);
+            free(filename_arr);
+            munmap_wrapper(Rgss3a_data, Rgss3a_file_size);
+            fclose(output_file);
+            rb_sys_fail(output_full_path_C);
         }
-        if (fclose(output_file) == EOF)
-            fclose_error_handler(output_full_path_C);
+        if (unlikely(fclose(output_file) == EOF))
+            rb_sys_fail(output_full_path_C);
+        if (unlikely(verbose_bool))
 #ifdef _WIN32
-        if (verbose_bool)
-            printf("\e[2K\e[32mWrited \e[0m%ls\n", wchar_arr);
-#endif
-#ifdef __linux__
-        if (verbose_bool)
+            printf("\e[2K\e[32mWrited \e[0m%ls\n", filename_arr);
+#elifdef __linux__
             printf("\e[2K\e[32mWrited \e[0m%s\n", output_full_path_C);
 #endif
         Rgss3a_p += filename_size;
     }
 
-#ifdef _WIN32
-    free(wchar_arr);
-#endif
-#ifdef __linux__
-    free(char_arr);
-#endif
-    free(Rgss3a_data);
+    free(filename_arr);
+    munmap_wrapper(Rgss3a_data, Rgss3a_file_size);
     return Qnil;
 }
 
