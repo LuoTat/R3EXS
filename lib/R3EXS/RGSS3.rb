@@ -713,7 +713,8 @@ module RPG
             extra = @exp_params[1].to_f
             acc_a = @exp_params[2].to_f
             acc_b = @exp_params[3].to_f
-            return (basis * ((lv - 1) ** (0.9 + acc_a / 250)) * lv * (lv + 1) /
+
+            (basis * ((lv - 1) ** (0.9 + acc_a / 250)) * lv * (lv + 1) /
                 (6 + lv ** 2 / 50 / acc_b) + (lv - 1) * extra).round.to_i
         end
 

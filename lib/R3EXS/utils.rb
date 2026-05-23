@@ -961,7 +961,7 @@ module R3EXS
         # @param module_name [Symbol] 模块名
         #
         # @yieldparam commonevents [Array<Object>] CommonEvent JSON 文件反序列化后的数组
-        # @yieldparam commonevents_basenames [String] CommonEvent JSON 文件名数组（不包含扩展名）
+        # @yieldparam commonevents_basenames [Array<String>] CommonEvent JSON 文件名数组（不包含扩展名）
         # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
         # @yieldreturn [void]
         #

@@ -120,16 +120,6 @@ module R3EXS
             strings
         end
 
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@name, '角色名称')
-            glossary << GlossaryItem.new(@nickname, '角色昵称')
-            glossary
-        end
-
         # 将所有的字符串替换为指定的字符串
         #
         # @param hash [Hash<String, String>] 字符串翻译表
@@ -282,15 +272,6 @@ module R3EXS
             super
         end
 
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@name, '护甲名称')
-            glossary
-        end
-
         # 将所有的字符串替换为指定的字符串
         #
         # @param hash [Hash<String, String>] 字符串翻译表
@@ -417,15 +398,6 @@ module R3EXS
                 end
             end
             strings
-        end
-
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@name, '职业名称')
-            glossary
         end
 
         # 将所有的字符串替换为指定的字符串
@@ -929,15 +901,6 @@ module R3EXS
             super
         end
 
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@name, '敌人名称')
-            glossary
-        end
-
         # 将所有的字符串替换为指定的字符串
         #
         # @param hash [Hash<String, String>] 字符串翻译表
@@ -1030,15 +993,6 @@ module R3EXS
         # @return [Array<String>]
         def ex_strings
             super
-        end
-
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@name, '物品名称')
-            glossary
         end
 
         # 将所有的字符串替换为指定的字符串
@@ -1268,15 +1222,6 @@ module R3EXS
             strings
         end
 
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@display_name, '地图名称')
-            glossary
-        end
-
         # 将所有的字符串替换为指定的字符串
         #
         # @param hash [Hash<String, String>] 字符串翻译表
@@ -1329,15 +1274,6 @@ module R3EXS
         # @return [Array<String>]
         def ex_strings
             [@name]
-        end
-
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@name, '地图名称')
-            glossary
         end
 
         # 将所有的字符串替换为指定的字符串
@@ -1395,15 +1331,6 @@ module R3EXS
             strings << @message1
             strings << @message2
             strings
-        end
-
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@name, '技能名称')
-            glossary
         end
 
         # 将所有的字符串替换为指定的字符串
@@ -1487,15 +1414,6 @@ module R3EXS
             strings << @message3
             strings << @message4
             strings
-        end
-
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@name, '状态名称')
-            glossary
         end
 
         # 将所有的字符串替换为指定的字符串
@@ -1626,26 +1544,6 @@ module R3EXS
                 strings
             end
 
-            # 提取术语表
-            #
-            # @return [Array<GlossaryItem>]
-            def ex_glossary
-                glossary = []
-                @basic.each do |string|
-                    glossary << GlossaryItem.new(string, '基本术语')
-                end
-                @params.each do |string|
-                    glossary << GlossaryItem.new(string, '计量单位名称')
-                end
-                @etypes.each do |string|
-                    glossary << GlossaryItem.new(string, '装备类型名称')
-                end
-                @commands.each do |string|
-                    glossary << GlossaryItem.new(string, '指令名称')
-                end
-                glossary
-            end
-
             # 将所有的字符串替换为指定的字符串
             #
             # @param hash [Hash<String, String>] 字符串翻译表
@@ -1708,28 +1606,6 @@ module R3EXS
             strings.concat(@variables)
             strings.concat(@terms.ex_strings)
             strings
-        end
-
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@game_title, '游戏标题')
-            glossary << GlossaryItem.new(@currency_unit, '货币单位')
-            @elements.each do |element|
-                glossary << GlossaryItem.new(element, '属性名称')
-            end
-            @skill_types.each do |skill_type|
-                glossary << GlossaryItem.new(skill_type, '技能类型名称')
-            end
-            @weapon_types.each do |weapon_type|
-                glossary << GlossaryItem.new(weapon_type, '武器类型名称')
-            end
-            @armor_types.each do |armor_type|
-                glossary << GlossaryItem.new(armor_type, '防具类型名称')
-            end
-            glossary.concat(@terms.ex_glossary)
         end
 
         # 将所有的字符串替换为指定的字符串
@@ -1996,15 +1872,6 @@ module R3EXS
         # @return [Array<String>]
         def ex_strings
             super
-        end
-
-        # 提取术语表
-        #
-        # @return [Array<GlossaryItem>]
-        def ex_glossary
-            glossary = []
-            glossary << GlossaryItem.new(@name, '武器名称')
-            glossary
         end
 
         # 将所有的字符串替换为指定的字符串
