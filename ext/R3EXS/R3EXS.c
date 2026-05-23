@@ -1,5 +1,5 @@
-#include <fcntl.h>
 #include "ruby.h"
+#include <fcntl.h>
 
 #define likely(x)   __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
@@ -93,16 +93,13 @@ VALUE R3EXS = Qnil;
 ID r3exs_RGSS3AFileError_id;
 ID r3exs_File_id;
 ID r3exs_FileUtils_id;
-ID r3exs_Dir_id;
 ID r3exs_join_id;
 ID r3exs_dirname_id;
-ID r3exs_exist_id;
 ID r3exs_mkdir_p_id;
 
 VALUE r3exs_RGSS3AFileError_class;
 VALUE r3exs_File_module;
 VALUE r3exs_FileUtils_module;
-VALUE r3exs_Dir_module;
 
 // 解码文件类型
 enum RGSSAD_DECRYPT_TYPE
@@ -113,16 +110,16 @@ enum RGSSAD_DECRYPT_TYPE
 
 #ifdef __AVX512F__
     #include <immintrin.h>
-    #define MOD_64_MASK 0b111111
+    #define MOD_64_MASK 0B111111
 #elifdef __AVX2__
     #include <immintrin.h>
-    #define MOD_32_MASK 0b11111
+    #define MOD_32_MASK 0B11111
 #endif
 
-#define MOD_4_MASK 0b11
-#define MASK_KEY_1 0x000000FF
-#define MASK_KEY_2 0x0000FFFF
-#define MASK_KEY_3 0x00FFFFFF
+#define MOD_4_MASK 0B11
+#define MASK_KEY_1 0X000000FF
+#define MASK_KEY_2 0X0000FFFF
+#define MASK_KEY_3 0X00FFFFFF
 
 /*
  * 解码文件名
@@ -183,10 +180,23 @@ static void decrypt_file_data_avx512(uint8_t* data, const size_t n, uint32_t mag
         magickey = ks[15] * 7 + 3;
 
         __m512i v_magickey = _mm512_setr_epi32(
-            ks[0], ks[1], ks[2], ks[3],
-            ks[4], ks[5], ks[6], ks[7],
-            ks[8], ks[9], ks[10], ks[11],
-            ks[12], ks[13], ks[14], ks[15]);
+            ks[0],
+            ks[1],
+            ks[2],
+            ks[3],
+            ks[4],
+            ks[5],
+            ks[6],
+            ks[7],
+            ks[8],
+            ks[9],
+            ks[10],
+            ks[11],
+            ks[12],
+            ks[13],
+            ks[14],
+            ks[15]
+        );
         // 加载 64 字节
         __m512i tmp = _mm512_loadu_si512(data_p);
         // 并行异或
@@ -213,9 +223,7 @@ static void decrypt_file_data_avx2(uint8_t* data, const size_t n, uint32_t magic
         // 下一轮初始 magickey
         magickey = ks[7] * 7 + 3;
 
-        __m256i v_magickey = _mm256_setr_epi32(
-            ks[0], ks[1], ks[2], ks[3],
-            ks[4], ks[5], ks[6], ks[7]);
+        __m256i v_magickey = _mm256_setr_epi32(ks[0], ks[1], ks[2], ks[3], ks[4], ks[5], ks[6], ks[7]);
         // 加载 32 字节
         __m256i tmp = _mm256_loadu_si256(data_p);
         // 并行异或
@@ -276,10 +284,12 @@ inline static void* mmap_wapper(int fd, size_t len)
 {
 #ifdef _WIN32
     HANDLE hFile = (HANDLE)_get_osfhandle(fd);
-    if (unlikely(hFile == INVALID_HANDLE_VALUE)) return MAP_FAILED;
+    if (unlikely(hFile == INVALID_HANDLE_VALUE))
+        return MAP_FAILED;
 
     HANDLE hMap = CreateFileMappingW(hFile, NULL, PAGE_WRITECOPY, 0, 0, NULL);
-    if (unlikely(!hMap)) return MAP_FAILED;
+    if (unlikely(!hMap))
+        return MAP_FAILED;
 
     void* mapped = MapViewOfFile(hMap, FILE_MAP_COPY, 0, 0, 0);
     CloseHandle(hMap);
@@ -441,12 +451,8 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
     uint32_t magickey;
     switch (decrypt_type)
     {
-        case RGSSAD :
-            magickey = *(uint32_t*)Rgss3a_p * 9 + 3;
-            break;
-        case Fux2Pack2 :
-            magickey = *(uint32_t*)Rgss3a_p;
-            break;
+        case RGSSAD    : magickey = *(uint32_t*)Rgss3a_p * 9 + 3; break;
+        case Fux2Pack2 : magickey = *(uint32_t*)Rgss3a_p; break;
     }
     Rgss3a_p += 4;
 
@@ -501,25 +507,54 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
         // 解码数据段
 #ifdef _WIN32
         if (unlikely(verbose_bool))
-            printf("\e[2K\e[32mDecrypting \e[0m%ls \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m...\r", filename_arr, data_offset, data_size, data_magickey);
+            printf(
+                "\e[2K\e[32mDecrypting \e[0m%ls \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: "
+                "\e[35m%u\e[0m...\r",
+                filename_arr,
+                data_offset,
+                data_size,
+                data_magickey
+            );
 #elifdef __linux__
         if (unlikely(verbose_bool))
-            printf("\e[2K\e[32mDecrypting \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m...\r", filename_arr, data_offset, data_size, data_magickey);
+            printf(
+                "\e[2K\e[32mDecrypting \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: "
+                "\e[35m%u\e[0m...\r",
+                filename_arr,
+                data_offset,
+                data_size,
+                data_magickey
+            );
 #endif
         decrypt_file_data_dispatch(Rgss3a_data + data_offset, data_size, data_magickey);
 #ifdef _WIN32
         if (unlikely(verbose_bool))
-            printf("\e[2K\e[32mDecrypted \e[0m%ls \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m\n", filename_arr, data_offset, data_size, data_magickey);
+            printf(
+                "\e[2K\e[32mDecrypted \e[0m%ls \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: "
+                "\e[35m%u\e[0m\n",
+                filename_arr,
+                data_offset,
+                data_size,
+                data_magickey
+            );
 #elifdef __linux__
         if (unlikely(verbose_bool))
-            printf("\e[2K\e[32mDecrypted \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m\n", filename_arr, data_offset, data_size, data_magickey);
+            printf(
+                "\e[2K\e[32mDecrypted \e[0m%s \e[0mOffset: \e[35m%u \e[0mSize: \e[35m%u \e[0mMagicKey: \e[35m%u\e[0m\n",
+                filename_arr,
+                data_offset,
+                data_size,
+                data_magickey
+            );
 #endif
 
         // 写入解密后的数据到文件
         // 先将 output_dir 和文件名拼接得到 output_full_path
         // 再通过 File.dirname(output_full_path) 获得 output_full_dir
         // 最后通过 FileUtils.mkdir_p(output_full_dir) 递归创建目录
-        VALUE output_full_path   = rb_funcall(r3exs_File_module, r3exs_join_id, 2, output_dir, rb_utf8_str_new((char*)Rgss3a_p, filename_size));
+        VALUE output_full_path = rb_funcall(
+            r3exs_File_module, r3exs_join_id, 2, output_dir, rb_utf8_str_new((char*)Rgss3a_p, filename_size)
+        );
         VALUE output_full_dir    = rb_funcall(r3exs_File_module, r3exs_dirname_id, 1, output_full_path);
         char* output_full_path_C = StringValueCStr(output_full_path);
         // 创建目录
@@ -585,17 +620,14 @@ void Init_R3EXS()
     r3exs_RGSS3AFileError_id = rb_intern("RGSS3AFileError");
     r3exs_File_id            = rb_intern("File");
     r3exs_FileUtils_id       = rb_intern("FileUtils");
-    r3exs_Dir_id             = rb_intern("Dir");
     r3exs_join_id            = rb_intern("join");
     r3exs_dirname_id         = rb_intern("dirname");
-    r3exs_exist_id           = rb_intern("exist?");
     r3exs_mkdir_p_id         = rb_intern("mkdir_p");
 
     // 定义模块和类
     r3exs_RGSS3AFileError_class = rb_const_get(R3EXS, r3exs_RGSS3AFileError_id);
     r3exs_File_module           = rb_const_get(rb_cObject, r3exs_File_id);
     r3exs_FileUtils_module      = rb_const_get(rb_cObject, r3exs_FileUtils_id);
-    r3exs_Dir_module            = rb_const_get(rb_cObject, r3exs_Dir_id);
     // 定义 rgss3a_rvdata2 方法
     rb_define_singleton_method(R3EXS, "rgss3a_rvdata2", r3exs_rgss3a_rvdata2, 3);
 }
