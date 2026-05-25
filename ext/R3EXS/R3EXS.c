@@ -174,7 +174,13 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
     const char* const target_path_c = RSTRING_PTR(target_path);
 
     // 获取文件描述符
-    int fd = open(target_path_c, O_RDONLY);
+    int fd = open(
+        target_path_c,
+        O_RDONLY
+#ifdef __WIN32
+            | O_BINARY    // Windows 下以二进制模式打开文件
+#endif
+    );
     if (unlikely(fd == -1))
     {
         rb_sys_fail(target_path_c);
@@ -342,10 +348,8 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
  */
 void Init_R3EXS()
 {
-    setlocale(LC_ALL, ".utf-8");    // 设置标准库调用系统 API 所用的编码
 #ifdef _WIN32
-    SetConsoleOutputCP(CP_UTF8);    // 设置控制台输出编码
-    SetConsoleCP(CP_UTF8);          // 设置控制台输入编码
+    setlocale(LC_ALL, ".utf-8");    // 设置标准库调用系统 API 所用的编码
 #endif
 
     // 定义 R3EXS 模块
