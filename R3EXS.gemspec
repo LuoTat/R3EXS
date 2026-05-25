@@ -18,13 +18,13 @@ spec = Gem::Specification.new do |s|
     s.bindir   = 'bin'
     s.executables << 'R3EXS'
     s.platform              = Gem::Platform::RUBY
-    s.required_ruby_version = '>= 3.4.1'
-    s.add_development_dependency('rake', '~> 13.2.1')
-    s.add_development_dependency('rake-compiler', '~> 1.3.0') # For building C extension
-    s.add_development_dependency('yard', '~> 0.9.37') # For documentation
+    s.required_ruby_version = '>= 4.0.0'
+    s.add_development_dependency('rake', '~> 13.4.2')
+    s.add_development_dependency('rake-compiler', '~> 1.3.1') # For building C extension
+    s.add_development_dependency('yard', '~> 0.9.43') # For documentation
     s.add_development_dependency('redcarpet', '~> 3.6.1') # For Markdown parsing
-    s.add_development_dependency('ocran', '~>1.3.17') # For packaging
+    s.add_development_dependency('ocran', '~>1.4.3') # For packaging
     s.add_runtime_dependency('gli', '~> 2.22.2') # For command line interface
-    s.add_runtime_dependency('oj', '~> 3.16.10') # For JSON parsing
+    s.add_runtime_dependency('oj', '~> 3.17.1') # For JSON parsing
     s.extensions << './ext/R3EXS/extconf.rb' # Add C extension
 end
