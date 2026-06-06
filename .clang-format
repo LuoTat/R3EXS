@@ -243,9 +243,9 @@ PPIndentWidth: -1
 QualifierAlignment: Custom
 QualifierOrder:
     [
-        "const",
         "inline",
         "static",
+        "const",
         "friend",
         "constexpr",
         "volatile",
