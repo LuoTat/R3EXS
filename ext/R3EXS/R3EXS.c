@@ -1,5 +1,6 @@
 #include "ruby.h"
 #include <fcntl.h>
+#include <immintrin.h>
 #include <locale.h>
 #ifdef _WIN32
     #include <windows.h>
@@ -47,14 +48,14 @@ enum RGSSAD_DECRYPT_TYPE
  * 解码文件名
  *
  * @param data [uint8_t*] 文件名指针
- * @param n [size_t] 文件名长度
+ * @param n [uint32_t] 文件名长度
  * @param magickey [uint32_t] 解密密钥
  *
  * @return [void]
  */
-static void decrypt_file_name(uint8_t* data, size_t n, uint32_t magickey)
+static void decrypt_file_name(uint8_t* data, uint32_t n, uint32_t magickey)
 {
-    size_t    q      = n >> 2;
+    uint32_t  q      = n >> 2;
     uint8_t   r      = n & MOD_4_MASK;
     uint32_t* data_p = (uint32_t*)data;
     for (; data_p < (uint32_t*)(data + q * sizeof(uint32_t)); ++data_p)
@@ -69,17 +70,16 @@ static void decrypt_file_name(uint8_t* data, size_t n, uint32_t magickey)
     }
 }
 
-static void decrypt_file_data_scalar(uint8_t* data, size_t n, uint32_t magickey)
+static void decrypt_file_data_scalar(uint8_t* data, uint32_t n, uint32_t magickey)
 {
-    size_t    q      = n >> 2;
-    uint8_t   r      = n & MOD_4_MASK;
+    // 主循环：每轮处理 1 块,共 4 字节
     uint32_t* data_p = (uint32_t*)data;
-    for (; data_p < (uint32_t*)(data + q * sizeof(uint32_t)); ++data_p)
+    for (; data_p < (uint32_t*)(data + (n & ~MOD_4_MASK)); ++data_p)
     {
         *data_p  ^= magickey;
         magickey  = magickey * 7 + 3;
     }
-    switch (r)
+    switch (n & MOD_4_MASK)
     {
         case 1 : *data_p ^= (magickey & MASK_KEY_1); break;
         case 2 : *data_p ^= (magickey & MASK_KEY_2); break;
@@ -87,54 +87,148 @@ static void decrypt_file_data_scalar(uint8_t* data, size_t n, uint32_t magickey)
     }
 }
 
-#ifdef __AVX2__
-    #include <immintrin.h>
-    #define MOD_32_MASK 0B11111
+#ifdef __AVX512F__
+    #define MOD_64_MASK  0B111111
+    #define MOD_256_MASK 0B11111111
 
-const static uint32_t AVX2_MUL_TABLE[8] __attribute__((aligned(32))) = {
-    1U,         // 7^0
-    7U,         // 7^1
-    49U,        // 7^2
-    343U,       // 7^3
-    2401U,      // 7^4
-    16807U,     // 7^5
-    117649U,    // 7^6
-    823543U,    // 7^7
+static const alignas(64) uint32_t AVX512_MUL_TABLE[16] = {
+    1U,             // 7^0 mod 2^32
+    7U,             // 7^1 mod 2^32
+    49U,            // 7^2 mod 2^32
+    343U,           // 7^3 mod 2^32
+    2401U,          // 7^4 mod 2^32
+    16807U,         // 7^5 mod 2^32
+    117649U,        // 7^6 mod 2^32
+    823543U,        // 7^7 mod 2^32
+    5764801U,       // 7^8 mod 2^32
+    40353607U,      // 7^9 mod 2^32
+    282475249U,     // 7^10 mod 2^32
+    1977326743U,    // 7^11 mod 2^32
+    956385313U,     // 7^12 mod 2^32
+    2399729895U,    // 7^13 mod 2^32
+    3913207377U,    // 7^14 mod 2^32
+    1622647863U     // 7^15 mod 2^32
 };
 
-const static uint32_t AVX2_ADD_TABLE[8] __attribute__((aligned(32))) = {
-    0U,         // (7^0-1)/2
-    3U,         // (7^1-1)/2
-    24U,        // (7^2-1)/2
-    171U,       // (7^3-1)/2
-    1200U,      // (7^4-1)/2
-    8403U,      // (7^5-1)/2
-    58824U,     // (7^6-1)/2
-    411771U,    // (7^7-1)/2
+static const alignas(64) uint32_t AVX512_ADD_TABLE[16] = {
+    0U,             // (7^0-1)/2 mod 2^32
+    3U,             // (7^1-1)/2 mod 2^32
+    24U,            // (7^2-1)/2 mod 2^32
+    171U,           // (7^3-1)/2 mod 2^32
+    1200U,          // (7^4-1)/2 mod 2^32
+    8403U,          // (7^5-1)/2 mod 2^32
+    58824U,         // (7^6-1)/2 mod 2^32
+    411771U,        // (7^7-1)/2 mod 2^32
+    2882400U,       // (7^8-1)/2 mod 2^32
+    20176803U,      // (7^9-1)/2 mod 2^32
+    141237624U,     // (7^10-1)/2 mod 2^32
+    988663371U,     // (7^11-1)/2 mod 2^32
+    2625676304U,    // (7^12-1)/2 mod 2^32
+    1199864947U,    // (7^13-1)/2 mod 2^32
+    4104087336U,    // (7^14-1)/2 mod 2^32
+    2958807579U     // (7^15-1)/2 mod 2^32
 };
 
-    #define AVX2_MUL_STEP 5764801U    // 7^8
-    #define AVX2_ADD_STEP 2882400U    // (7^8-1)/2
+    #define AVX512_MUL_STEP   2768600449U    // 7^16 mod 2^32
+    #define AVX512_ADD_STEP   3531783872U    // (7^16-1)/2 mod 2^32
+    #define AVX512_MUL_STEP_4 3233510913U    // 7^64 mod 2^32
+    #define AVX512_ADD_STEP_4 1616755456U    // (7^64-1)/2 mod 2^32
 
-static void decrypt_file_data_avx2(uint8_t* data, size_t n, uint32_t magickey)
+static void decrypt_file_data_avx512(uint8_t* data, uint32_t n, uint32_t magickey)
 {
-    __m256i v_mul = _mm256_load_si256((__m256i*)AVX2_MUL_TABLE);
-    __m256i v_add = _mm256_load_si256((__m256i*)AVX2_ADD_TABLE);
+    const __m512i v_mul_table = _mm512_load_si512(AVX512_MUL_TABLE);
+    const __m512i v_add_table = _mm512_load_si512(AVX512_ADD_TABLE);
 
-    size_t   q        = n >> 5;    // 32 字节为一组
-    uint8_t  r        = n & MOD_32_MASK;
-    __m256i* v_data_p = (__m256i*)data;
+    // 4 路循环展开
+    const __m512i v_mul_step   = _mm512_set1_epi32(AVX512_MUL_STEP);
+    const __m512i v_add_step   = _mm512_set1_epi32(AVX512_ADD_STEP);
+    const __m512i v_mul_step_4 = _mm512_set1_epi32(AVX512_MUL_STEP_4);
+    const __m512i v_add_step_4 = _mm512_set1_epi32(AVX512_ADD_STEP_4);
 
-    for (; v_data_p < (__m256i*)(data + sizeof(__m256i) * q); ++v_data_p)
+    // 4 路独立初始 key
+    __m512i v_key0 = _mm512_add_epi32(_mm512_mullo_epi32(_mm512_set1_epi32(magickey), v_mul_table), v_add_table);
+    __m512i v_key1 = _mm512_add_epi32(_mm512_mullo_epi32(v_key0, v_mul_step), v_add_step);
+    __m512i v_key2 = _mm512_add_epi32(_mm512_mullo_epi32(v_key1, v_mul_step), v_add_step);
+    __m512i v_key3 = _mm512_add_epi32(_mm512_mullo_epi32(v_key2, v_mul_step), v_add_step);
+
+    // 主循环：每轮处理 4 块,共 256 字节
+    __m512i* v_data_p = (__m512i*)data;
+    for (; v_data_p < (__m512i*)(data + (n & ~MOD_256_MASK)); v_data_p += 4)
     {
-        // 并行生成 8 个密钥
-        __m256i v_key  = _mm256_add_epi32(_mm256_mullo_epi32(_mm256_set1_epi32(magickey), v_mul), v_add);
-        __m256i v_data = _mm256_loadu_si256(v_data_p);
-        _mm256_storeu_si256(v_data_p, _mm256_xor_si256(v_data, v_key));
-        magickey = magickey * AVX2_MUL_STEP + AVX2_ADD_STEP;
+        _mm512_storeu_si512(v_data_p + 0, _mm512_xor_si512(_mm512_loadu_si512(v_data_p + 0), v_key0));
+        _mm512_storeu_si512(v_data_p + 1, _mm512_xor_si512(_mm512_loadu_si512(v_data_p + 1), v_key1));
+        _mm512_storeu_si512(v_data_p + 2, _mm512_xor_si512(_mm512_loadu_si512(v_data_p + 2), v_key2));
+        _mm512_storeu_si512(v_data_p + 3, _mm512_xor_si512(_mm512_loadu_si512(v_data_p + 3), v_key3));
+        v_key0 = _mm512_add_epi32(_mm512_mullo_epi32(v_key0, v_mul_step_4), v_add_step_4);
+        v_key1 = _mm512_add_epi32(_mm512_mullo_epi32(v_key1, v_mul_step_4), v_add_step_4);
+        v_key2 = _mm512_add_epi32(_mm512_mullo_epi32(v_key2, v_mul_step_4), v_add_step_4);
+        v_key3 = _mm512_add_epi32(_mm512_mullo_epi32(v_key3, v_mul_step_4), v_add_step_4);
     }
 
-    decrypt_file_data_scalar((uint8_t*)v_data_p, r, magickey);
+    decrypt_file_data_scalar((uint8_t*)v_data_p, n & MOD_256_MASK, _mm512_cvtsi512_si32(v_key0));
+}
+#elifdef __AVX2__
+    #define MOD_128_MASK 0B1111111
+
+static const alignas(32) uint32_t AVX2_MUL_TABLE[8] = {
+    1U,         // 7^0 mod 2^32
+    7U,         // 7^1 mod 2^32
+    49U,        // 7^2 mod 2^32
+    343U,       // 7^3 mod 2^32
+    2401U,      // 7^4 mod 2^32
+    16807U,     // 7^5 mod 2^32
+    117649U,    // 7^6 mod 2^32
+    823543U,    // 7^7 mod 2^32
+};
+
+static const alignas(32) uint32_t AVX2_ADD_TABLE[8] = {
+    0U,         // (7^0-1)/2 mod 2^32
+    3U,         // (7^1-1)/2 mod 2^32
+    24U,        // (7^2-1)/2 mod 2^32
+    171U,       // (7^3-1)/2 mod 2^32
+    1200U,      // (7^4-1)/2 mod 2^32
+    8403U,      // (7^5-1)/2 mod 2^32
+    58824U,     // (7^6-1)/2 mod 2^32
+    411771U,    // (7^7-1)/2 mod 2^32
+};
+
+    #define AVX2_MUL_STEP   5764801U       // 7^8 mod 2^32
+    #define AVX2_ADD_STEP   2882400U       // (7^8-1)/2 mod 2^32
+    #define AVX2_MUL_STEP_4 1855011585U    // 7^32 mod 2^32
+    #define AVX2_ADD_STEP_4 927505792U     // (7^32-1)/2 mod 2^32
+
+static void decrypt_file_data_avx2(uint8_t* data, uint32_t n, uint32_t magickey)
+{
+    const __m256i v_mul_table = _mm256_load_si256((__m256i*)AVX2_MUL_TABLE);
+    const __m256i v_add_table = _mm256_load_si256((__m256i*)AVX2_ADD_TABLE);
+
+    // 4 路循环展开
+    const __m256i v_mul_step   = _mm256_set1_epi32(AVX2_MUL_STEP);
+    const __m256i v_add_step   = _mm256_set1_epi32(AVX2_ADD_STEP);
+    const __m256i v_mul_step_4 = _mm256_set1_epi32(AVX2_MUL_STEP_4);
+    const __m256i v_add_step_4 = _mm256_set1_epi32(AVX2_ADD_STEP_4);
+
+    // 4 路独立初始 key
+    __m256i v_key0 = _mm256_add_epi32(_mm256_mullo_epi32(_mm256_set1_epi32(magickey), v_mul_table), v_add_table);
+    __m256i v_key1 = _mm256_add_epi32(_mm256_mullo_epi32(v_key0, v_mul_step), v_add_step);
+    __m256i v_key2 = _mm256_add_epi32(_mm256_mullo_epi32(v_key1, v_mul_step), v_add_step);
+    __m256i v_key3 = _mm256_add_epi32(_mm256_mullo_epi32(v_key2, v_mul_step), v_add_step);
+
+    // 主循环：每轮处理 4 块,共 128 字节
+    __m256i* v_data_p = (__m256i*)data;
+    for (; v_data_p < (__m256i*)(data + (n & ~MOD_128_MASK)); v_data_p += 4)
+    {
+        _mm256_storeu_si256(v_data_p + 0, _mm256_xor_si256(_mm256_loadu_si256(v_data_p + 0), v_key0));
+        _mm256_storeu_si256(v_data_p + 1, _mm256_xor_si256(_mm256_loadu_si256(v_data_p + 1), v_key1));
+        _mm256_storeu_si256(v_data_p + 2, _mm256_xor_si256(_mm256_loadu_si256(v_data_p + 2), v_key2));
+        _mm256_storeu_si256(v_data_p + 3, _mm256_xor_si256(_mm256_loadu_si256(v_data_p + 3), v_key3));
+        v_key0 = _mm256_add_epi32(_mm256_mullo_epi32(v_key0, v_mul_step_4), v_add_step_4);
+        v_key1 = _mm256_add_epi32(_mm256_mullo_epi32(v_key1, v_mul_step_4), v_add_step_4);
+        v_key2 = _mm256_add_epi32(_mm256_mullo_epi32(v_key2, v_mul_step_4), v_add_step_4);
+        v_key3 = _mm256_add_epi32(_mm256_mullo_epi32(v_key3, v_mul_step_4), v_add_step_4);
+    }
+
+    decrypt_file_data_scalar((uint8_t*)v_data_p, n & MOD_128_MASK, _mm256_cvtsi256_si32(v_key0));
 }
 #endif
 
@@ -142,14 +236,16 @@ static void decrypt_file_data_avx2(uint8_t* data, size_t n, uint32_t magickey)
  * 解码数据段
  *
  * @param data [uint8_t*] 数据段指针
- * @param n [size_t] 数据段长度
+ * @param n [uint32_t] 数据段长度
  * @param magickey [uint32_t] 解密密钥
  *
  * @return [void]
  */
-inline static void decrypt_file_data_dispatch(uint8_t* data, size_t n, uint32_t key)
+inline static void decrypt_file_data_dispatch(uint8_t* data, uint32_t n, uint32_t key)
 {
-#ifdef __AVX2__
+#ifdef __AVX512F__
+    decrypt_file_data_avx512(data, n, key);
+#elifdef __AVX2__
     decrypt_file_data_avx2(data, n, key);
 #else
     decrypt_file_data_scalar(data, n, key);
@@ -245,7 +341,8 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
     }
     rgss3a_p += 4;
 
-    struct timespec start, end;
+    struct timespec start;
+    struct timespec end;
     while (true)
     {
         // 读取数据段偏移量
@@ -337,7 +434,7 @@ static VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_di
 
     free(rgss3a_data);
 
-    printf(GREEN_COLOR("Total Time_ms:") "%ld\n", all_time / 1000000);
+    printf(GREEN_COLOR("Total Time_ms:") "%f\n", (double)all_time / 1000000);
     return Qnil;
 }
 
