@@ -1,0 +1,44 @@
+---
+Checks: >
+    boost-*,
+    bugprone-*,
+    clang-analyzer-*,
+    concurrency-*,
+    cppcoreguidelines-*,
+    misc-*,
+    modernize-*,
+    performance-*,
+    portability-*,
+    readability-*,
+    -bugprone-easily-swappable-parameters,
+    -bugprone-narrowing-conversions,
+    -bugprone-switch-missing-default-case,
+    -cppcoreguidelines-avoid-c-arrays,
+    -cppcoreguidelines-avoid-magic-numbers,
+    -cppcoreguidelines-narrowing-conversions,
+    -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+    -cppcoreguidelines-pro-type-vararg,
+    -modernize-avoid-c-arrays,
+    -readability-magic-numbers,
+CheckOptions:
+    boost-use-ranges.UseReversePipe: 'true'
+    bugprone-misplaced-widening-cast.CheckImplicitCasts: 'true'
+    bugprone-sizeof-expression.WarnOnSizeOfIntegerExpression: 'true'
+    bugprone-sizeof-expression.WarnOnSizeOfPointer: 'true'
+    bugprone-suspicious-enum-usage.StrictMode: 'true'
+    cppcoreguidelines-pro-type-member-init.IgnoreArrays: 'true'
+    cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor: 'true'
+    misc-const-correctness.TransformPointersAsValues: 'true'
+    misc-const-correctness.WarnPointersAsValues: 'true'
+    misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: 'true'
+    modernize-deprecated-headers.CheckHeaderFile: 'true'
+    modernize-use-ranges.UseReversePipe: 'true'
+    modernize-use-trailing-return-type.TransformFunctions: 'false'
+    portability-simd-intrinsics.Suggest: 'true'
+    readability-identifier-length.MinimumParameterNameLength: '2'
+    readability-identifier-length.MinimumVariableNameLength: '1'
+    readability-identifier-naming.ClassMemberPrefix: 'm_'
+    readability-simplify-boolean-expr.ChainedConditionalAssignment: 'true'
+    readability-simplify-boolean-expr.ChainedConditionalReturn: 'true'
+    readability-simplify-boolean-expr.SimplifyDeMorganRelaxed: 'true'
+...
