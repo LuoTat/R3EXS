@@ -24,8 +24,6 @@ namespace
 constexpr std::uint64_t RGSSAD_HEADER {0X0300444153534752};       // "RGSSAD\0\3"
 constexpr std::uint64_t FUX2PACK2_HEADER {0X6B63615032787546};    // "Fux2Pack"
 
-constexpr std::uint32_t MOD_4_MASK {0B11};
-
 struct DecryptTask
 {
     std::span<char>       filename;
@@ -53,6 +51,8 @@ inline T load_little_data(char*& data) noexcept
     return t;
 }
 
+constexpr std::uint32_t MOD_4_MASK {0B11};
+
 inline void xor_u32(char* data, std::uint32_t key) noexcept
 {
     std::uint32_t value {};
@@ -71,18 +71,17 @@ void decrypt_file_name(std::span<char> data, std::uint32_t magickey) noexcept
         xor_u32(data_p, magickey);
     }
 
-    auto key_array {std::bit_cast<std::array<char, 4>>(magickey)};
     switch (n & MOD_4_MASK)
     {
-        case 3 : data_p[2] ^= key_array[2]; [[fallthrough]];
-        case 2 : data_p[1] ^= key_array[1]; [[fallthrough]];
-        case 1 : data_p[0] ^= key_array[0];
+        case 3 : data_p[2] ^= magickey >> 16 & 0XFF; [[fallthrough]];
+        case 2 : data_p[1] ^= magickey >> 8 & 0XFF; [[fallthrough]];
+        case 1 : data_p[0] ^= magickey & 0XFF;
     }
 }
 
 void decrypt_file_data_scalar(std::span<char> data, std::uint32_t magickey) noexcept
 {
-    // 主循环：每轮处理 1 块,共 4 字节
+    // 主循环：每轮处理 1 块,共 4 字
     auto  n {data.size()};
     auto* data_p {data.data()};
     for (; data_p < data.data() + (n & ~MOD_4_MASK); data_p += 4)
@@ -91,98 +90,18 @@ void decrypt_file_data_scalar(std::span<char> data, std::uint32_t magickey) noex
         magickey = (magickey * 7) + 3;
     }
 
-    auto key_array {std::bit_cast<std::array<char, 4>>(magickey)};
     switch (n & MOD_4_MASK)
     {
-        case 3 : data_p[2] ^= key_array[2]; [[fallthrough]];
-        case 2 : data_p[1] ^= key_array[1]; [[fallthrough]];
-        case 1 : data_p[0] ^= key_array[0];
+        case 3 : data_p[2] ^= magickey >> 16 & 0XFF; [[fallthrough]];
+        case 2 : data_p[1] ^= magickey >> 8 & 0XFF; [[fallthrough]];
+        case 1 : data_p[0] ^= magickey & 0XFF;
     }
 }
 
-#ifdef __AVX512F__
-constexpr std::uint32_t MOD_256_MASK {0B11111111};
-
-alignas(64) constexpr std::array<std::uint32_t, 16> AVX512_MUL_TABLE {
-    1U,                                                     // 7^0 mod 2^32
-    7U,                                                     // 7^1 mod 2^32
-    49U,                                                    // 7^2 mod 2^32
-    343U,                                                   // 7^3 mod 2^32
-    2401U,                                                  // 7^4 mod 2^32
-    16807U,                                                 // 7^5 mod 2^32
-    117649U,                                                // 7^6 mod 2^32
-    823543U,                                                // 7^7 mod 2^32
-    5764801U,                                               // 7^8 mod 2^32
-    40353607U,                                              // 7^9 mod 2^32
-    282475249U,                                             // 7^10 mod 2^32
-    1977326743U,                                            // 7^11 mod 2^32
-    956385313U,                                             // 7^12 mod 2^32
-    2399729895U,                                            // 7^13 mod 2^32
-    3913207377U,                                            // 7^14 mod 2^32
-    1622647863U                                             // 7^15 mod 2^32
-};
-constexpr std::uint32_t AVX512_MUL_STEP {2768600449U};      // 7^16 mod 2^32
-constexpr std::uint32_t AVX512_MUL_STEP_4 {3233510913U};    // 7^64 mod 2^32
-
-alignas(64) constexpr std::array<std::uint32_t, 16> AVX512_ADD_TABLE {
-    0U,                                                     // (7^0-1)/2 mod 2^32
-    3U,                                                     // (7^1-1)/2 mod 2^32
-    24U,                                                    // (7^2-1)/2 mod 2^32
-    171U,                                                   // (7^3-1)/2 mod 2^32
-    1200U,                                                  // (7^4-1)/2 mod 2^32
-    8403U,                                                  // (7^5-1)/2 mod 2^32
-    58824U,                                                 // (7^6-1)/2 mod 2^32
-    411771U,                                                // (7^7-1)/2 mod 2^32
-    2882400U,                                               // (7^8-1)/2 mod 2^32
-    20176803U,                                              // (7^9-1)/2 mod 2^32
-    141237624U,                                             // (7^10-1)/2 mod 2^32
-    988663371U,                                             // (7^11-1)/2 mod 2^32
-    2625676304U,                                            // (7^12-1)/2 mod 2^32
-    1199864947U,                                            // (7^13-1)/2 mod 2^32
-    4104087336U,                                            // (7^14-1)/2 mod 2^32
-    2958807579U                                             // (7^15-1)/2 mod 2^32
-};
-constexpr std::uint32_t AVX512_ADD_STEP {3531783872U};      // (7^16-1)/2 mod 2^32
-constexpr std::uint32_t AVX512_ADD_STEP_4 {1616755456U};    // (7^64-1)/2 mod 2^32
-
-void decrypt_file_data_avx512(std::span<char> data, std::uint32_t magickey) noexcept
-{
-    auto v_mul_table {_mm512_load_si512(AVX512_MUL_TABLE.data())};
-    auto v_add_table {_mm512_load_si512(AVX512_ADD_TABLE.data())};
-
-    // 4 路循环展开
-    auto v_mul_step {_mm512_set1_epi32(AVX512_MUL_STEP)};
-    auto v_add_step {_mm512_set1_epi32(AVX512_ADD_STEP)};
-    auto v_mul_step_4 {_mm512_set1_epi32(AVX512_MUL_STEP_4)};
-    auto v_add_step_4 {_mm512_set1_epi32(AVX512_ADD_STEP_4)};
-
-    // 4 路独立初始 key
-    auto v_key0 {_mm512_add_epi32(_mm512_mullo_epi32(_mm512_set1_epi32(magickey), v_mul_table), v_add_table)};
-    auto v_key1 {_mm512_add_epi32(_mm512_mullo_epi32(v_key0, v_mul_step), v_add_step)};
-    auto v_key2 {_mm512_add_epi32(_mm512_mullo_epi32(v_key1, v_mul_step), v_add_step)};
-    auto v_key3 {_mm512_add_epi32(_mm512_mullo_epi32(v_key2, v_mul_step), v_add_step)};
-
-    // 主循环：每轮处理 4 块,共 256 字节
-    auto  n {data.size()};
-    auto* data_p {data.data()};
-    for (; data_p < data.data() + (n & ~MOD_256_MASK); data_p += 256)
-    {
-        _mm512_storeu_si512(data_p + 0, _mm512_xor_si512(_mm512_loadu_si512(data_p + 0), v_key0));
-        _mm512_storeu_si512(data_p + 64, _mm512_xor_si512(_mm512_loadu_si512(data_p + 64), v_key1));
-        _mm512_storeu_si512(data_p + 128, _mm512_xor_si512(_mm512_loadu_si512(data_p + 128), v_key2));
-        _mm512_storeu_si512(data_p + 192, _mm512_xor_si512(_mm512_loadu_si512(data_p + 192), v_key3));
-        v_key0 = _mm512_add_epi32(_mm512_mullo_epi32(v_key0, v_mul_step_4), v_add_step_4);
-        v_key1 = _mm512_add_epi32(_mm512_mullo_epi32(v_key1, v_mul_step_4), v_add_step_4);
-        v_key2 = _mm512_add_epi32(_mm512_mullo_epi32(v_key2, v_mul_step_4), v_add_step_4);
-        v_key3 = _mm512_add_epi32(_mm512_mullo_epi32(v_key3, v_mul_step_4), v_add_step_4);
-    }
-
-    decrypt_file_data_scalar(data.subspan(data.size() - (n & MOD_256_MASK)), _mm512_cvtsi512_si32(v_key0));
-}
-#elifdef __AVX2__
+#ifdef __AVX2__
 constexpr std::uint32_t MOD_128_MASK {0B1111111};
 
-alignas(32) constexpr std::array<std::uint32_t, 8> AVX2_MUL_TABLE {
+alignas(32) constexpr std::uint32_t AVX2_MUL_TABLE[8] {
     1U,                                                   // 7^0 mod 2^32
     7U,                                                   // 7^1 mod 2^32
     49U,                                                  // 7^2 mod 2^32
@@ -195,7 +114,7 @@ alignas(32) constexpr std::array<std::uint32_t, 8> AVX2_MUL_TABLE {
 constexpr std::uint32_t AVX2_MUL_STEP {5764801U};         // 7^8 mod 2^32
 constexpr std::uint32_t AVX2_MUL_STEP_4 {1855011585U};    // 7^32 mod 2^32
 
-alignas(32) constexpr std::array<std::uint32_t, 8> AVX2_ADD_TABLE {
+alignas(32) constexpr uint32_t AVX2_ADD_TABLE[8] {
     0U,                                                  // (7^0-1)/2 mod 2^32
     3U,                                                  // (7^1-1)/2 mod 2^32
     24U,                                                 // (7^2-1)/2 mod 2^32
@@ -208,10 +127,10 @@ alignas(32) constexpr std::array<std::uint32_t, 8> AVX2_ADD_TABLE {
 constexpr std::uint32_t AVX2_ADD_STEP {2882400U};        // (7^8-1)/2 mod 2^32
 constexpr std::uint32_t AVX2_ADD_STEP_4 {927505792U};    // (7^32-1)/2 mod 2^32
 
-void decrypt_file_data_avx2(std::span<char> data, std::uint32_t magickey) noexcept
+void decrypt_file_data_avx2_4_unroll(std::span<char> data, std::uint32_t magickey) noexcept
 {
-    auto v_mul_table {_mm256_load_si256(reinterpret_cast<const __m256i*>(AVX2_MUL_TABLE.data()))};
-    auto v_add_table {_mm256_load_si256(reinterpret_cast<const __m256i*>(AVX2_ADD_TABLE.data()))};
+    auto v_mul_table {_mm256_load_si256(reinterpret_cast<const __m256i*>(AVX2_MUL_TABLE))};
+    auto v_add_table {_mm256_load_si256(reinterpret_cast<const __m256i*>(AVX2_ADD_TABLE))};
 
     // 4 路循环展开
     auto v_mul_step {_mm256_set1_epi32(AVX2_MUL_STEP)};
@@ -226,25 +145,25 @@ void decrypt_file_data_avx2(std::span<char> data, std::uint32_t magickey) noexce
     auto v_key3 {_mm256_add_epi32(_mm256_mullo_epi32(v_key2, v_mul_step), v_add_step)};
 
     // 主循环：每轮处理 4 块,共 128 字节
-    auto  n {data.size()};
+    auto  simd_size {data.size() & ~MOD_128_MASK};
     auto* data_p {data.data()};
-    for (; data_p < (data.data() + (n & ~MOD_128_MASK)); data_p += 128)
+    for (; data_p < data.data() + simd_size; data_p += 128)
     {
         _mm256_storeu_si256(
-            reinterpret_cast<__m256i*>(data_p + 0),
-            _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<__m256i*>(data_p + 0)), v_key0)
+            reinterpret_cast<__m256i_u*>(data_p + 0),
+            _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<__m256i_u*>(data_p + 0)), v_key0)
         );
         _mm256_storeu_si256(
-            reinterpret_cast<__m256i*>(data_p + 32),
-            _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<__m256i*>(data_p + 32)), v_key1)
+            reinterpret_cast<__m256i_u*>(data_p + 32),
+            _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<__m256i_u*>(data_p + 32)), v_key1)
         );
         _mm256_storeu_si256(
-            reinterpret_cast<__m256i*>(data_p + 64),
-            _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<__m256i*>(data_p + 64)), v_key2)
+            reinterpret_cast<__m256i_u*>(data_p + 64),
+            _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<__m256i_u*>(data_p + 64)), v_key2)
         );
         _mm256_storeu_si256(
-            reinterpret_cast<__m256i*>(data_p + 96),
-            _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<__m256i*>(data_p + 96)), v_key3)
+            reinterpret_cast<__m256i_u*>(data_p + 96),
+            _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<__m256i_u*>(data_p + 96)), v_key3)
         );
         v_key0 = _mm256_add_epi32(_mm256_mullo_epi32(v_key0, v_mul_step_4), v_add_step_4);
         v_key1 = _mm256_add_epi32(_mm256_mullo_epi32(v_key1, v_mul_step_4), v_add_step_4);
@@ -252,16 +171,14 @@ void decrypt_file_data_avx2(std::span<char> data, std::uint32_t magickey) noexce
         v_key3 = _mm256_add_epi32(_mm256_mullo_epi32(v_key3, v_mul_step_4), v_add_step_4);
     }
 
-    decrypt_file_data_scalar(data.subspan(data.size() - (n & MOD_128_MASK)), _mm256_cvtsi256_si32(v_key0));
+    decrypt_file_data_scalar(data.subspan(simd_size), _mm256_cvtsi256_si32(v_key0));
 }
 #endif
 
 void decrypt_file_data_dispatch(std::span<char> data, std::uint32_t magickey) noexcept
 {
-#ifdef __AVX512F__
-    decrypt_file_data_avx512(data, magickey);
-#elifdef __AVX2__
-    decrypt_file_data_avx2(data, magickey);
+#ifdef __AVX2__
+    decrypt_file_data_avx2_4_unroll(data, magickey);
 #else
     decrypt_file_data_scalar(data, magickey);
 #endif
@@ -350,7 +267,6 @@ void r3exs_rgss3a_rvdata2_cxx(
         std::filesystem::create_directories(dir);
     }
     // 写入文件
-    auto start {std::chrono::high_resolution_clock::now()};
     for (const auto& task : tasks)
     {
         write_file(task.output_full_path, task.data);
@@ -363,11 +279,6 @@ void r3exs_rgss3a_rvdata2_cxx(
             );
         }
     }
-    auto end {std::chrono::high_resolution_clock::now()};
-
-    std::println(
-        "Decryption completed in {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
-    );
 }
 
 /*
