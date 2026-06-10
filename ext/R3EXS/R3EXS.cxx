@@ -175,7 +175,7 @@ void decrypt_file_data_avx2_4_unroll(std::span<char> data, std::uint32_t magicke
 }
 #endif
 
-void decrypt_file_data_dispatch(std::span<char> data, std::uint32_t magickey) noexcept
+inline void decrypt_file_data_dispatch(std::span<char> data, std::uint32_t magickey) noexcept
 {
 #ifdef __AVX2__
     decrypt_file_data_avx2_4_unroll(data, magickey);
