@@ -1,10 +1,8 @@
 --title R3EXS
 --readme README_EN.md
---markup markdown
---markup-provider redcarpet
 --charset utf-8
 lib/**/*.rb
-ext/**/*.c
+ext/**/*.cxx
 -
 LICENSE
 README.md
