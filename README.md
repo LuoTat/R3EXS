@@ -8,14 +8,14 @@ RGSS3_Extract_Strings_Tool
 
 ## 目录
 
--   [简介](#简介)
--   [特点](#特点)
--   [功能列表](#功能列表)
--   [安装方法](#安装方法)
--   [使用方法](#使用方法)
--   [项目构建](#项目构建)
--   [项目文档](#项目文档)
--   [友情链接](#友情链接)
+- [简介](#简介)
+- [特点](#特点)
+- [功能列表](#功能列表)
+- [安装方法](#安装方法)
+- [使用方法](#使用方法)
+- [项目构建](#项目构建)
+- [项目文档](#项目文档)
+- [友情链接](#友情链接)
 
 ## [简介](#目录)
 
@@ -248,13 +248,13 @@ rake -T
 
 ## [友情链接](#目录)
 
--   [oj](https://github.com/ohler55/oj)
--   [gli](https://github.com/davetron5000/gli)
--   [Prism](https://github.com/ruby/prism)
--   [Ocran](https://github.com/Largo/ocran)
--   [Tebako](https://github.com/tamatebako/tebako)
--   [RGSS3](https://github.com/taroxd/RGSS3)
--   [rvdata2json](https://github.com/DICE2000/rvdata2json)
--   [VX-Ace-Translator](https://github.com/AhmedAhmedEG/VX-Ace-Translator)
--   [RPGMakerDecrypter](https://github.com/uuksu/RPGMakerDecrypter)
--   [RPGMaker VX Ace F1-Manual](https://miaowm5.github.io/RMVA-F1)
+- [oj](https://github.com/ohler55/oj)
+- [gli](https://github.com/davetron5000/gli)
+- [Prism](https://github.com/ruby/prism)
+- [Ocran](https://github.com/Largo/ocran)
+- [Tebako](https://github.com/tamatebako/tebako)
+- [RGSS3](https://github.com/taroxd/RGSS3)
+- [rvdata2json](https://github.com/DICE2000/rvdata2json)
+- [VX-Ace-Translator](https://github.com/AhmedAhmedEG/VX-Ace-Translator)
+- [RPGMakerDecrypter](https://github.com/uuksu/RPGMakerDecrypter)
+- [RPGMaker VX Ace F1-Manual](https://miaowm5.github.io/RMVA-F1)

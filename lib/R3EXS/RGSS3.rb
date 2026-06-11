@@ -3,284 +3,284 @@
 # RPG Maker VX Ace Color 类
 class Color
 
-    # red 通道的值
-    #
-    # @return [Integer]
-    attr_reader :red
+  # red 通道的值
+  #
+  # @return [Integer]
+  attr_reader :red
 
-    # green 通道的值
-    #
-    # @return [Integer]
-    attr_reader :green
+  # green 通道的值
+  #
+  # @return [Integer]
+  attr_reader :green
 
-    # blue 通道的值
-    #
-    # @return [Integer]
-    attr_reader :blue
+  # blue 通道的值
+  #
+  # @return [Integer]
+  attr_reader :blue
 
-    # alpha 通道的值
-    #
-    # @return [Integer]
-    attr_reader :alpha
+  # alpha 通道的值
+  #
+  # @return [Integer]
+  attr_reader :alpha
 
-    # 初始化时接受以下几种参数情况：
-    # - 无参数时，默认 (0, 0, 0, 0)
-    # - 3 个参数时，默认为 (red, green, blue, 255)
-    # - 4 个参数时，指定 (red, green, blue, alpha)
-    #
-    # @param args [Array<Integer>] red, green, blue, alpha
-    #        - red: 红色通道的值 (0-255)
-    #        - green: 绿色通道的值 (0-255)
-    #        - blue: 蓝色通道的值 (0-255)
-    #        - alpha: 可选，透明度通道的值 (0-255)，默认为 255
-    #
-    # @return [Color]
-    def initialize(*args)
-        case args.length
-        when 0 # 无参数
-            set(0, 0, 0, 0)
-        when 3 # 3 个参数, alpha 默认为 255
-            set(*args)
-        when 4 # 4 个参数, 分别为 red, green, blue, alpha
-            set(*args)
-        else
-            raise ArgumentError, "Invalid arguments for initialize method"
-        end
+  # 初始化时接受以下几种参数情况：
+  # - 无参数时，默认 (0, 0, 0, 0)
+  # - 3 个参数时，默认为 (red, green, blue, 255)
+  # - 4 个参数时，指定 (red, green, blue, alpha)
+  #
+  # @param args [Array<Integer>] red, green, blue, alpha
+  #        - red: 红色通道的值 (0-255)
+  #        - green: 绿色通道的值 (0-255)
+  #        - blue: 蓝色通道的值 (0-255)
+  #        - alpha: 可选，透明度通道的值 (0-255)，默认为 255
+  #
+  # @return [Color]
+  def initialize(*args)
+    case args.length
+    when 0 # 无参数
+      set(0, 0, 0, 0)
+    when 3 # 3 个参数, alpha 默认为 255
+      set(*args)
+    when 4 # 4 个参数, 分别为 red, green, blue, alpha
+      set(*args)
+    else
+      raise ArgumentError, "Invalid arguments for initialize method"
     end
+  end
 
-    # 设置 Color 对象的值
-    # - 无参数时，默认 (0, 0, 0, 0)
-    # - 3 个参数时，默认为 (red, green, blue, 255)
-    # - 4 个参数时，指定 (red, green, blue, alpha)
-    #
-    # @param args [Array<Integer>] red, green, blue, alpha
-    #        - red: 红色通道的值 (0-255)
-    #        - green: 绿色通道的值 (0-255)
-    #        - blue: 蓝色通道的值 (0-255)
-    #        - alpha: 可选，透明度通道的值 (0-255)，默认为 255
-    #
-    # @return [void]
-    def set(*args)
-        case args.length
-        when 1 # 一个参数, 为 Color 对象
-            if args[0].is_a?(Color)
-                other_color = args[0]
-                self.red    = other_color.red
-                self.green  = other_color.green
-                self.blue   = other_color.blue
-                self.alpha  = other_color.alpha
-            else
-                raise ArgumentError, "Invalid arguments for set method"
-            end
-        when 3 # 三个参数, 分别为 red, green, blue (alpha 默认为 255)
-            self.red   = args[0]
-            self.green = args[1]
-            self.blue  = args[2]
-            self.alpha = 255.0
-        when 4 # 四个参数, 分别为 red, green, blue, alpha
-            self.red   = args[0]
-            self.green = args[1]
-            self.blue  = args[2]
-            self.alpha = args[3]
-        else
-            raise ArgumentError, "Invalid arguments for set method"
-        end
+  # 设置 Color 对象的值
+  # - 无参数时，默认 (0, 0, 0, 0)
+  # - 3 个参数时，默认为 (red, green, blue, 255)
+  # - 4 个参数时，指定 (red, green, blue, alpha)
+  #
+  # @param args [Array<Integer>] red, green, blue, alpha
+  #        - red: 红色通道的值 (0-255)
+  #        - green: 绿色通道的值 (0-255)
+  #        - blue: 蓝色通道的值 (0-255)
+  #        - alpha: 可选，透明度通道的值 (0-255)，默认为 255
+  #
+  # @return [void]
+  def set(*args)
+    case args.length
+    when 1 # 一个参数, 为 Color 对象
+      if args[0].is_a?(Color)
+        other_color = args[0]
+        self.red = other_color.red
+        self.green = other_color.green
+        self.blue = other_color.blue
+        self.alpha = other_color.alpha
+      else
+        raise ArgumentError, "Invalid arguments for set method"
+      end
+    when 3 # 三个参数, 分别为 red, green, blue (alpha 默认为 255)
+      self.red = args[0]
+      self.green = args[1]
+      self.blue = args[2]
+      self.alpha = 255.0
+    when 4 # 四个参数, 分别为 red, green, blue, alpha
+      self.red = args[0]
+      self.green = args[1]
+      self.blue = args[2]
+      self.alpha = args[3]
+    else
+      raise ArgumentError, "Invalid arguments for set method"
     end
+  end
 
-    # 序列化 Color 对象
-    #
-    # @param level [Integer] 序列化的级别
-    #
-    # @return [String]
-    def _dump(level)
-        [@red, @green, @blue, @alpha].pack('D4')
-    end
+  # 序列化 Color 对象
+  #
+  # @param level [Integer] 序列化的级别
+  #
+  # @return [String]
+  def _dump(level)
+    [@red, @green, @blue, @alpha].pack('D4')
+  end
 
-    # 反序列化 Color 对象
-    #
-    # @param obj [String] 序列化后的字符串
-    #
-    # @return [Color]
-    def Color._load(obj)
-        new(*obj.unpack('D4'))
-    end
+  # 反序列化 Color 对象
+  #
+  # @param obj [String] 序列化后的字符串
+  #
+  # @return [Color]
+  def Color._load(obj)
+    new(*obj.unpack('D4'))
+  end
 
-    # 设置 red 通道的值，限制在 0 到 255 之间
-    #
-    # @param value [Float] 新的 red 通道值
-    #
-    # @return [void]
-    def red=(value)
-        @red = [[value, 0.0].max, 255.0].min.to_i
-    end
+  # 设置 red 通道的值，限制在 0 到 255 之间
+  #
+  # @param value [Float] 新的 red 通道值
+  #
+  # @return [void]
+  def red=(value)
+    @red = [[value, 0.0].max, 255.0].min.to_i
+  end
 
-    # 设置 green 通道的值，限制在 0 到 255 之间
-    #
-    # @param value [Float] 新的 green 通道值
-    #
-    # @return [void]
-    def green=(value)
-        @green = [[value, 0.0].max, 255.0].min.to_i
-    end
+  # 设置 green 通道的值，限制在 0 到 255 之间
+  #
+  # @param value [Float] 新的 green 通道值
+  #
+  # @return [void]
+  def green=(value)
+    @green = [[value, 0.0].max, 255.0].min.to_i
+  end
 
-    # 设置 blue 通道的值，限制在 0 到 255 之间
-    #
-    # @param value [Float] 新的 blue 通道值
-    #
-    # @return [void]
-    def blue=(value)
-        @blue = [[value, 0.0].max, 255.0].min.to_i
-    end
+  # 设置 blue 通道的值，限制在 0 到 255 之间
+  #
+  # @param value [Float] 新的 blue 通道值
+  #
+  # @return [void]
+  def blue=(value)
+    @blue = [[value, 0.0].max, 255.0].min.to_i
+  end
 
-    # 设置 alpha 通道的值，限制在 0 到 255 之间
-    #
-    # @param value [Float] 新的 alpha 通道值
-    #
-    # @return [void]
-    def alpha=(value)
-        @alpha = [[value, 0.0].max, 255.0].min
-    end
+  # 设置 alpha 通道的值，限制在 0 到 255 之间
+  #
+  # @param value [Float] 新的 alpha 通道值
+  #
+  # @return [void]
+  def alpha=(value)
+    @alpha = [[value, 0.0].max, 255.0].min
+  end
 end
 
 # RPG Maker VX Ace Tone 类
 class Tone
 
-    # red 通道的值
-    #
-    # @return [Integer]
-    attr_reader :red
+  # red 通道的值
+  #
+  # @return [Integer]
+  attr_reader :red
 
-    # green 通道的值
-    #
-    # @return [Integer]
-    attr_reader :green
+  # green 通道的值
+  #
+  # @return [Integer]
+  attr_reader :green
 
-    # blue 通道的值
-    #
-    # @return [Integer]
-    attr_reader :blue
+  # blue 通道的值
+  #
+  # @return [Integer]
+  attr_reader :blue
 
-    # gray 通道的值
-    #
-    # @return [Integer]
-    attr_reader :gray
+  # gray 通道的值
+  #
+  # @return [Integer]
+  attr_reader :gray
 
-    # 初始化时接受以下几种参数情况：
-    # - 无参数时，默认 (0, 0, 0, 0)
-    # - 3 个参数时，默认为 (red, green, blue, 0)
-    # - 4 个参数时，指定 (red, green, blue, gray)
-    #
-    # @param args [Array<Integer>] red, green, blue, gray
-    #        - red: 红色通道的值 (-255-255)
-    #        - green: 绿色通道的值 (-255-255)
-    #        - blue: 蓝色通道的值 (-255-255)
-    #        - gray: 可选，灰度通道的值 (0-255)，默认为 0
-    #
-    # @return [Tone]
-    def initialize(*args)
-        case args.length
-        when 0 # 无参数
-            set(0, 0, 0, 0)
-        when 3 # 3 个参数, gray 默认为 0
-            set(*args)
-        when 4 # 4 个参数, 分别为 red, green, blue, gray
-            set(*args)
-        else
-            raise ArgumentError, "Invalid arguments for initialize method"
-        end
+  # 初始化时接受以下几种参数情况：
+  # - 无参数时，默认 (0, 0, 0, 0)
+  # - 3 个参数时，默认为 (red, green, blue, 0)
+  # - 4 个参数时，指定 (red, green, blue, gray)
+  #
+  # @param args [Array<Integer>] red, green, blue, gray
+  #        - red: 红色通道的值 (-255-255)
+  #        - green: 绿色通道的值 (-255-255)
+  #        - blue: 蓝色通道的值 (-255-255)
+  #        - gray: 可选，灰度通道的值 (0-255)，默认为 0
+  #
+  # @return [Tone]
+  def initialize(*args)
+    case args.length
+    when 0 # 无参数
+      set(0, 0, 0, 0)
+    when 3 # 3 个参数, gray 默认为 0
+      set(*args)
+    when 4 # 4 个参数, 分别为 red, green, blue, gray
+      set(*args)
+    else
+      raise ArgumentError, "Invalid arguments for initialize method"
     end
+  end
 
-    # 设置 Tone 对象的值
-    # - 无参数时，默认 (0, 0, 0, 0)
-    # - 3 个参数时，默认为 (red, green, blue, 0)
-    # - 4 个参数时，指定 (red, green, blue, gray)
-    #
-    # @param args [Array<Integer>] red, green, blue, gray
-    #        - red: 红色通道的值 (-255-255)
-    #        - green: 绿色通道的值 (-255-255)
-    #        - blue: 蓝色通道的值 (-255-255)
-    #        - gray: 可选，透明度通道的值 (0-255)，默认为 0
-    #
-    # @return [void]
-    def set(*args)
-        case args.length
-        when 1 # 一个参数, 为 Tone 对象
-            if args[0].is_a?(Tone)
-                self.red   = args[0].red
-                self.green = args[0].green
-                self.blue  = args[0].blue
-                self.gray  = args[0].gray
-            else
-                raise ArgumentError, "Invalid arguments for set method"
-            end
-        when 3 # 三个参数, 分别为 red, green, blue (gray 默认为 0)
-            self.red   = args[0]
-            self.green = args[1]
-            self.blue  = args[2]
-            self.gray  = 0.0
-        when 4 # 四个参数, 分别为 red, green, blue, gray
-            self.red   = args[0]
-            self.green = args[1]
-            self.blue  = args[2]
-            self.gray  = args[3]
-        else
-            raise ArgumentError, "Invalid arguments for set method"
-        end
+  # 设置 Tone 对象的值
+  # - 无参数时，默认 (0, 0, 0, 0)
+  # - 3 个参数时，默认为 (red, green, blue, 0)
+  # - 4 个参数时，指定 (red, green, blue, gray)
+  #
+  # @param args [Array<Integer>] red, green, blue, gray
+  #        - red: 红色通道的值 (-255-255)
+  #        - green: 绿色通道的值 (-255-255)
+  #        - blue: 蓝色通道的值 (-255-255)
+  #        - gray: 可选，透明度通道的值 (0-255)，默认为 0
+  #
+  # @return [void]
+  def set(*args)
+    case args.length
+    when 1 # 一个参数, 为 Tone 对象
+      if args[0].is_a?(Tone)
+        self.red = args[0].red
+        self.green = args[0].green
+        self.blue = args[0].blue
+        self.gray = args[0].gray
+      else
+        raise ArgumentError, "Invalid arguments for set method"
+      end
+    when 3 # 三个参数, 分别为 red, green, blue (gray 默认为 0)
+      self.red = args[0]
+      self.green = args[1]
+      self.blue = args[2]
+      self.gray = 0.0
+    when 4 # 四个参数, 分别为 red, green, blue, gray
+      self.red = args[0]
+      self.green = args[1]
+      self.blue = args[2]
+      self.gray = args[3]
+    else
+      raise ArgumentError, "Invalid arguments for set method"
     end
+  end
 
-    # 序列化 Tone 对象
-    #
-    # @param level [Integer] 序列化的级别
-    #
-    # @return [String]
-    def _dump(level)
-        [@red, @green, @blue, @gray].pack('D4')
-    end
+  # 序列化 Tone 对象
+  #
+  # @param level [Integer] 序列化的级别
+  #
+  # @return [String]
+  def _dump(level)
+    [@red, @green, @blue, @gray].pack('D4')
+  end
 
-    # 反序列化 Tone 对象
-    #
-    # @param obj [String] 序列化后的字符串
-    #
-    # @return [Tone]
-    def Tone._load(obj)
-        new(*obj.unpack('D4'))
-    end
+  # 反序列化 Tone 对象
+  #
+  # @param obj [String] 序列化后的字符串
+  #
+  # @return [Tone]
+  def Tone._load(obj)
+    new(*obj.unpack('D4'))
+  end
 
-    # 设置 red 通道的值，限制在 -255 到 255 之间
-    #
-    # @param value [Float] 新的 red 通道值
-    #
-    # @return [void]
-    def red=(value)
-        @red = [[value, -255.0].max, 255.0].min.to_i
-    end
+  # 设置 red 通道的值，限制在 -255 到 255 之间
+  #
+  # @param value [Float] 新的 red 通道值
+  #
+  # @return [void]
+  def red=(value)
+    @red = [[value, -255.0].max, 255.0].min.to_i
+  end
 
-    # 设置 green 通道的值，限制在 -255 到 255 之间
-    #
-    # @param value [Float] 新的 green 通道值
-    #
-    # @return [void]
-    def green=(value)
-        @green = [[value, -255.0].max, 255.0].min.to_i
-    end
+  # 设置 green 通道的值，限制在 -255 到 255 之间
+  #
+  # @param value [Float] 新的 green 通道值
+  #
+  # @return [void]
+  def green=(value)
+    @green = [[value, -255.0].max, 255.0].min.to_i
+  end
 
-    # 设置 blue 通道的值，限制在 -255 到 255 之间
-    #
-    # @param value [Float] 新的 blue 通道值
-    #
-    # @return [void]
-    def blue=(value)
-        @blue = [[value, -255.0].max, 255.0].min.to_i
-    end
+  # 设置 blue 通道的值，限制在 -255 到 255 之间
+  #
+  # @param value [Float] 新的 blue 通道值
+  #
+  # @return [void]
+  def blue=(value)
+    @blue = [[value, -255.0].max, 255.0].min.to_i
+  end
 
-    # 设置 alpha 通道的值，限制在 0 到 255 之间
-    #
-    # @param value [Float] 新的 alpha 通道值
-    #
-    # @return [void]
-    def gray=(value)
-        @gray = [[value, 0.0].max, 255.0].min.to_i
-    end
+  # 设置 alpha 通道的值，限制在 0 到 255 之间
+  #
+  # @param value [Float] 新的 alpha 通道值
+  #
+  # @return [void]
+  def gray=(value)
+    @gray = [[value, 0.0].max, 255.0].min.to_i
+  end
 end
 
 # RPG Maker VX Ace Table 类
@@ -290,1191 +290,1191 @@ end
 # Ruby Array 类在处理大量信息时效率很差，因此使用了此类。
 class Table
 
-    # 数据数组
-    #
-    # @return [Array<Integer>]
-    attr_accessor :data
+  # 数据数组
+  #
+  # @return [Array<Integer>]
+  attr_accessor :data
 
-    # 维度
-    #
-    # @return [Integer]
-    attr_accessor :dim
+  # 维度
+  #
+  # @return [Integer]
+  attr_accessor :dim
 
-    # 第一维的长度
-    #
-    # @return [Integer]
-    attr_accessor :xsize
+  # 第一维的长度
+  #
+  # @return [Integer]
+  attr_accessor :xsize
 
-    # 第二维的长度
-    #
-    # @return [Integer]
-    attr_accessor :ysize
+  # 第二维的长度
+  #
+  # @return [Integer]
+  attr_accessor :ysize
 
-    # 第三维的长度
-    #
-    # @return [Integer]
-    attr_accessor :zsize
+  # 第三维的长度
+  #
+  # @return [Integer]
+  attr_accessor :zsize
 
-    # 初始化 Table 对象，指定多维数组各维的长度。生成的数组可以是 1~3 维，甚至是没有元素的数组。
-    #
-    # 初始化时传入的参数个数决定了生成的数组维度：
-    # - 最少 1 维，最多 3 维。
-    # - `ysize` 和 `zsize` 参数可以省略，默认值为 1。
-    #
-    # 注意：该类没有参数检查，请确保 `ysize` 和 `zsize` 的值在 `[-32768, 32767]` 范围内。
-    #
-    # @param xsize [Integer] 第一维的长度（必需）
-    # @param ysize [Integer, nil] 第二维的长度（可选，默认值为 nil)
-    # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
-    #
-    # @return [Table]
-    def initialize(xsize, ysize = nil, zsize = nil)
-        init_attr(xsize, ysize, zsize)
-    end
+  # 初始化 Table 对象，指定多维数组各维的长度。生成的数组可以是 1~3 维，甚至是没有元素的数组。
+  #
+  # 初始化时传入的参数个数决定了生成的数组维度：
+  # - 最少 1 维，最多 3 维。
+  # - `ysize` 和 `zsize` 参数可以省略，默认值为 1。
+  #
+  # 注意：该类没有参数检查，请确保 `ysize` 和 `zsize` 的值在 `[-32768, 32767]` 范围内。
+  #
+  # @param xsize [Integer] 第一维的长度（必需）
+  # @param ysize [Integer, nil] 第二维的长度（可选，默认值为 nil)
+  # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
+  #
+  # @return [Table]
+  def initialize(xsize, ysize = nil, zsize = nil)
+    init_attr(xsize, ysize, zsize)
+  end
 
-    # 设置各维的长度
-    #
-    # @param xsize [Integer] 第一维的长度
-    # @param ysize [Integer, nil] 第二维的长度（如果为 nil，则默认为 1）
-    # @param zsize [Integer, nil] 第三维的长度（如果为 nil，则默认为 1）
-    #
-    # @return [void]
-    def init_attr(xsize, ysize, zsize)
-        @dim   = 1 + (ysize.nil? ? 0 : 1) + (zsize.nil? ? 0 : 1)
-        @xsize = xsize
-        @ysize = ysize.nil? ? 1 : ysize
-        @zsize = zsize.nil? ? 1 : zsize
-        @data  = Array.new(@xsize * @ysize * @zsize, 0)
-    end
+  # 设置各维的长度
+  #
+  # @param xsize [Integer] 第一维的长度
+  # @param ysize [Integer, nil] 第二维的长度（如果为 nil，则默认为 1）
+  # @param zsize [Integer, nil] 第三维的长度（如果为 nil，则默认为 1）
+  #
+  # @return [void]
+  def init_attr(xsize, ysize, zsize)
+    @dim = 1 + (ysize.nil? ? 0 : 1) + (zsize.nil? ? 0 : 1)
+    @xsize = xsize
+    @ysize = ysize.nil? ? 1 : ysize
+    @zsize = zsize.nil? ? 1 : zsize
+    @data = Array.new(@xsize * @ysize * @zsize, 0)
+  end
 
-    # 获取指定位置的元素值
-    #
-    # @param x [Integer] 第一维的长度（必需）
-    # @param y [Integer] 第二维的长度（可选，默认值为 0)
-    # @param z [Integer] 第三维的长度（可选，默认值为 0)
-    #
-    # @return [Integer]
-    def [](x, y = 0, z = 0)
-        @data[x + y * @xsize + z * @xsize * @ysize]
-    end
+  # 获取指定位置的元素值
+  #
+  # @param x [Integer] 第一维的长度（必需）
+  # @param y [Integer] 第二维的长度（可选，默认值为 0)
+  # @param z [Integer] 第三维的长度（可选，默认值为 0)
+  #
+  # @return [Integer]
+  def [](x, y = 0, z = 0)
+    @data[x + y * @xsize + z * @xsize * @ysize]
+  end
 
-    # 设置指定位置的元素值
-    #
-    # @param args [Array<Integer>] x, y, z, v
-    #   - x: 第一维的长度（必需）
-    #   - y: 第二维的长度（可选，默认值为 nil)
-    #   - z: 第三维的长度（可选，默认值为 nil)
-    #   - v: 新的元素值
-    #
-    # @return [void]
-    def []=(*args)
-        v                                           = args.pop
-        x, y, z                                     = args
-        y                                           ||= 0
-        z                                           ||= 0
-        @data[x + y * @xsize + z * @xsize * @ysize] = v
-    end
+  # 设置指定位置的元素值
+  #
+  # @param args [Array<Integer>] x, y, z, v
+  #   - x: 第一维的长度（必需）
+  #   - y: 第二维的长度（可选，默认值为 nil)
+  #   - z: 第三维的长度（可选，默认值为 nil)
+  #   - v: 新的元素值
+  #
+  # @return [void]
+  def []=(*args)
+    v = args.pop
+    x, y, z = args
+    y ||= 0
+    z ||= 0
+    @data[x + y * @xsize + z * @xsize * @ysize] = v
+  end
 
-    # 扩容 Table 对象，保留原有数据
-    #
-    # @param xsize [Integer] 第一维的长度（必需）
-    # @param ysize [Integer, nil] 第二维的长度（可选，默认值为 nil)
-    # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
-    #
-    # @return [void]
-    def resize(xsize, ysize = nil, zsize = nil)
-        old_data                        = @data.dup
-        old_xsize, old_ysize, old_zsize = @xsize, @ysize, @zsize
-        init_attr(xsize, ysize, zsize)
-        (0...[old_xsize, @xsize].min).each { |x|
-            (0...[old_ysize, @ysize].min).each { |y|
-                (0...[old_zsize, @zsize].min).each { |z|
-                    @data[x + y * @xsize + z * @xsize * @ysize] = old_data[x + y * old_xsize + z * old_xsize * old_ysize]
-                }
-            }
+  # 扩容 Table 对象，保留原有数据
+  #
+  # @param xsize [Integer] 第一维的长度（必需）
+  # @param ysize [Integer, nil] 第二维的长度（可选，默认值为 nil)
+  # @param zsize [Integer, nil] 第三维的长度（可选，默认值为 nil)
+  #
+  # @return [void]
+  def resize(xsize, ysize = nil, zsize = nil)
+    old_data = @data.dup
+    old_xsize, old_ysize, old_zsize = @xsize, @ysize, @zsize
+    init_attr(xsize, ysize, zsize)
+    (0...[old_xsize, @xsize].min).each { |x|
+      (0...[old_ysize, @ysize].min).each { |y|
+        (0...[old_zsize, @zsize].min).each { |z|
+          @data[x + y * @xsize + z * @xsize * @ysize] = old_data[x + y * old_xsize + z * old_xsize * old_ysize]
         }
-    end
+      }
+    }
+  end
 
-    # 序列化 Table 对象
-    #
-    # @param level [Integer] 序列化的级别
-    #
-    # @return [String]
-    def _dump(level)
-        s = [@dim, @xsize, @ysize, @zsize, @xsize * @ysize * @zsize].pack('LLLLL')
-        @data.each do |d|
-            s << [d].pack('s')
-        end
-        s
+  # 序列化 Table 对象
+  #
+  # @param level [Integer] 序列化的级别
+  #
+  # @return [String]
+  def _dump(level)
+    s = [@dim, @xsize, @ysize, @zsize, @xsize * @ysize * @zsize].pack('LLLLL')
+    @data.each do |d|
+      s << [d].pack('s')
     end
+    s
+  end
 
-    # 反序列化 Table 对象
-    #
-    # @param obj [String] 序列化后的字符串
-    #
-    # @return [Table]
-    def Table._load(obj)
-        # 从序列化字符串中解包维度信息
-        dim, xsize, ysize, zsize, total_size = *obj[0, 20].unpack('LLLLL')
-        # 初始化 Table 对象
-        table      = Table.new(*[xsize, ysize, zsize].first(dim))
-        table.data = obj[20, total_size * 2].unpack("s#{total_size}")
-        # 现在 @data 已经从序列化字符串中完整提取
-        table
-    end
+  # 反序列化 Table 对象
+  #
+  # @param obj [String] 序列化后的字符串
+  #
+  # @return [Table]
+  def Table._load(obj)
+    # 从序列化字符串中解包维度信息
+    dim, xsize, ysize, zsize, total_size = *obj[0, 20].unpack('LLLLL')
+    # 初始化 Table 对象
+    table = Table.new(*[xsize, ysize, zsize].first(dim))
+    table.data = obj[20, total_size * 2].unpack("s#{total_size}")
+    # 现在 @data 已经从序列化字符串中完整提取
+    table
+  end
 end
 
 # RPG Maker VX Ace 的RPG 模块
 module RPG
-    class Map
-        def initialize(width, height)
-            @display_name          = ''
-            @tileset_id            = 1
-            @width                 = width
-            @height                = height
-            @scroll_type           = 0
-            @specify_battleback    = false
-            @battleback_floor_name = ''
-            @battleback_wall_name  = ''
-            @autoplay_bgm          = false
-            @bgm                   = RPG::BGM.new
-            @autoplay_bgs          = false
-            @bgs                   = RPG::BGS.new('', 80)
-            @disable_dashing       = false
-            @encounter_list        = []
-            @encounter_step        = 30
-            @parallax_name         = ''
-            @parallax_loop_x       = false
-            @parallax_loop_y       = false
-            @parallax_sx           = 0
-            @parallax_sy           = 0
-            @parallax_show         = false
-            @note                  = ''
-            @data                  = Table.new(width, height, 4)
-            @events                = {}
-        end
-
-        attr_accessor :display_name
-        attr_accessor :tileset_id
-        attr_accessor :width
-        attr_accessor :height
-        attr_accessor :scroll_type
-        attr_accessor :specify_battleback
-        attr_accessor :battleback1_name
-        attr_accessor :battleback2_name
-        attr_accessor :autoplay_bgm
-        attr_accessor :bgm
-        attr_accessor :autoplay_bgs
-        attr_accessor :bgs
-        attr_accessor :disable_dashing
-        attr_accessor :encounter_list
-        attr_accessor :encounter_step
-        attr_accessor :parallax_name
-        attr_accessor :parallax_loop_x
-        attr_accessor :parallax_loop_y
-        attr_accessor :parallax_sx
-        attr_accessor :parallax_sy
-        attr_accessor :parallax_show
-        attr_accessor :note
-        attr_accessor :data
-        attr_accessor :events
+  class Map
+    def initialize(width, height)
+      @display_name = ''
+      @tileset_id = 1
+      @width = width
+      @height = height
+      @scroll_type = 0
+      @specify_battleback = false
+      @battleback_floor_name = ''
+      @battleback_wall_name = ''
+      @autoplay_bgm = false
+      @bgm = RPG::BGM.new
+      @autoplay_bgs = false
+      @bgs = RPG::BGS.new('', 80)
+      @disable_dashing = false
+      @encounter_list = []
+      @encounter_step = 30
+      @parallax_name = ''
+      @parallax_loop_x = false
+      @parallax_loop_y = false
+      @parallax_sx = 0
+      @parallax_sy = 0
+      @parallax_show = false
+      @note = ''
+      @data = Table.new(width, height, 4)
+      @events = {}
     end
 
-    class Map::Encounter
-        def initialize
-            @troop_id   = 1
-            @weight     = 10
-            @region_set = []
-        end
+    attr_accessor :display_name
+    attr_accessor :tileset_id
+    attr_accessor :width
+    attr_accessor :height
+    attr_accessor :scroll_type
+    attr_accessor :specify_battleback
+    attr_accessor :battleback1_name
+    attr_accessor :battleback2_name
+    attr_accessor :autoplay_bgm
+    attr_accessor :bgm
+    attr_accessor :autoplay_bgs
+    attr_accessor :bgs
+    attr_accessor :disable_dashing
+    attr_accessor :encounter_list
+    attr_accessor :encounter_step
+    attr_accessor :parallax_name
+    attr_accessor :parallax_loop_x
+    attr_accessor :parallax_loop_y
+    attr_accessor :parallax_sx
+    attr_accessor :parallax_sy
+    attr_accessor :parallax_show
+    attr_accessor :note
+    attr_accessor :data
+    attr_accessor :events
+  end
 
-        attr_accessor :troop_id
-        attr_accessor :weight
-        attr_accessor :region_set
+  class Map::Encounter
+    def initialize
+      @troop_id = 1
+      @weight = 10
+      @region_set = []
     end
 
-    class MapInfo
-        def initialize
-            @name      = ''
-            @parent_id = 0
-            @order     = 0
-            @expanded  = false
-            @scroll_x  = 0
-            @scroll_y  = 0
-        end
+    attr_accessor :troop_id
+    attr_accessor :weight
+    attr_accessor :region_set
+  end
 
-        attr_accessor :name
-        attr_accessor :parent_id
-        attr_accessor :order
-        attr_accessor :expanded
-        attr_accessor :scroll_x
-        attr_accessor :scroll_y
+  class MapInfo
+    def initialize
+      @name = ''
+      @parent_id = 0
+      @order = 0
+      @expanded = false
+      @scroll_x = 0
+      @scroll_y = 0
     end
 
-    class Event
-        def initialize(x, y)
-            @id    = 0
-            @name  = ''
-            @x     = x
-            @y     = y
-            @pages = [RPG::Event::Page.new]
-        end
+    attr_accessor :name
+    attr_accessor :parent_id
+    attr_accessor :order
+    attr_accessor :expanded
+    attr_accessor :scroll_x
+    attr_accessor :scroll_y
+  end
 
-        attr_accessor :id
-        attr_accessor :name
-        attr_accessor :x
-        attr_accessor :y
-        attr_accessor :pages
+  class Event
+    def initialize(x, y)
+      @id = 0
+      @name = ''
+      @x = x
+      @y = y
+      @pages = [RPG::Event::Page.new]
     end
 
-    class Event::Page
-        def initialize
-            @condition      = RPG::Event::Page::Condition.new
-            @graphic        = RPG::Event::Page::Graphic.new
-            @move_type      = 0
-            @move_speed     = 3
-            @move_frequency = 3
-            @move_route     = RPG::MoveRoute.new
-            @walk_anime     = true
-            @step_anime     = false
-            @direction_fix  = false
-            @through        = false
-            @priority_type  = 0
-            @trigger        = 0
-            @list           = [RPG::EventCommand.new]
-        end
+    attr_accessor :id
+    attr_accessor :name
+    attr_accessor :x
+    attr_accessor :y
+    attr_accessor :pages
+  end
 
-        attr_accessor :condition
-        attr_accessor :graphic
-        attr_accessor :move_type
-        attr_accessor :move_speed
-        attr_accessor :move_frequency
-        attr_accessor :move_route
-        attr_accessor :walk_anime
-        attr_accessor :step_anime
-        attr_accessor :direction_fix
-        attr_accessor :through
-        attr_accessor :priority_type
-        attr_accessor :trigger
-        attr_accessor :list
+  class Event::Page
+    def initialize
+      @condition = RPG::Event::Page::Condition.new
+      @graphic = RPG::Event::Page::Graphic.new
+      @move_type = 0
+      @move_speed = 3
+      @move_frequency = 3
+      @move_route = RPG::MoveRoute.new
+      @walk_anime = true
+      @step_anime = false
+      @direction_fix = false
+      @through = false
+      @priority_type = 0
+      @trigger = 0
+      @list = [RPG::EventCommand.new]
     end
 
-    class Event::Page::Condition
-        def initialize
-            @switch1_valid     = false
-            @switch2_valid     = false
-            @variable_valid    = false
-            @self_switch_valid = false
-            @item_valid        = false
-            @actor_valid       = false
-            @switch1_id        = 1
-            @switch2_id        = 1
-            @variable_id       = 1
-            @variable_value    = 0
-            @self_switch_ch    = 'A'
-            @item_id           = 1
-            @actor_id          = 1
-        end
+    attr_accessor :condition
+    attr_accessor :graphic
+    attr_accessor :move_type
+    attr_accessor :move_speed
+    attr_accessor :move_frequency
+    attr_accessor :move_route
+    attr_accessor :walk_anime
+    attr_accessor :step_anime
+    attr_accessor :direction_fix
+    attr_accessor :through
+    attr_accessor :priority_type
+    attr_accessor :trigger
+    attr_accessor :list
+  end
 
-        attr_accessor :switch1_valid
-        attr_accessor :switch2_valid
-        attr_accessor :variable_valid
-        attr_accessor :self_switch_valid
-        attr_accessor :item_valid
-        attr_accessor :actor_valid
-        attr_accessor :switch1_id
-        attr_accessor :switch2_id
-        attr_accessor :variable_id
-        attr_accessor :variable_value
-        attr_accessor :self_switch_ch
-        attr_accessor :item_id
-        attr_accessor :actor_id
+  class Event::Page::Condition
+    def initialize
+      @switch1_valid = false
+      @switch2_valid = false
+      @variable_valid = false
+      @self_switch_valid = false
+      @item_valid = false
+      @actor_valid = false
+      @switch1_id = 1
+      @switch2_id = 1
+      @variable_id = 1
+      @variable_value = 0
+      @self_switch_ch = 'A'
+      @item_id = 1
+      @actor_id = 1
     end
 
-    class Event::Page::Graphic
-        def initialize
-            @tile_id         = 0
-            @character_name  = ''
-            @character_index = 0
-            @direction       = 2
-            @pattern         = 0
-        end
+    attr_accessor :switch1_valid
+    attr_accessor :switch2_valid
+    attr_accessor :variable_valid
+    attr_accessor :self_switch_valid
+    attr_accessor :item_valid
+    attr_accessor :actor_valid
+    attr_accessor :switch1_id
+    attr_accessor :switch2_id
+    attr_accessor :variable_id
+    attr_accessor :variable_value
+    attr_accessor :self_switch_ch
+    attr_accessor :item_id
+    attr_accessor :actor_id
+  end
 
-        attr_accessor :tile_id
-        attr_accessor :character_name
-        attr_accessor :character_index
-        attr_accessor :direction
-        attr_accessor :pattern
+  class Event::Page::Graphic
+    def initialize
+      @tile_id = 0
+      @character_name = ''
+      @character_index = 0
+      @direction = 2
+      @pattern = 0
     end
 
-    class EventCommand
-        def initialize(code = 0, indent = 0, parameters = [])
-            @code       = code
-            @indent     = indent
-            @parameters = parameters
-        end
+    attr_accessor :tile_id
+    attr_accessor :character_name
+    attr_accessor :character_index
+    attr_accessor :direction
+    attr_accessor :pattern
+  end
 
-        attr_accessor :code
-        attr_accessor :indent
-        attr_accessor :parameters
+  class EventCommand
+    def initialize(code = 0, indent = 0, parameters = [])
+      @code = code
+      @indent = indent
+      @parameters = parameters
     end
 
-    class MoveRoute
-        def initialize
-            @repeat    = true
-            @skippable = false
-            @wait      = false
-            @list      = [RPG::MoveCommand.new]
-        end
+    attr_accessor :code
+    attr_accessor :indent
+    attr_accessor :parameters
+  end
 
-        attr_accessor :repeat
-        attr_accessor :skippable
-        attr_accessor :wait
-        attr_accessor :list
+  class MoveRoute
+    def initialize
+      @repeat = true
+      @skippable = false
+      @wait = false
+      @list = [RPG::MoveCommand.new]
     end
 
-    class MoveCommand
-        def initialize(code = 0, parameters = [])
-            @code       = code
-            @parameters = parameters
-        end
+    attr_accessor :repeat
+    attr_accessor :skippable
+    attr_accessor :wait
+    attr_accessor :list
+  end
 
-        attr_accessor :code
-        attr_accessor :parameters
+  class MoveCommand
+    def initialize(code = 0, parameters = [])
+      @code = code
+      @parameters = parameters
     end
 
-    class BaseItem
-        def initialize
-            @id          = 0
-            @name        = ''
-            @icon_index  = 0
-            @description = ''
-            @features    = []
-            @note        = ''
-        end
+    attr_accessor :code
+    attr_accessor :parameters
+  end
 
-        attr_accessor :id
-        attr_accessor :name
-        attr_accessor :icon_index
-        attr_accessor :description
-        attr_accessor :features
-        attr_accessor :note
+  class BaseItem
+    def initialize
+      @id = 0
+      @name = ''
+      @icon_index = 0
+      @description = ''
+      @features = []
+      @note = ''
     end
 
-    class Actor < BaseItem
+    attr_accessor :id
+    attr_accessor :name
+    attr_accessor :icon_index
+    attr_accessor :description
+    attr_accessor :features
+    attr_accessor :note
+  end
 
-        def initialize
-            super
-            @nickname        = ''
-            @class_id        = 1
-            @initial_level   = 1
-            @max_level       = 99
-            @character_name  = ''
-            @character_index = 0
-            @face_name       = ''
-            @face_index      = 0
-            @equips          = [0, 0, 0, 0, 0]
-        end
+  class Actor < BaseItem
 
-        attr_accessor :nickname
-        attr_accessor :class_id
-        attr_accessor :initial_level
-        attr_accessor :max_level
-        attr_accessor :character_name
-        attr_accessor :character_index
-        attr_accessor :face_name
-        attr_accessor :face_index
-        attr_accessor :equips
+    def initialize
+      super
+      @nickname = ''
+      @class_id = 1
+      @initial_level = 1
+      @max_level = 99
+      @character_name = ''
+      @character_index = 0
+      @face_name = ''
+      @face_index = 0
+      @equips = [0, 0, 0, 0, 0]
     end
 
-    class Class < BaseItem
-        def initialize
-            super
-            @exp_params = [30, 20, 30, 30]
-            @params     = Table.new(8, 100)
-            (1..99).each do |i|
-                @params[0, i] = 400 + i * 50
-                @params[1, i] = 80 + i * 10
-                (2..5).each { |j| @params[j, i] = 15 + i * 5 / 4 }
-                (6..7).each { |j| @params[j, i] = 30 + i * 5 / 2 }
-            end
-            @learnings = []
-            @features.push(RPG::BaseItem::Feature.new(23, 0, 1))
-            @features.push(RPG::BaseItem::Feature.new(22, 0, 0.95))
-            @features.push(RPG::BaseItem::Feature.new(22, 1, 0.05))
-            @features.push(RPG::BaseItem::Feature.new(22, 2, 0.04))
-            @features.push(RPG::BaseItem::Feature.new(41, 1))
-            @features.push(RPG::BaseItem::Feature.new(51, 1))
-            @features.push(RPG::BaseItem::Feature.new(52, 1))
-        end
+    attr_accessor :nickname
+    attr_accessor :class_id
+    attr_accessor :initial_level
+    attr_accessor :max_level
+    attr_accessor :character_name
+    attr_accessor :character_index
+    attr_accessor :face_name
+    attr_accessor :face_index
+    attr_accessor :equips
+  end
 
-        def exp_for_level(level)
-            lv    = level.to_f
-            basis = @exp_params[0].to_f
-            extra = @exp_params[1].to_f
-            acc_a = @exp_params[2].to_f
-            acc_b = @exp_params[3].to_f
-
-            (basis * ((lv - 1) ** (0.9 + acc_a / 250)) * lv * (lv + 1) /
-                (6 + lv ** 2 / 50 / acc_b) + (lv - 1) * extra).round.to_i
-        end
-
-        attr_accessor :exp_params
-        attr_accessor :params
-        attr_accessor :learnings
+  class Class < BaseItem
+    def initialize
+      super
+      @exp_params = [30, 20, 30, 30]
+      @params = Table.new(8, 100)
+      (1..99).each do |i|
+        @params[0, i] = 400 + i * 50
+        @params[1, i] = 80 + i * 10
+        (2..5).each { |j| @params[j, i] = 15 + i * 5 / 4 }
+        (6..7).each { |j| @params[j, i] = 30 + i * 5 / 2 }
+      end
+      @learnings = []
+      @features.push(RPG::BaseItem::Feature.new(23, 0, 1))
+      @features.push(RPG::BaseItem::Feature.new(22, 0, 0.95))
+      @features.push(RPG::BaseItem::Feature.new(22, 1, 0.05))
+      @features.push(RPG::BaseItem::Feature.new(22, 2, 0.04))
+      @features.push(RPG::BaseItem::Feature.new(41, 1))
+      @features.push(RPG::BaseItem::Feature.new(51, 1))
+      @features.push(RPG::BaseItem::Feature.new(52, 1))
     end
 
-    class UsableItem < BaseItem
-        def initialize
-            super
-            @scope        = 0
-            @occasion     = 0
-            @speed        = 0
-            @success_rate = 100
-            @repeats      = 1
-            @tp_gain      = 0
-            @hit_type     = 0
-            @animation_id = 0
-            @damage       = RPG::UsableItem::Damage.new
-            @effects      = []
-        end
+    def exp_for_level(level)
+      lv = level.to_f
+      basis = @exp_params[0].to_f
+      extra = @exp_params[1].to_f
+      acc_a = @exp_params[2].to_f
+      acc_b = @exp_params[3].to_f
 
-        def for_opponent?
-            [1, 2, 3, 4, 5, 6].include?(@scope)
-        end
-
-        def for_friend?
-            [7, 8, 9, 10, 11].include?(@scope)
-        end
-
-        def for_dead_friend?
-            [9, 10].include?(@scope)
-        end
-
-        def for_user?
-            @scope == 11
-        end
-
-        def for_one?
-            [1, 3, 7, 9, 11].include?(@scope)
-        end
-
-        def for_random?
-            [3, 4, 5, 6].include?(@scope)
-        end
-
-        def number_of_targets
-            for_random? ? @scope - 2 : 0
-        end
-
-        def for_all?
-            [2, 8, 10].include?(@scope)
-        end
-
-        def need_selection?
-            [1, 7, 9].include?(@scope)
-        end
-
-        def battle_ok?
-            [0, 1].include?(@occasion)
-        end
-
-        def menu_ok?
-            [0, 2].include?(@occasion)
-        end
-
-        def certain?
-            @hit_type == 0
-        end
-
-        def physical?
-            @hit_type == 1
-        end
-
-        def magical?
-            @hit_type == 2
-        end
-
-        attr_accessor :scope
-        attr_accessor :occasion
-        attr_accessor :speed
-        attr_accessor :animation_id
-        attr_accessor :success_rate
-        attr_accessor :repeats
-        attr_accessor :tp_gain
-        attr_accessor :hit_type
-        attr_accessor :damage
-        attr_accessor :effects
+      (basis * ((lv - 1) ** (0.9 + acc_a / 250)) * lv * (lv + 1) /
+        (6 + lv ** 2 / 50 / acc_b) + (lv - 1) * extra).round.to_i
     end
 
-    class Skill < UsableItem
-        def initialize
-            super
-            @scope              = 1
-            @stype_id           = 1
-            @mp_cost            = 0
-            @tp_cost            = 0
-            @message1           = ''
-            @message2           = ''
-            @required_wtype_id1 = 0
-            @required_wtype_id2 = 0
-        end
+    attr_accessor :exp_params
+    attr_accessor :params
+    attr_accessor :learnings
+  end
 
-        attr_accessor :stype_id
-        attr_accessor :mp_cost
-        attr_accessor :tp_cost
-        attr_accessor :message1
-        attr_accessor :message2
-        attr_accessor :required_wtype_id1
-        attr_accessor :required_wtype_id2
+  class UsableItem < BaseItem
+    def initialize
+      super
+      @scope = 0
+      @occasion = 0
+      @speed = 0
+      @success_rate = 100
+      @repeats = 1
+      @tp_gain = 0
+      @hit_type = 0
+      @animation_id = 0
+      @damage = RPG::UsableItem::Damage.new
+      @effects = []
     end
 
-    class Item < UsableItem
-        def initialize
-            super
-            @scope      = 7
-            @itype_id   = 1
-            @price      = 0
-            @consumable = true
-        end
-
-        def key_item?
-            @itype_id == 2
-        end
-
-        attr_accessor :itype_id
-        attr_accessor :price
-        attr_accessor :consumable
+    def for_opponent?
+      [1, 2, 3, 4, 5, 6].include?(@scope)
     end
 
-    class EquipItem < BaseItem
-        def initialize
-            super
-            @price    = 0
-            @etype_id = 0
-            @params   = [0] * 8
-        end
-
-        attr_accessor :price
-        attr_accessor :etype_id
-        attr_accessor :params
+    def for_friend?
+      [7, 8, 9, 10, 11].include?(@scope)
     end
 
-    class Weapon < EquipItem
-        def initialize
-            super
-            @wtype_id     = 0
-            @animation_id = 0
-            @features.push(RPG::BaseItem::Feature.new(31, 1, 0))
-            @features.push(RPG::BaseItem::Feature.new(22, 0, 0))
-        end
-
-        def performance
-            params[2] + params[4] + params.inject(0) { |r, v| r += v }
-        end
-
-        attr_accessor :wtype_id
-        attr_accessor :animation_id
+    def for_dead_friend?
+      [9, 10].include?(@scope)
     end
 
-    class Armor < EquipItem
-        def initialize
-            super
-            @atype_id = 0
-            @etype_id = 1
-            @features.push(RPG::BaseItem::Feature.new(22, 1, 0))
-        end
-
-        def performance
-            params[3] + params[5] + params.inject(0) { |r, v| r += v }
-        end
-
-        attr_accessor :atype_id
+    def for_user?
+      @scope == 11
     end
 
-    class Enemy < BaseItem
-        def initialize
-            super
-            @battler_name = ''
-            @battler_hue  = 0
-            @params       = [100, 0, 10, 10, 10, 10, 10, 10]
-            @exp          = 0
-            @gold         = 0
-            @drop_items   = Array.new(3) { RPG::Enemy::DropItem.new }
-            @actions      = [RPG::Enemy::Action.new]
-            @features.push(RPG::BaseItem::Feature.new(22, 0, 0.95))
-            @features.push(RPG::BaseItem::Feature.new(22, 1, 0.05))
-            @features.push(RPG::BaseItem::Feature.new(31, 1, 0))
-        end
-
-        attr_accessor :battler_name
-        attr_accessor :battler_hue
-        attr_accessor :params
-        attr_accessor :exp
-        attr_accessor :gold
-        attr_accessor :drop_items
-        attr_accessor :actions
+    def for_one?
+      [1, 3, 7, 9, 11].include?(@scope)
     end
 
-    class State < BaseItem
-        def initialize
-            super
-            @restriction           = 0
-            @priority              = 50
-            @remove_at_battle_end  = false
-            @remove_by_restriction = false
-            @auto_removal_timing   = 0
-            @min_turns             = 1
-            @max_turns             = 1
-            @remove_by_damage      = false
-            @chance_by_damage      = 100
-            @remove_by_walking     = false
-            @steps_to_remove       = 100
-            @message1              = ''
-            @message2              = ''
-            @message3              = ''
-            @message4              = ''
-        end
-
-        attr_accessor :restriction
-        attr_accessor :priority
-        attr_accessor :remove_at_battle_end
-        attr_accessor :remove_by_restriction
-        attr_accessor :auto_removal_timing
-        attr_accessor :min_turns
-        attr_accessor :max_turns
-        attr_accessor :remove_by_damage
-        attr_accessor :chance_by_damage
-        attr_accessor :remove_by_walking
-        attr_accessor :steps_to_remove
-        attr_accessor :message1
-        attr_accessor :message2
-        attr_accessor :message3
-        attr_accessor :message4
+    def for_random?
+      [3, 4, 5, 6].include?(@scope)
     end
 
-    class BaseItem::Feature
-        def initialize(code = 0, data_id = 0, value = 0)
-            @code    = code
-            @data_id = data_id
-            @value   = value
-        end
-
-        attr_accessor :code
-        attr_accessor :data_id
-        attr_accessor :value
+    def number_of_targets
+      for_random? ? @scope - 2 : 0
     end
 
-    class UsableItem::Damage
-        def initialize
-            @type       = 0
-            @element_id = 0
-            @formula    = '0'
-            @variance   = 20
-            @critical   = false
-        end
-
-        def none?
-            @type == 0
-        end
-
-        def to_hp?
-            [1, 3, 5].include?(@type)
-        end
-
-        def to_mp?
-            [2, 4, 6].include?(@type)
-        end
-
-        def recover?
-            [3, 4].include?(@type)
-        end
-
-        def drain?
-            [5, 6].include?(@type)
-        end
-
-        def sign
-            recover? ? -1 : 1
-        end
-
-        def eval(a, b, v)
-            [Kernel.eval(@formula), 0].max * sign rescue 0
-        end
-
-        attr_accessor :type
-        attr_accessor :element_id
-        attr_accessor :formula
-        attr_accessor :variance
-        attr_accessor :critical
+    def for_all?
+      [2, 8, 10].include?(@scope)
     end
 
-    class UsableItem::Effect
-        def initialize(code = 0, data_id = 0, value1 = 0, value2 = 0)
-            @code    = code
-            @data_id = data_id
-            @value1  = value1
-            @value2  = value2
-        end
-
-        attr_accessor :code
-        attr_accessor :data_id
-        attr_accessor :value1
-        attr_accessor :value2
+    def need_selection?
+      [1, 7, 9].include?(@scope)
     end
 
-    class Class::Learning
-        def initialize
-            @level    = 1
-            @skill_id = 1
-            @note     = ''
-        end
-
-        attr_accessor :level
-        attr_accessor :skill_id
-        attr_accessor :note
+    def battle_ok?
+      [0, 1].include?(@occasion)
     end
 
-    class Enemy::DropItem
-        def initialize
-            @kind        = 0
-            @data_id     = 1
-            @denominator = 1
-        end
-
-        attr_accessor :kind
-        attr_accessor :data_id
-        attr_accessor :denominator
+    def menu_ok?
+      [0, 2].include?(@occasion)
     end
 
-    class Enemy::Action
-        def initialize
-            @skill_id         = 1
-            @condition_type   = 0
-            @condition_param1 = 0
-            @condition_param2 = 0
-            @rating           = 5
-        end
-
-        attr_accessor :skill_id
-        attr_accessor :condition_type
-        attr_accessor :condition_param1
-        attr_accessor :condition_param2
-        attr_accessor :rating
+    def certain?
+      @hit_type == 0
     end
 
-    class Troop
-        def initialize
-            @id      = 0
-            @name    = ''
-            @members = []
-            @pages   = [RPG::Troop::Page.new]
-        end
-
-        attr_accessor :id
-        attr_accessor :name
-        attr_accessor :members
-        attr_accessor :pages
+    def physical?
+      @hit_type == 1
     end
 
-    class Troop::Member
-        def initialize
-            @enemy_id = 1
-            @x        = 0
-            @y        = 0
-            @hidden   = false
-        end
-
-        attr_accessor :enemy_id
-        attr_accessor :x
-        attr_accessor :y
-        attr_accessor :hidden
+    def magical?
+      @hit_type == 2
     end
 
-    class Troop::Page
-        def initialize
-            @condition = RPG::Troop::Page::Condition.new
-            @span      = 0
-            @list      = [RPG::EventCommand.new]
-        end
+    attr_accessor :scope
+    attr_accessor :occasion
+    attr_accessor :speed
+    attr_accessor :animation_id
+    attr_accessor :success_rate
+    attr_accessor :repeats
+    attr_accessor :tp_gain
+    attr_accessor :hit_type
+    attr_accessor :damage
+    attr_accessor :effects
+  end
 
-        attr_accessor :condition
-        attr_accessor :span
-        attr_accessor :list
+  class Skill < UsableItem
+    def initialize
+      super
+      @scope = 1
+      @stype_id = 1
+      @mp_cost = 0
+      @tp_cost = 0
+      @message1 = ''
+      @message2 = ''
+      @required_wtype_id1 = 0
+      @required_wtype_id2 = 0
     end
 
-    class Troop::Page::Condition
-        def initialize
-            @turn_ending  = false
-            @turn_valid   = false
-            @enemy_valid  = false
-            @actor_valid  = false
-            @switch_valid = false
-            @turn_a       = 0
-            @turn_b       = 0
-            @enemy_index  = 0
-            @enemy_hp     = 50
-            @actor_id     = 1
-            @actor_hp     = 50
-            @switch_id    = 1
-        end
+    attr_accessor :stype_id
+    attr_accessor :mp_cost
+    attr_accessor :tp_cost
+    attr_accessor :message1
+    attr_accessor :message2
+    attr_accessor :required_wtype_id1
+    attr_accessor :required_wtype_id2
+  end
 
-        attr_accessor :turn_ending
-        attr_accessor :turn_valid
-        attr_accessor :enemy_valid
-        attr_accessor :actor_valid
-        attr_accessor :switch_valid
-        attr_accessor :turn_a
-        attr_accessor :turn_b
-        attr_accessor :enemy_index
-        attr_accessor :enemy_hp
-        attr_accessor :actor_id
-        attr_accessor :actor_hp
-        attr_accessor :switch_id
+  class Item < UsableItem
+    def initialize
+      super
+      @scope = 7
+      @itype_id = 1
+      @price = 0
+      @consumable = true
     end
 
-    class Animation
-        def initialize
-            @id              = 0
-            @name            = ''
-            @animation1_name = ''
-            @animation1_hue  = 0
-            @animation2_name = ''
-            @animation2_hue  = 0
-            @position        = 1
-            @frame_max       = 1
-            @frames          = [RPG::Animation::Frame.new]
-            @timings         = []
-        end
-
-        def to_screen?
-            @position == 3
-        end
-
-        attr_accessor :id
-        attr_accessor :name
-        attr_accessor :animation1_name
-        attr_accessor :animation1_hue
-        attr_accessor :animation2_name
-        attr_accessor :animation2_hue
-        attr_accessor :position
-        attr_accessor :frame_max
-        attr_accessor :frames
-        attr_accessor :timings
+    def key_item?
+      @itype_id == 2
     end
 
-    class Animation::Frame
-        def initialize
-            @cell_max  = 0
-            @cell_data = Table.new(0, 0)
-        end
+    attr_accessor :itype_id
+    attr_accessor :price
+    attr_accessor :consumable
+  end
 
-        attr_accessor :cell_max
-        attr_accessor :cell_data
+  class EquipItem < BaseItem
+    def initialize
+      super
+      @price = 0
+      @etype_id = 0
+      @params = [0] * 8
     end
 
-    class Animation::Timing
-        def initialize
-            @frame          = 0
-            @se             = RPG::SE.new('', 80)
-            @flash_scope    = 0
-            @flash_color    = Color.new(255, 255, 255, 255)
-            @flash_duration = 5
-        end
+    attr_accessor :price
+    attr_accessor :etype_id
+    attr_accessor :params
+  end
 
-        attr_accessor :frame
-        attr_accessor :se
-        attr_accessor :flash_scope
-        attr_accessor :flash_color
-        attr_accessor :flash_duration
+  class Weapon < EquipItem
+    def initialize
+      super
+      @wtype_id = 0
+      @animation_id = 0
+      @features.push(RPG::BaseItem::Feature.new(31, 1, 0))
+      @features.push(RPG::BaseItem::Feature.new(22, 0, 0))
     end
 
-    class Tileset
-        def initialize
-            @id            = 0
-            @mode          = 1
-            @name          = ''
-            @tileset_names = Array.new(9).collect { '' }
-            @flags         = Table.new(8192)
-            @flags[0]      = 0x0010
-            (2048..2815).each { |i| @flags[i] = 0x000F }
-            (4352..8191).each { |i| @flags[i] = 0x000F }
-            @note = ''
-        end
-
-        attr_accessor :id
-        attr_accessor :mode
-        attr_accessor :name
-        attr_accessor :tileset_names
-        attr_accessor :flags
-        attr_accessor :note
+    def performance
+      params[2] + params[4] + params.inject(0) { |r, v| r += v }
     end
 
-    class CommonEvent
-        def initialize
-            @id        = 0
-            @name      = ''
-            @trigger   = 0
-            @switch_id = 1
-            @list      = [RPG::EventCommand.new]
-        end
+    attr_accessor :wtype_id
+    attr_accessor :animation_id
+  end
 
-        def autorun?
-            @trigger == 1
-        end
-
-        def parallel?
-            @trigger == 2
-        end
-
-        attr_accessor :id
-        attr_accessor :name
-        attr_accessor :trigger
-        attr_accessor :switch_id
-        attr_accessor :list
+  class Armor < EquipItem
+    def initialize
+      super
+      @atype_id = 0
+      @etype_id = 1
+      @features.push(RPG::BaseItem::Feature.new(22, 1, 0))
     end
 
-    class System
-        def initialize
-            @game_title       = ''
-            @version_id       = 0
-            @japanese         = true
-            @party_members    = [1]
-            @currency_unit    = ''
-            @elements         = [nil, '']
-            @skill_types      = [nil, '']
-            @weapon_types     = [nil, '']
-            @armor_types      = [nil, '']
-            @switches         = [nil, '']
-            @variables        = [nil, '']
-            @boat             = RPG::System::Vehicle.new
-            @ship             = RPG::System::Vehicle.new
-            @airship          = RPG::System::Vehicle.new
-            @title1_name      = ''
-            @title2_name      = ''
-            @opt_draw_title   = true
-            @opt_use_midi     = false
-            @opt_transparent  = false
-            @opt_followers    = true
-            @opt_slip_death   = false
-            @opt_floor_death  = false
-            @opt_display_tp   = true
-            @opt_extra_exp    = false
-            @window_tone      = Tone.new(0, 0, 0)
-            @title_bgm        = RPG::BGM.new
-            @battle_bgm       = RPG::BGM.new
-            @battle_end_me    = RPG::ME.new
-            @gameover_me      = RPG::ME.new
-            @sounds           = Array.new(24) { RPG::SE.new }
-            @test_battlers    = []
-            @test_troop_id    = 1
-            @start_map_id     = 1
-            @start_x          = 0
-            @start_y          = 0
-            @terms            = RPG::System::Terms.new
-            @battleback1_name = ''
-            @battleback2_name = ''
-            @battler_name     = ''
-            @battler_hue      = 0
-            @edit_map_id      = 1
-        end
-
-        attr_accessor :game_title
-        attr_accessor :version_id
-        attr_accessor :japanese
-        attr_accessor :party_members
-        attr_accessor :currency_unit
-        attr_accessor :skill_types
-        attr_accessor :weapon_types
-        attr_accessor :armor_types
-        attr_accessor :elements
-        attr_accessor :switches
-        attr_accessor :variables
-        attr_accessor :boat
-        attr_accessor :ship
-        attr_accessor :airship
-        attr_accessor :title1_name
-        attr_accessor :title2_name
-        attr_accessor :opt_draw_title
-        attr_accessor :opt_use_midi
-        attr_accessor :opt_transparent
-        attr_accessor :opt_followers
-        attr_accessor :opt_slip_death
-        attr_accessor :opt_floor_death
-        attr_accessor :opt_display_tp
-        attr_accessor :opt_extra_exp
-        attr_accessor :window_tone
-        attr_accessor :title_bgm
-        attr_accessor :battle_bgm
-        attr_accessor :battle_end_me
-        attr_accessor :gameover_me
-        attr_accessor :sounds
-        attr_accessor :test_battlers
-        attr_accessor :test_troop_id
-        attr_accessor :start_map_id
-        attr_accessor :start_x
-        attr_accessor :start_y
-        attr_accessor :terms
-        attr_accessor :battleback1_name
-        attr_accessor :battleback2_name
-        attr_accessor :battler_name
-        attr_accessor :battler_hue
-        attr_accessor :edit_map_id
+    def performance
+      params[3] + params[5] + params.inject(0) { |r, v| r += v }
     end
 
-    class System::Vehicle
-        def initialize
-            @character_name  = ''
-            @character_index = 0
-            @bgm             = RPG::BGM.new
-            @start_map_id    = 0
-            @start_x         = 0
-            @start_y         = 0
-        end
+    attr_accessor :atype_id
+  end
 
-        attr_accessor :character_name
-        attr_accessor :character_index
-        attr_accessor :bgm
-        attr_accessor :start_map_id
-        attr_accessor :start_x
-        attr_accessor :start_y
+  class Enemy < BaseItem
+    def initialize
+      super
+      @battler_name = ''
+      @battler_hue = 0
+      @params = [100, 0, 10, 10, 10, 10, 10, 10]
+      @exp = 0
+      @gold = 0
+      @drop_items = Array.new(3) { RPG::Enemy::DropItem.new }
+      @actions = [RPG::Enemy::Action.new]
+      @features.push(RPG::BaseItem::Feature.new(22, 0, 0.95))
+      @features.push(RPG::BaseItem::Feature.new(22, 1, 0.05))
+      @features.push(RPG::BaseItem::Feature.new(31, 1, 0))
     end
 
-    class System::Terms
-        def initialize
-            @basic    = Array.new(8) { '' }
-            @params   = Array.new(8) { '' }
-            @etypes   = Array.new(5) { '' }
-            @commands = Array.new(23) { '' }
-        end
+    attr_accessor :battler_name
+    attr_accessor :battler_hue
+    attr_accessor :params
+    attr_accessor :exp
+    attr_accessor :gold
+    attr_accessor :drop_items
+    attr_accessor :actions
+  end
 
-        attr_accessor :basic
-        attr_accessor :params
-        attr_accessor :etypes
-        attr_accessor :commands
+  class State < BaseItem
+    def initialize
+      super
+      @restriction = 0
+      @priority = 50
+      @remove_at_battle_end = false
+      @remove_by_restriction = false
+      @auto_removal_timing = 0
+      @min_turns = 1
+      @max_turns = 1
+      @remove_by_damage = false
+      @chance_by_damage = 100
+      @remove_by_walking = false
+      @steps_to_remove = 100
+      @message1 = ''
+      @message2 = ''
+      @message3 = ''
+      @message4 = ''
     end
 
-    class System::TestBattler
-        def initialize
-            @actor_id = 1
-            @level    = 1
-            @equips   = [0, 0, 0, 0, 0]
-        end
+    attr_accessor :restriction
+    attr_accessor :priority
+    attr_accessor :remove_at_battle_end
+    attr_accessor :remove_by_restriction
+    attr_accessor :auto_removal_timing
+    attr_accessor :min_turns
+    attr_accessor :max_turns
+    attr_accessor :remove_by_damage
+    attr_accessor :chance_by_damage
+    attr_accessor :remove_by_walking
+    attr_accessor :steps_to_remove
+    attr_accessor :message1
+    attr_accessor :message2
+    attr_accessor :message3
+    attr_accessor :message4
+  end
 
-        attr_accessor :actor_id
-        attr_accessor :level
-        attr_accessor :equips
+  class BaseItem::Feature
+    def initialize(code = 0, data_id = 0, value = 0)
+      @code = code
+      @data_id = data_id
+      @value = value
     end
 
-    class AudioFile
-        def initialize(name = '', volume = 100, pitch = 100)
-            @name   = name
-            @volume = volume
-            @pitch  = pitch
-        end
+    attr_accessor :code
+    attr_accessor :data_id
+    attr_accessor :value
+  end
 
-        attr_accessor :name
-        attr_accessor :volume
-        attr_accessor :pitch
+  class UsableItem::Damage
+    def initialize
+      @type = 0
+      @element_id = 0
+      @formula = '0'
+      @variance = 20
+      @critical = false
     end
 
-    class BGM < AudioFile
+    def none?
+      @type == 0
+    end
+
+    def to_hp?
+      [1, 3, 5].include?(@type)
+    end
+
+    def to_mp?
+      [2, 4, 6].include?(@type)
+    end
+
+    def recover?
+      [3, 4].include?(@type)
+    end
+
+    def drain?
+      [5, 6].include?(@type)
+    end
+
+    def sign
+      recover? ? -1 : 1
+    end
+
+    def eval(a, b, v)
+      [Kernel.eval(@formula), 0].max * sign rescue 0
+    end
+
+    attr_accessor :type
+    attr_accessor :element_id
+    attr_accessor :formula
+    attr_accessor :variance
+    attr_accessor :critical
+  end
+
+  class UsableItem::Effect
+    def initialize(code = 0, data_id = 0, value1 = 0, value2 = 0)
+      @code = code
+      @data_id = data_id
+      @value1 = value1
+      @value2 = value2
+    end
+
+    attr_accessor :code
+    attr_accessor :data_id
+    attr_accessor :value1
+    attr_accessor :value2
+  end
+
+  class Class::Learning
+    def initialize
+      @level = 1
+      @skill_id = 1
+      @note = ''
+    end
+
+    attr_accessor :level
+    attr_accessor :skill_id
+    attr_accessor :note
+  end
+
+  class Enemy::DropItem
+    def initialize
+      @kind = 0
+      @data_id = 1
+      @denominator = 1
+    end
+
+    attr_accessor :kind
+    attr_accessor :data_id
+    attr_accessor :denominator
+  end
+
+  class Enemy::Action
+    def initialize
+      @skill_id = 1
+      @condition_type = 0
+      @condition_param1 = 0
+      @condition_param2 = 0
+      @rating = 5
+    end
+
+    attr_accessor :skill_id
+    attr_accessor :condition_type
+    attr_accessor :condition_param1
+    attr_accessor :condition_param2
+    attr_accessor :rating
+  end
+
+  class Troop
+    def initialize
+      @id = 0
+      @name = ''
+      @members = []
+      @pages = [RPG::Troop::Page.new]
+    end
+
+    attr_accessor :id
+    attr_accessor :name
+    attr_accessor :members
+    attr_accessor :pages
+  end
+
+  class Troop::Member
+    def initialize
+      @enemy_id = 1
+      @x = 0
+      @y = 0
+      @hidden = false
+    end
+
+    attr_accessor :enemy_id
+    attr_accessor :x
+    attr_accessor :y
+    attr_accessor :hidden
+  end
+
+  class Troop::Page
+    def initialize
+      @condition = RPG::Troop::Page::Condition.new
+      @span = 0
+      @list = [RPG::EventCommand.new]
+    end
+
+    attr_accessor :condition
+    attr_accessor :span
+    attr_accessor :list
+  end
+
+  class Troop::Page::Condition
+    def initialize
+      @turn_ending = false
+      @turn_valid = false
+      @enemy_valid = false
+      @actor_valid = false
+      @switch_valid = false
+      @turn_a = 0
+      @turn_b = 0
+      @enemy_index = 0
+      @enemy_hp = 50
+      @actor_id = 1
+      @actor_hp = 50
+      @switch_id = 1
+    end
+
+    attr_accessor :turn_ending
+    attr_accessor :turn_valid
+    attr_accessor :enemy_valid
+    attr_accessor :actor_valid
+    attr_accessor :switch_valid
+    attr_accessor :turn_a
+    attr_accessor :turn_b
+    attr_accessor :enemy_index
+    attr_accessor :enemy_hp
+    attr_accessor :actor_id
+    attr_accessor :actor_hp
+    attr_accessor :switch_id
+  end
+
+  class Animation
+    def initialize
+      @id = 0
+      @name = ''
+      @animation1_name = ''
+      @animation1_hue = 0
+      @animation2_name = ''
+      @animation2_hue = 0
+      @position = 1
+      @frame_max = 1
+      @frames = [RPG::Animation::Frame.new]
+      @timings = []
+    end
+
+    def to_screen?
+      @position == 3
+    end
+
+    attr_accessor :id
+    attr_accessor :name
+    attr_accessor :animation1_name
+    attr_accessor :animation1_hue
+    attr_accessor :animation2_name
+    attr_accessor :animation2_hue
+    attr_accessor :position
+    attr_accessor :frame_max
+    attr_accessor :frames
+    attr_accessor :timings
+  end
+
+  class Animation::Frame
+    def initialize
+      @cell_max = 0
+      @cell_data = Table.new(0, 0)
+    end
+
+    attr_accessor :cell_max
+    attr_accessor :cell_data
+  end
+
+  class Animation::Timing
+    def initialize
+      @frame = 0
+      @se = RPG::SE.new('', 80)
+      @flash_scope = 0
+      @flash_color = Color.new(255, 255, 255, 255)
+      @flash_duration = 5
+    end
+
+    attr_accessor :frame
+    attr_accessor :se
+    attr_accessor :flash_scope
+    attr_accessor :flash_color
+    attr_accessor :flash_duration
+  end
+
+  class Tileset
+    def initialize
+      @id = 0
+      @mode = 1
+      @name = ''
+      @tileset_names = Array.new(9).collect { '' }
+      @flags = Table.new(8192)
+      @flags[0] = 0x0010
+      (2048..2815).each { |i| @flags[i] = 0x000F }
+      (4352..8191).each { |i| @flags[i] = 0x000F }
+      @note = ''
+    end
+
+    attr_accessor :id
+    attr_accessor :mode
+    attr_accessor :name
+    attr_accessor :tileset_names
+    attr_accessor :flags
+    attr_accessor :note
+  end
+
+  class CommonEvent
+    def initialize
+      @id = 0
+      @name = ''
+      @trigger = 0
+      @switch_id = 1
+      @list = [RPG::EventCommand.new]
+    end
+
+    def autorun?
+      @trigger == 1
+    end
+
+    def parallel?
+      @trigger == 2
+    end
+
+    attr_accessor :id
+    attr_accessor :name
+    attr_accessor :trigger
+    attr_accessor :switch_id
+    attr_accessor :list
+  end
+
+  class System
+    def initialize
+      @game_title = ''
+      @version_id = 0
+      @japanese = true
+      @party_members = [1]
+      @currency_unit = ''
+      @elements = [nil, '']
+      @skill_types = [nil, '']
+      @weapon_types = [nil, '']
+      @armor_types = [nil, '']
+      @switches = [nil, '']
+      @variables = [nil, '']
+      @boat = RPG::System::Vehicle.new
+      @ship = RPG::System::Vehicle.new
+      @airship = RPG::System::Vehicle.new
+      @title1_name = ''
+      @title2_name = ''
+      @opt_draw_title = true
+      @opt_use_midi = false
+      @opt_transparent = false
+      @opt_followers = true
+      @opt_slip_death = false
+      @opt_floor_death = false
+      @opt_display_tp = true
+      @opt_extra_exp = false
+      @window_tone = Tone.new(0, 0, 0)
+      @title_bgm = RPG::BGM.new
+      @battle_bgm = RPG::BGM.new
+      @battle_end_me = RPG::ME.new
+      @gameover_me = RPG::ME.new
+      @sounds = Array.new(24) { RPG::SE.new }
+      @test_battlers = []
+      @test_troop_id = 1
+      @start_map_id = 1
+      @start_x = 0
+      @start_y = 0
+      @terms = RPG::System::Terms.new
+      @battleback1_name = ''
+      @battleback2_name = ''
+      @battler_name = ''
+      @battler_hue = 0
+      @edit_map_id = 1
+    end
+
+    attr_accessor :game_title
+    attr_accessor :version_id
+    attr_accessor :japanese
+    attr_accessor :party_members
+    attr_accessor :currency_unit
+    attr_accessor :skill_types
+    attr_accessor :weapon_types
+    attr_accessor :armor_types
+    attr_accessor :elements
+    attr_accessor :switches
+    attr_accessor :variables
+    attr_accessor :boat
+    attr_accessor :ship
+    attr_accessor :airship
+    attr_accessor :title1_name
+    attr_accessor :title2_name
+    attr_accessor :opt_draw_title
+    attr_accessor :opt_use_midi
+    attr_accessor :opt_transparent
+    attr_accessor :opt_followers
+    attr_accessor :opt_slip_death
+    attr_accessor :opt_floor_death
+    attr_accessor :opt_display_tp
+    attr_accessor :opt_extra_exp
+    attr_accessor :window_tone
+    attr_accessor :title_bgm
+    attr_accessor :battle_bgm
+    attr_accessor :battle_end_me
+    attr_accessor :gameover_me
+    attr_accessor :sounds
+    attr_accessor :test_battlers
+    attr_accessor :test_troop_id
+    attr_accessor :start_map_id
+    attr_accessor :start_x
+    attr_accessor :start_y
+    attr_accessor :terms
+    attr_accessor :battleback1_name
+    attr_accessor :battleback2_name
+    attr_accessor :battler_name
+    attr_accessor :battler_hue
+    attr_accessor :edit_map_id
+  end
+
+  class System::Vehicle
+    def initialize
+      @character_name = ''
+      @character_index = 0
+      @bgm = RPG::BGM.new
+      @start_map_id = 0
+      @start_x = 0
+      @start_y = 0
+    end
+
+    attr_accessor :character_name
+    attr_accessor :character_index
+    attr_accessor :bgm
+    attr_accessor :start_map_id
+    attr_accessor :start_x
+    attr_accessor :start_y
+  end
+
+  class System::Terms
+    def initialize
+      @basic = Array.new(8) { '' }
+      @params = Array.new(8) { '' }
+      @etypes = Array.new(5) { '' }
+      @commands = Array.new(23) { '' }
+    end
+
+    attr_accessor :basic
+    attr_accessor :params
+    attr_accessor :etypes
+    attr_accessor :commands
+  end
+
+  class System::TestBattler
+    def initialize
+      @actor_id = 1
+      @level = 1
+      @equips = [0, 0, 0, 0, 0]
+    end
+
+    attr_accessor :actor_id
+    attr_accessor :level
+    attr_accessor :equips
+  end
+
+  class AudioFile
+    def initialize(name = '', volume = 100, pitch = 100)
+      @name = name
+      @volume = volume
+      @pitch = pitch
+    end
+
+    attr_accessor :name
+    attr_accessor :volume
+    attr_accessor :pitch
+  end
+
+  class BGM < AudioFile
+    @@last = RPG::BGM.new
+
+    def play(pos = 0)
+      if @name.empty?
+        Audio.bgm_stop
         @@last = RPG::BGM.new
-
-        def play(pos = 0)
-            if @name.empty?
-                Audio.bgm_stop
-                @@last = RPG::BGM.new
-            else
-                Audio.bgm_play('Audio/BGM/' + @name, @volume, @pitch, pos)
-                @@last = self.clone
-            end
-        end
-
-        def replay
-            play(@pos)
-        end
-
-        def self.stop
-            Audio.bgm_stop
-            @@last = RPG::BGM.new
-        end
-
-        def self.fade(time)
-            Audio.bgm_fade(time)
-            @@last = RPG::BGM.new
-        end
-
-        def self.last
-            @@last.pos = Audio.bgm_pos
-            @@last
-        end
-
-        attr_accessor :pos
+      else
+        Audio.bgm_play('Audio/BGM/' + @name, @volume, @pitch, pos)
+        @@last = self.clone
+      end
     end
 
-    class BGS < AudioFile
+    def replay
+      play(@pos)
+    end
+
+    def self.stop
+      Audio.bgm_stop
+      @@last = RPG::BGM.new
+    end
+
+    def self.fade(time)
+      Audio.bgm_fade(time)
+      @@last = RPG::BGM.new
+    end
+
+    def self.last
+      @@last.pos = Audio.bgm_pos
+      @@last
+    end
+
+    attr_accessor :pos
+  end
+
+  class BGS < AudioFile
+    @@last = RPG::BGS.new
+
+    def play(pos = 0)
+      if @name.empty?
+        Audio.bgs_stop
         @@last = RPG::BGS.new
-
-        def play(pos = 0)
-            if @name.empty?
-                Audio.bgs_stop
-                @@last = RPG::BGS.new
-            else
-                Audio.bgs_play('Audio/BGS/' + @name, @volume, @pitch, pos)
-                @@last = self.clone
-            end
-        end
-
-        def replay
-            play(@pos)
-        end
-
-        def self.stop
-            Audio.bgs_stop
-            @@last = RPG::BGS.new
-        end
-
-        def self.fade(time)
-            Audio.bgs_fade(time)
-            @@last = RPG::BGS.new
-        end
-
-        def self.last
-            @@last.pos = Audio.bgs_pos
-            @@last
-        end
-
-        attr_accessor :pos
+      else
+        Audio.bgs_play('Audio/BGS/' + @name, @volume, @pitch, pos)
+        @@last = self.clone
+      end
     end
 
-    class ME < AudioFile
-        def play
-            if @name.empty?
-                Audio.me_stop
-            else
-                Audio.me_play('Audio/ME/' + @name, @volume, @pitch)
-            end
-        end
-
-        def self.stop
-            Audio.me_stop
-        end
-
-        def self.fade(time)
-            Audio.me_fade(time)
-        end
+    def replay
+      play(@pos)
     end
 
-    class SE < AudioFile
-        def play
-            unless @name.empty?
-                Audio.se_play('Audio/SE/' + @name, @volume, @pitch)
-            end
-        end
-
-        def self.stop
-            Audio.se_stop
-        end
+    def self.stop
+      Audio.bgs_stop
+      @@last = RPG::BGS.new
     end
+
+    def self.fade(time)
+      Audio.bgs_fade(time)
+      @@last = RPG::BGS.new
+    end
+
+    def self.last
+      @@last.pos = Audio.bgs_pos
+      @@last
+    end
+
+    attr_accessor :pos
+  end
+
+  class ME < AudioFile
+    def play
+      if @name.empty?
+        Audio.me_stop
+      else
+        Audio.me_play('Audio/ME/' + @name, @volume, @pitch)
+      end
+    end
+
+    def self.stop
+      Audio.me_stop
+    end
+
+    def self.fade(time)
+      Audio.me_fade(time)
+    end
+  end
+
+  class SE < AudioFile
+    def play
+      unless @name.empty?
+        Audio.se_play('Audio/SE/' + @name, @volume, @pitch)
+      end
+    end
+
+    def self.stop
+      Audio.se_stop
+    end
+  end
 
 end

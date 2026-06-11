@@ -8,14 +8,14 @@ RGSS3_Extract_Strings_Tool
 
 ## Contents
 
--   [Synopsis](#synopsis)
--   [Features](#features)
--   [Function List](#function-list)
--   [Installation](#installation)
--   [Usage](#usage)
--   [Project Build](#project-build)
--   [Documentation](#documentation)
--   [Links](#links)
+- [Synopsis](#synopsis)
+- [Features](#features)
+- [Function List](#function-list)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Project Build](#project-build)
+- [Documentation](#documentation)
+- [Links](#links)
 
 ## [Synopsis](#contents)
 
@@ -48,7 +48,8 @@ gem install R3EXS
 
 Click to download [R3EXS.exe](https://github.com/LuoTat/R3EXS/releases)
 
-Since the R3EXS.exe file is packaged using [Ocran](https://github.com/Largo/ocran) and [Tebako](https://github.com/tamatebako/tebako)
+Since the R3EXS.exe file is packaged using [Ocran](https://github.com/Largo/ocran)
+and [Tebako](https://github.com/tamatebako/tebako)
 
 The `Windows` environment provides `R3EXS-windows_Ocran` and `R3EXS-windows_Tebako`
 
@@ -58,9 +59,11 @@ it will extract the Ruby environment the first time it runs, so the first run ma
 
 ## [Usage](#contents)
 
-The following commands assume they are run in the game’s root directory, ensuring the `./Game.rgss3a` file exists or has already been unpacked into the `./Data` folder.
+The following commands assume they are run in the game’s root directory, ensuring the `./Game.rgss3a` file exists or has
+already been unpacked into the `./Data` folder.
 
-~~If you enjoy a crazy amount of console output or feel like the execution is too fast~~, please enable the `--verbose` option.
+~~If you enjoy a crazy amount of console output or feel like the execution is too fast~~, please enable the `--verbose`
+option.
 
 ### [Unpack Game.rgss3a file](#function-list)
 
@@ -248,13 +251,13 @@ rake -T
 
 ## [Links](#contents)
 
--   [oj](https://github.com/ohler55/oj)
--   [gli](https://github.com/davetron5000/gli)
--   [Prism](https://github.com/ruby/prism)
--   [Ocran](https://github.com/Largo/ocran)
--   [Tebako](https://github.com/tamatebako/tebako)
--   [RGSS3](https://github.com/taroxd/RGSS3)
--   [rvdata2json](https://github.com/DICE2000/rvdata2json)
--   [VX-Ace-Translator](https://github.com/AhmedAhmedEG/VX-Ace-Translator)
--   [RPGMakerDecrypter](https://github.com/uuksu/RPGMakerDecrypter)
--   [RPGMaker VX Ace F1-Manual](https://miaowm5.github.io/RMVA-F1)
+- [oj](https://github.com/ohler55/oj)
+- [gli](https://github.com/davetron5000/gli)
+- [Prism](https://github.com/ruby/prism)
+- [Ocran](https://github.com/Largo/ocran)
+- [Tebako](https://github.com/tamatebako/tebako)
+- [RGSS3](https://github.com/taroxd/RGSS3)
+- [rvdata2json](https://github.com/DICE2000/rvdata2json)
+- [VX-Ace-Translator](https://github.com/AhmedAhmedEG/VX-Ace-Translator)
+- [RPGMakerDecrypter](https://github.com/uuksu/RPGMakerDecrypter)
+- [RPGMaker VX Ace F1-Manual](https://miaowm5.github.io/RMVA-F1)

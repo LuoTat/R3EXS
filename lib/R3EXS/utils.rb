@@ -6,121 +6,121 @@ require_relative 'RGSS3_R3EXS'
 
 module R3EXS
 
-    # 工具模块
-    # 主要用来提供一些读取，写入，转换等功能
-    module Utils
+  # 工具模块
+  # 主要用来提供一些读取，写入，转换等功能
+  module Utils
 
-        # 用来匹配读取的 rvdata2 文件名
-        RVDATA2_FILE_NAME =
-            [
-                /\AActors\z/,
-                /\AAnimations\z/,
-                /\AArmors\z/,
-                /\AClasses\z/,
-                /\ACommonEvents\z/,
-                /\AEnemies\z/,
-                /\AItems\z/,
-                /\AMap\d{3}\z/,
-                /\AMapInfos\z/,
-                /\AScripts\z/,
-                /\ASkills\z/,
-                /\AStates\z/,
-                /\ASystem\z/,
-                /\ATilesets\z/,
-                /\ATroops\z/,
-                /\AWeapons\z/
-            ]
+    # 用来匹配读取的 rvdata2 文件名
+    RVDATA2_FILE_NAME =
+      [
+        /\AActors\z/,
+        /\AAnimations\z/,
+        /\AArmors\z/,
+        /\AClasses\z/,
+        /\ACommonEvents\z/,
+        /\AEnemies\z/,
+        /\AItems\z/,
+        /\AMap\d{3}\z/,
+        /\AMapInfos\z/,
+        /\AScripts\z/,
+        /\ASkills\z/,
+        /\AStates\z/,
+        /\ASystem\z/,
+        /\ATilesets\z/,
+        /\ATroops\z/,
+        /\AWeapons\z/
+      ]
 
-        # 用来匹配读取的 JSON 文件名
-        JSON_FILE_NAME =
-            [
-                /\AActors\z/,
-                /\AAnimations\z/,
-                /\AArmors\z/,
-                /\AClasses\z/,
-                /\AEnemies\z/,
-                /\AItems\z/,
-                /\AMap\d{3}\z/,
-                /\AMapInfos\z/,
-                /\ASkills\z/,
-                /\AStates\z/,
-                /\ASystem\z/,
-                /\ATilesets\z/,
-                /\ATroops\z/,
-                /\AWeapons\z/
-            ]
+    # 用来匹配读取的 JSON 文件名
+    JSON_FILE_NAME =
+      [
+        /\AActors\z/,
+        /\AAnimations\z/,
+        /\AArmors\z/,
+        /\AClasses\z/,
+        /\AEnemies\z/,
+        /\AItems\z/,
+        /\AMap\d{3}\z/,
+        /\AMapInfos\z/,
+        /\ASkills\z/,
+        /\AStates\z/,
+        /\ASystem\z/,
+        /\ATilesets\z/,
+        /\ATroops\z/,
+        /\AWeapons\z/
+      ]
 
-        # 用来匹配读取的文件名到对应的R3EXS的类
-        FILE_BASENAME_TO_CLASS_R3EXS = {
-            /\AActors\z/       => R3EXS::Actor,
-            /\AAnimations\z/   => R3EXS::Animation,
-            /\AArmors\z/       => R3EXS::Armor,
-            /\AClasses\z/      => R3EXS::Class,
-            /\ACommonEvents\z/ => R3EXS::CommonEvent,
-            /\AEnemies\z/      => R3EXS::Enemy,
-            /\AItems\z/        => R3EXS::Item,
-            /\AMap\d{3}\z/     => R3EXS::Map,
-            /\AMapInfos\z/     => R3EXS::MapInfo,
-            /\ASkills\z/       => R3EXS::Skill,
-            /\AStates\z/       => R3EXS::State,
-            /\ASystem\z/       => R3EXS::System,
-            /\ATilesets\z/     => R3EXS::Tileset,
-            /\ATroops\z/       => R3EXS::Troop,
-            /\AWeapons\z/      => R3EXS::Weapon
-        }
+    # 用来匹配读取的文件名到对应的R3EXS的类
+    FILE_BASENAME_TO_CLASS_R3EXS = {
+      /\AActors\z/ => R3EXS::Actor,
+      /\AAnimations\z/ => R3EXS::Animation,
+      /\AArmors\z/ => R3EXS::Armor,
+      /\AClasses\z/ => R3EXS::Class,
+      /\ACommonEvents\z/ => R3EXS::CommonEvent,
+      /\AEnemies\z/ => R3EXS::Enemy,
+      /\AItems\z/ => R3EXS::Item,
+      /\AMap\d{3}\z/ => R3EXS::Map,
+      /\AMapInfos\z/ => R3EXS::MapInfo,
+      /\ASkills\z/ => R3EXS::Skill,
+      /\AStates\z/ => R3EXS::State,
+      /\ASystem\z/ => R3EXS::System,
+      /\ATilesets\z/ => R3EXS::Tileset,
+      /\ATroops\z/ => R3EXS::Troop,
+      /\AWeapons\z/ => R3EXS::Weapon
+    }
 
-        # 用来匹配读取的文件名到对应的RPG的类
-        FILE_BASENAME_TO_CLASS_RPG = {
-            /\AActors\z/       => RPG::Actor,
-            /\AAnimations\z/   => RPG::Animation,
-            /\AArmors\z/       => RPG::Armor,
-            /\AClasses\z/      => RPG::Class,
-            /\ACommonEvents\z/ => RPG::CommonEvent,
-            /\AEnemies\z/      => RPG::Enemy,
-            /\AItems\z/        => RPG::Item,
-            /\AMap\d{3}\z/     => RPG::Map,
-            /\AMapInfos\z/     => RPG::MapInfo,
-            /\ASkills\z/       => RPG::Skill,
-            /\AStates\z/       => RPG::State,
-            /\ASystem\z/       => RPG::System,
-            /\ATilesets\z/     => RPG::Tileset,
-            /\ATroops\z/       => RPG::Troop,
-            /\AWeapons\z/      => RPG::Weapon
-        }
+    # 用来匹配读取的文件名到对应的RPG的类
+    FILE_BASENAME_TO_CLASS_RPG = {
+      /\AActors\z/ => RPG::Actor,
+      /\AAnimations\z/ => RPG::Animation,
+      /\AArmors\z/ => RPG::Armor,
+      /\AClasses\z/ => RPG::Class,
+      /\ACommonEvents\z/ => RPG::CommonEvent,
+      /\AEnemies\z/ => RPG::Enemy,
+      /\AItems\z/ => RPG::Item,
+      /\AMap\d{3}\z/ => RPG::Map,
+      /\AMapInfos\z/ => RPG::MapInfo,
+      /\ASkills\z/ => RPG::Skill,
+      /\AStates\z/ => RPG::State,
+      /\ASystem\z/ => RPG::System,
+      /\ATilesets\z/ => RPG::Tileset,
+      /\ATroops\z/ => RPG::Troop,
+      /\AWeapons\z/ => RPG::Weapon
+    }
 
-        # 事件指令的命令名称
-        EVENT_COMMANDS = {
-            0   => 'Empty',
+    # 事件指令的命令名称
+    EVENT_COMMANDS = {
+      0 => 'Empty',
 
 =begin
     [string(Face Graphic name)]---[int(Face Graphic index)]---[int:{0:Normal Window, 1:Dim Background, 2:Transparent}]---[int:{0:Top, 1:Middle, 2:Bottom}]---END
 =end
-            101 => 'ShowTextAttributes',
+      101 => 'ShowTextAttributes',
 
 =begin
     [Array<string>(Choices Array)]---[int:{0:Disallow, 1:Choice 1, 2:Choice 2, 3:Choice 3, 4:Choice 4, 5:Branch}(When Cancel)]---END
 =end
-            102 => 'ShowChoices',
+      102 => 'ShowChoices',
 
 =begin
     [int(Variable for Number)]---[int:{1~8}(Digits)]---END
 =end
-            103 => 'InputNumber',
+      103 => 'InputNumber',
 
 =begin
     [int(Variable for Item ID)]---END
 =end
-            104 => 'SelectKeyItem',
+      104 => 'SelectKeyItem',
 
 =begin
     [int:{1~8}(Speed)]---[bool(No Fast Forward)]---END
 =end
-            105 => 'ShowScrollingTextAttributes',
+      105 => 'ShowScrollingTextAttributes',
 
 =begin
     [string]---END
 =end
-            108 => 'Comment',
+      108 => 'Comment',
 
 =begin
     |--[int:0(Switch)]---[int(Switch ID)]---[int{0:ON, 1:OFF}]---END
@@ -167,31 +167,31 @@ module R3EXS
     |
     |--[int:13(Vehicle)]---[int:{0:Boat, 1:Ship, 2:Airship}]---END
 =end
-            111 => 'ConditionalBranch',
-            112 => 'Loop',
-            113 => 'BreakLoop',
-            115 => 'ExitEventProcessing',
+      111 => 'ConditionalBranch',
+      112 => 'Loop',
+      113 => 'BreakLoop',
+      115 => 'ExitEventProcessing',
 
 =begin
     [int(Common Event ID)]---END
 =end
-            117 => 'CallCommonEvent',
+      117 => 'CallCommonEvent',
 
 =begin
     [string]---END
 =end
-            118 => 'Label',
+      118 => 'Label',
 
 =begin
 
     [string]---END
 =end
-            119 => 'JumpToLabel',
+      119 => 'JumpToLabel',
 
 =begin
     [int(Switch Begin ID)]---[int(Switch End ID)]---[int:{0:ON, 1:OFF}]---END
 =end
-            121 => 'ControlSwitches',
+      121 => 'ControlSwitches',
 
 =begin
                                                                                                           |--[int:0(Constant)]---[int(Number)]---END
@@ -214,31 +214,31 @@ module R3EXS
                                                                                                           |
                                                                                                           |--[int:4(Scripts)]---[string]---END
 =end
-            122 => 'ControlVariables',
+      122 => 'ControlVariables',
 
 =begin
     [string:{'A', 'B', 'C', 'D'}(Self Switch Name)]---[int:{0:ON, 1:OFF}]---END
 =end
-            123 => 'ControlSelfSwitch',
+      123 => 'ControlSelfSwitch',
 
 =begin
     [int:{0:Start, 1:Stop}]---[int:{0~5999}(sec)]---END
 =end
-            124 => 'ControlTimer',
+      124 => 'ControlTimer',
 
 =begin
                                     |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
     [int:{0:Increase, 1:Decrease}]--|
                                     |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            125 => 'ChangeGold',
+      125 => 'ChangeGold',
 
 =begin
                                                      |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
     [int(Item ID)]---[int:{0:Increase, 1:Decrease}]--|
                                                      |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            126 => 'ChangeItems',
+      126 => 'ChangeItems',
 
 =begin
                                             |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
@@ -249,7 +249,7 @@ module R3EXS
                       |--[int:1(Decrease)]--|                                                 |--[bool(Include Equipment)]---END
                                             |--[int:1(Variable)]---[int(Variable ID)]---------|
 =end
-            127 => 'ChangeWeapons',
+      127 => 'ChangeWeapons',
 
 =begin
                                            |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
@@ -260,61 +260,61 @@ module R3EXS
                      |--[int:1(Decrease)]--|                                                 |--[bool(Include Equipment)]---END
                                            |--[int:1(Variable)]---[int(Variable ID)]---------|
 =end
-            128 => 'ChangeArmor',
+      128 => 'ChangeArmor',
 
 =begin
     [int(Actor ID)]---[int:{0:Add, 1:Remove}]---[int:{0:NO, 1:YES}(Initialize)]---END
 =end
-            129 => 'ChangePartyMember',
+      129 => 'ChangePartyMember',
 
 =begin
     [RPG::BGM]---END
 =end
-            132 => 'ChangeBattleBGM',
+      132 => 'ChangeBattleBGM',
 
 =begin
     [RPG::ME]---END
 =end
-            133 => 'ChangeBattleEndME',
+      133 => 'ChangeBattleEndME',
 
 =begin
     [int:{0:Disable, 1:Enable}]---END
 =end
-            134 => 'ChangeSaveAccess',
+      134 => 'ChangeSaveAccess',
 
 =begin
     [int:{0:Disable, 1:Enable}]---END
 =end
-            135 => 'ChangeMenuAccess',
+      135 => 'ChangeMenuAccess',
 
 =begin
     [int:{0:Disable, 1:Enable}]---END
 =end
-            136 => 'ChangeEncounter',
+      136 => 'ChangeEncounter',
 
 =begin
     [int:{0:Disable, 1:Enable}]---END
 =end
-            137 => 'ChangeFormationAccess',
+      137 => 'ChangeFormationAccess',
 
 =begin
     [RPG::Tone]---END
 =end
-            138 => 'ChangeWindowColor',
+      138 => 'ChangeWindowColor',
 
 =begin
     |--[int:0(Direct Designation)]---[int(Map ID)]---[int(Map X)]---[int(Map Y)]-------------------------------------------------------------------------------------|
     |                                                                                                                                                                |--[int:{0:Retain, 2:Down, 4:Left, 6:Right, 8:Up}(Direction)]---[int:{0:Normal, 1:White, 2:None}(Fade)]---END
     |--[int:1(Designation with Variables)]---[int(Map ID Corresponded Variable ID)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
 =end
-            201 => 'TransferPlayer',
+      201 => 'TransferPlayer',
 
 =begin
                                        |--[int:0(Direct Designation)]---[int(Map ID)]---[int(Map X)]---[int(Map Y)]---END
     [int:{0:Boat, 1:Ship, 2:Airship}]--|
                                        |--[int:1(Designation with Variables)]---[int(Map ID Corresponded Variable ID)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]---END
 =end
-            202 => 'SetVehicleLocation',
+      202 => 'SetVehicleLocation',
 
 =begin
                                                 |--[int:0(Direct Designation)]---[int(Map X)]---[int(Map Y)]------------------------------------------------------------|
@@ -323,184 +323,184 @@ module R3EXS
                                                 |                                                                                                                       |
                                                 |--[int:2(Exchange with Another Event)]---[int(Exchanged Event ID)]---[int:0]-------------------------------------------|
 =end
-            203 => 'SetEventLocation',
+      203 => 'SetEventLocation',
 
 =begin
     [int:{2:Down, 4:Left, 6:Right, 8:Up}]---[int:{0~100}(Distance)]---[int:{1:1/8 Speed, 2:1/4 Speed, 3:1/2 Speed, 4:Normal, 5:2 Speed, 6:4 Speed}]---END
 =end
-            204 => 'ScrollMap',
+      204 => 'ScrollMap',
 
 =begin
     [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[RPG::MoveRoute(45 is Script)]---END
 =end
-            205 => 'SetMoveRoute',
+      205 => 'SetMoveRoute',
 
 =begin
     END
 =end
-            206 => 'GetSwitchVehicle',
+      206 => 'GetSwitchVehicle',
 
 =begin
     [int:{0:ON, 1:OFF}]---END
 =end
-            211 => 'ChangeTransparency',
+      211 => 'ChangeTransparency',
 
 =begin
     [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int(Animation ID)]---[bool(Wait for Completion)]---END
 =end
-            212 => 'ShowAnimation',
+      212 => 'ShowAnimation',
 
 =begin
     [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int(Ballon Icon ID)]---[bool(Wait for Completion)]---END
 =end
-            213 => 'ShowBalloonIcon',
-            214 => 'EraseEvent',
+      213 => 'ShowBalloonIcon',
+      214 => 'EraseEvent',
 
 =begin
     [int:{0:ON, 1:OFF}]---END
 =end
-            216 => 'ChangePlayerFollowers',
-            217 => 'GatherFollowers',
-            221 => 'FadeoutScreen',
-            222 => 'FadeinScreen',
+      216 => 'ChangePlayerFollowers',
+      217 => 'GatherFollowers',
+      221 => 'FadeoutScreen',
+      222 => 'FadeinScreen',
 
 =begin
     [RPG::Tone]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
 =end
-            223 => 'TintScreen',
+      223 => 'TintScreen',
 
 =begin
     [RPG::Color]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
 =end
-            224 => 'FlashScreen',
+      224 => 'FlashScreen',
 
 =begin
     [int:{1~9}(Power)]---[int:{1~9}(Speed)]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
 =end
-            225 => 'ShakeScreen',
+      225 => 'ShakeScreen',
 
 =begin
     [int:{0~999}(Time 1/60 sec)]---END
 =end
-            230 => 'Wait',
+      230 => 'Wait',
 
 =begin
                                                                                                      |--[int:0(Constant)]---[int:{-9999~9999}(Map X)]---[int:{-9999~9999}(Map Y)]--------------------------|
     [int:{1~100}(Number)]---[string(Picture Graphic Name)]---[int:{0:Upper Left, 1:Center}(Origin)]--|                                                                                                     |--[int:{0~2000}(Width %)]---[int:{0~2000}(Height %)]---[int:{0~255}(Opacity)]---[int:{0:Normal, 1:Add, 2:Sub}]---END
                                                                                                      |--[int:1(Variable)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
 =end
-            231 => 'ShowPicture',
+      231 => 'ShowPicture',
 
 =begin
                                                                     |--[int:0(Constant)]---[int:{-9999~9999}(Map X)]---[int:{-9999~9999}(Map Y)]--------------------------|
     [int:{1~100}(Number)]---[int:{0:Upper Left, 1:Center}(Origin)]--|                                                                                                     |--[int:{0~2000}(Width %)]---[int:{0~2000}(Height %)]---[int:{0~255}(Opacity)]---[int:{0:Normal, 1:Add, 2:Sub}]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
                                                                     |--[int:1(Variable)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
 =end
-            232 => 'MovePicture',
+      232 => 'MovePicture',
 
 =begin
     [int:{1~100}(Number)]-[int:{-90~90}(Speed)]--END
 =end
-            233 => 'RotatePicture',
+      233 => 'RotatePicture',
 
 =begin
     [int:{1~100}(Number)]---[RPG::Tone]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
 =end
-            234 => 'TintPicture',
+      234 => 'TintPicture',
 
 =begin
     [int:{1~100}(Number)]---END
 =end
-            235 => 'ErasePicture',
+      235 => 'ErasePicture',
 
 =begin
     [string:{":none", ":rain", ":storm", ":snow"}]---[int:{0~9}(Power)]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
 =end
-            236 => 'SetWeatherEffects',
+      236 => 'SetWeatherEffects',
 
 =begin
     [RPG::BGM]---END
 =end
-            241 => 'PlayBGM',
+      241 => 'PlayBGM',
 
 =begin
     [int:{1~60}(Time sec)]---END
 =end
-            242 => 'FadeoutBGM',
-            243 => 'SaveBGM',
-            244 => 'ReplayBGM',
+      242 => 'FadeoutBGM',
+      243 => 'SaveBGM',
+      244 => 'ReplayBGM',
 
 =begin
     [RPG::BGM]---END
 =end
-            245 => 'PlayBGS',
+      245 => 'PlayBGS',
 
 =begin
     [int:{1~60}(Time sec)]---END
 =end
-            246 => 'FadeoutBGS',
+      246 => 'FadeoutBGS',
 
 =begin
     [RPG::ME]---END
 =end
-            249 => 'PlayME',
+      249 => 'PlayME',
 
 =begin
     [RPG::SE]---END
 =end
-            250 => 'PlaySE',
-            251 => 'StopSE',
+      250 => 'PlaySE',
+      251 => 'StopSE',
 
 =begin
     [string(Movie Name)]---END
 =end
-            261 => 'PlayMovie',
+      261 => 'PlayMovie',
 
 =begin
     [int:{0:ON, 1:OFF}]---END
 =end
-            281 => 'ChangeMapNameDisplay',
+      281 => 'ChangeMapNameDisplay',
 
 =begin
     [int(Tileset ID)]---END
 =end
-            282 => 'ChangeTileset',
+      282 => 'ChangeTileset',
 
 =begin
     [string(Floor Picture)]---[string(Wall Picture)]---END
 =end
-            283 => 'ChangeBattleBack',
+      283 => 'ChangeBattleBack',
 
 =begin
     [string(Distant view Picture)]---[bool(Loop Horizontal)]---[bool(Loop Vertical)]---[int(-32~32)(Horizontal Scroll)]---[int(-32~32)(Vertical Scrool)]---END
 =end
-            284 => 'ChangeParallaxBack',
+      284 => 'ChangeParallaxBack',
 
 =begin
                                                                                                                                                   |--[int:0(Direct Designation)]---[int(Map X)]---[int(Map Y)]---END
     [int(Variable for Info)]---[int:{0:Terrain, 1:Event ID, 2:Tile ID(Layer 1), 3:Tile ID(Layer 2), 4:Tile ID(Layer 3), 5:Region ID}(Info Type)]--|
                                                                                                                                                   |--[int:1(Designation with Variables)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]---END
 =end
-            285 => 'GetLocationInfo',
+      285 => 'GetLocationInfo',
 
 =begin
     |--[int:0(Direct Designation)]---[int(Enemy ID)]-----------------------------------|
     |                                                                                  |--[bool(Can Escape)]---[bool(Continue Even When Loser)]---END
     |--[int:1(Designation with Variables)]---[int(Enemy ID Corresponded Variable ID)]--|
 =end
-            301 => 'BattleProcessing',
+      301 => 'BattleProcessing',
 
 =begin
                                                                      |--[int:0(Price: Standard)]---[int:0]------------------|
     [int:{0:Item, 1:Weapon, 2:Armor}]---[int(Corresponded Item ID)]--|                                                      |--[bool(Purchase Only)]---END
                                                                      |--[int:1(Price: Specify)]---[int:{0~9999999}(Price)]--|
 =end
-            302 => 'ShopProcessing',
+      302 => 'ShopProcessing',
 
 =begin
     [int(Actor ID)]---[int:{1~16}(Max Characters)]---END
 =end
-            303 => 'NameInputProcessing',
+      303 => 'NameInputProcessing',
 
 =begin
                                                                                         |--[int:0(Constant)]---[int:{1~9999}(Number)]--|
@@ -519,28 +519,28 @@ module R3EXS
                                                                     |--[int:1(Decrease)]--|                                              |--[bool(Allow Knockout)]---END
                                                                                           |--[int:1(Variable)]---[int(Variable ID)]------|
 =end
-            311 => 'ChangeHP',
+      311 => 'ChangeHP',
 
 =begin
     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|                                  |--[int:0(Constant)]---[int:{1~9999}(Number)]---END
     |                                                             |--[int:{0:Increase, 1:Decrease}]--|
     |--[int:1(Variable)]---[int(Variable ID)]---------------------|                                  |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            312 => 'ChangeMP',
+      312 => 'ChangeMP',
 
 =begin
     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
     |                                                             |--[int:{0:Add, 1:Remove}]---[int(State ID)]---END
     |--[int:1(Variable)]---[int(Variable ID)]---------------------|
 =end
-            313 => 'ChangeState',
+      313 => 'ChangeState',
 
 =begin
     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]---END
     |
     |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            314 => 'RecoverAll',
+      314 => 'RecoverAll',
 
 =begin
                                                                                         |--[int:0(:Constant)]---[int:{1~9999999}(Number)]--|
@@ -559,7 +559,7 @@ module R3EXS
                                                                   |--[int:1(Decrease)]--|                                                 |--[bool:false(Show Level Up Message)]---END
                                                                                         |--[int:1(Variable)]---[int(Variable ID)]---------|
 =end
-            315 => 'ChangeEXP',
+      315 => 'ChangeEXP',
 
 =begin
                                                                                         |--[int:0(Constant)]---[int:{1~98}(Number)]--|
@@ -578,51 +578,51 @@ module R3EXS
                                                                   |--[int:1(Decrease)]--|                                            |--[bool:false(Show Level Up Message)]---END
                                                                                       |--[int:1(Variable)]---[int(Variable ID)]------|
 =end
-            316 => 'ChangeLevel',
+      316 => 'ChangeLevel',
 
 =begin
     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|                                                                                                   |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
     |                                                             |--[int:{0:MHP, 1:MMP, 2:ATK, 3:DEF, 4:MAT, 5:MDF, 6:AGI, 7:LUK}]---[int:{0:Increase, 1:Decrease}]--|
     |--[int:1(Variable)]---[int(Variable ID)]---------------------|                                                                                                   |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            317 => 'ChangeParameters',
+      317 => 'ChangeParameters',
 
 =begin
     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
     |                                                             |--[int:{0:Learn, 1:Forget}]---[int(Skill ID)]---END
     |--[int:1(Variable)]---[int(Variable ID)]---------------------|
 =end
-            318 => 'ChangeSkills',
+      318 => 'ChangeSkills',
 
 =begin
     [int(Actor ID)]---[int:{0:Weapon, 1:Shield, 2:Head, 3:Boby, 4:Accessory}]---[int:{0:None, 1:Equipment 001, ...}(Equipment ID)]---END
 =end
-            319 => 'ChangeEquipment',
+      319 => 'ChangeEquipment',
 
 =begin
     [int(Actor ID)]---[string(New Actor Name)]---END
 =end
-            320 => 'ChangeActorName',
+      320 => 'ChangeActorName',
 
 =begin
     [int(Actor ID)]---[int(New Class ID)]---END
 =end
-            321 => 'ChangeActorClass',
+      321 => 'ChangeActorClass',
 
 =begin
     [int(Actor ID)]---[string(New Actor walking Picture Name)]---[int(New Actor Walking Picture Index)]---[string(New Actor Portrait Picture Name)]---[int(New Actor Portrait Picture Index)]---END
 =end
-            322 => 'ChangeActorGraphic',
+      322 => 'ChangeActorGraphic',
 
 =begin
     [int:{0:Boat, 1:Ship, 2:Airship}]---[string(New Vehicle Picture Name)]---[int(New Vehicle Picture Index)]---END
 =end
-            323 => 'ChangeVehicleGraphic',
+      323 => 'ChangeVehicleGraphic',
 
 =begin
     [int(Actor ID)]---[string(New Actor Nickname)]---END
 =end
-            324 => 'ChangeActorNickname',
+      324 => 'ChangeActorNickname',
 
 =begin
                                                                      |--[int:0(Constant)]---[int:{1~999999}(Number)]--|
@@ -634,451 +634,451 @@ module R3EXS
                                                                      |--[int:1(Variable)]---[int(Variable ID)]--------|
 
 =end
-            331 => 'ChangeEnemyHP',
+      331 => 'ChangeEnemyHP',
 
 =begin
                                                                                 |--[int:0(Constant)]---[int:{1~9999}(Number)]---END
     [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int:{0:Increase, 1:Decrease}]--|
                                                                                 |--[int:1(Variable)]---[int(Variable ID)]---END
 =end
-            332 => 'ChangeEnemyMP',
+      332 => 'ChangeEnemyMP',
 
 =begin
     [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int:{0:Add, 1:Remove}]---[int(State ID)]---END
 =end
-            333 => 'ChangeEnemyState',
+      333 => 'ChangeEnemyState',
 
 =begin
     [int:{-1:Entire Troop, 0:Troop 001, ...}]---END
 =end
-            334 => 'EnemyRecoverAll',
+      334 => 'EnemyRecoverAll',
 
 =begin
     [int:{-1:Entire Troop, 0:Troop 001, ...}]---END
 =end
-            335 => 'EnemyAppear',
+      335 => 'EnemyAppear',
 
 =begin
     [int(Troop ID)]---[int(Enemy ID)]---END
 =end
-            336 => 'EnemyTransform',
+      336 => 'EnemyTransform',
 
 =begin
     [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int(Animation ID)]---END
 =end
-            337 => 'ShowBattleAnimation',
+      337 => 'ShowBattleAnimation',
 
 =begin
     |--[int:0(Enemy)]---[int(Troop ID)]--|
     |                                    |--[int(Skill ID)]---[int:{-2:Last Target, -1:Random, 0:Index 1,...}]---END
     |--[int:1(Actor)]---[int(Actor ID)]--|
 =end
-            339 => 'ForceAction',
-            340 => 'AbortBattle',
-            351 => 'OpenMenuScreen',
-            352 => 'OpenSaveScreen',
-            353 => 'GameOver',
-            354 => 'ReturnToTitleScreen',
+      339 => 'ForceAction',
+      340 => 'AbortBattle',
+      351 => 'OpenMenuScreen',
+      352 => 'OpenSaveScreen',
+      353 => 'GameOver',
+      354 => 'ReturnToTitleScreen',
 
 =begin
     [string]---END
 =end
-            355 => 'Script',
+      355 => 'Script',
 
 =begin
     [string]---END
 =end
-            401 => 'ShowText',
+      401 => 'ShowText',
 
 =begin
     [int(Choice Index)]---[string(Choice Name)]---END
 =end
-            402 => 'When',
-            403 => 'WhenCancel',
-            404 => 'ChoicesEnd',
+      402 => 'When',
+      403 => 'WhenCancel',
+      404 => 'ChoicesEnd',
 
 =begin
     [string]---END
 =end
-            405 => 'ShowScrollingText',
+      405 => 'ShowScrollingText',
 
 =begin
     [string]---END
 =end
-            408 => 'CommentMore',
-            411 => 'Else',
-            412 => 'BranchEnd',
-            413 => 'RepeatAbove',
+      408 => 'CommentMore',
+      411 => 'Else',
+      412 => 'BranchEnd',
+      413 => 'RepeatAbove',
 
 =begin
     [RPG::MoveCommand(45 is script)]---END
 =end
-            505 => 'MoveRoute',
-            601 => 'IfWin',
-            602 => 'IfEscape',
-            603 => 'IfLose',
-            604 => 'BattleProcessingEnd',
+      505 => 'MoveRoute',
+      601 => 'IfWin',
+      602 => 'IfEscape',
+      603 => 'IfLose',
+      604 => 'BattleProcessingEnd',
 
 =begin
                                                                      |--[int:0(Price: Standard)]---[int:0]---END
     [int:{0:Item, 1:Weapon, 2:Armor}]---[int(Corresponded Item ID)]--|
                                                                      |--[int:1(Price: Specify)]---[int:{0~9999999}(Price)]---END
 =end
-            605 => 'ShopItem',
+      605 => 'ShopItem',
 
 =begin
     [string]---END
 =end
-            655 => 'ScriptMore' }
+      655 => 'ScriptMore' }
 
-        # 红色
-        RED_COLOR = "\e[31m"
+    # 红色
+    RED_COLOR = "\e[31m"
 
-        # 绿色
-        GREEN_COLOR = "\e[32m"
+    # 绿色
+    GREEN_COLOR = "\e[32m"
 
-        # 黄色
-        YELLOW_COLOR = "\e[33m"
+    # 黄色
+    YELLOW_COLOR = "\e[33m"
 
-        # 蓝色
-        BLUE_COLOR = "\e[34m"
+    # 蓝色
+    BLUE_COLOR = "\e[34m"
 
-        # 紫色
-        MAGENTA_COLOR = "\e[35m"
+    # 紫色
+    MAGENTA_COLOR = "\e[35m"
 
-        # 青色
-        CYAN_COLOR = "\e[36m"
+    # 青色
+    CYAN_COLOR = "\e[36m"
 
-        # 重置颜色
-        RESET_COLOR = "\e[0m"
+    # 重置颜色
+    RESET_COLOR = "\e[0m"
 
-        # 清除行
-        ESCAPE = "\e[2K"
+    # 清除行
+    ESCAPE = "\e[2K"
 
-        # 根据 file_basename 检查 object 的类型在 module_name 中是否正确
-        #
-        # @param object [Object] 待检查的对象
-        # @param file_basename [String] 文件名（不包含扩展名）
-        # @param is_compact [Boolean] 是否为紧凑模式
-        # @param module_name [Symbol] 模块名
-        #
-        # @raise [RPGTypeError] object 的类型不在 RPG 模块中
-        # @raise [R3EXSTypeError] object 的类型不在 R3EXS 模块中
-        # @raise [ModuleNameError] module_name 不是 :RPG 或 :R3EXS
-        # @raise [FileBaseNameError] file_basename 无法匹配到对应的类
-        #
-        # @return [void]
-        def Utils.check_type(object, file_basename, is_compact, module_name)
-            case module_name
-            when :RPG
-                matched_class = FILE_BASENAME_TO_CLASS_RPG.find { |pattern, _| file_basename =~ pattern }&.last
-                matched_class or raise FileBaseNameError.new(file_basename), "Invalid file basename: #{file_basename}"
-                if object.is_a?(Array)
-                    if is_compact
-                        object.compact.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not an Array<#{matched_class}>"
-                    else
-                        object.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not an Array<#{matched_class}>"
-                    end
-                elsif object.is_a?(Hash)
-                    if is_compact
-                        object.compact.values.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not a Hash<#{matched_class}>"
-                    else
-                        object.values.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not a Hash<#{matched_class}>"
-                    end
-                else
-                    object.is_a?(matched_class) or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not a #{matched_class}"
-                end
-            when :R3EXS
-                matched_class = FILE_BASENAME_TO_CLASS_R3EXS.find { |pattern, _| file_basename =~ pattern }&.last
-                matched_class or raise FileBaseNameError.new(file_basename), "Invalid file basename: #{file_basename}"
-                if object.is_a?(Array)
-                    if is_compact
-                        object.compact.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not an Array<#{matched_class}>"
-                    else
-                        object.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not an Array<#{matched_class}>"
-                    end
-                elsif object.is_a?(Hash)
-                    if is_compact
-                        object.compact.values.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not a Hash<#{matched_class}>"
-                    else
-                        object.values.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not a Hash<#{matched_class}>"
-                    end
-                else
-                    object.is_a?(matched_class) or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not #{matched_class}"
-                end
-            else
-                raise ModuleNameError.new(module_name), "Invalid module name: #{module_name}"
-            end
-
+    # 根据 file_basename 检查 object 的类型在 module_name 中是否正确
+    #
+    # @param object [Object] 待检查的对象
+    # @param file_basename [String] 文件名（不包含扩展名）
+    # @param is_compact [Boolean] 是否为紧凑模式
+    # @param module_name [Symbol] 模块名
+    #
+    # @raise [RPGTypeError] object 的类型不在 RPG 模块中
+    # @raise [R3EXSTypeError] object 的类型不在 R3EXS 模块中
+    # @raise [ModuleNameError] module_name 不是 :RPG 或 :R3EXS
+    # @raise [FileBaseNameError] file_basename 无法匹配到对应的类
+    #
+    # @return [void]
+    def Utils.check_type(object, file_basename, is_compact, module_name)
+      case module_name
+      when :RPG
+        matched_class = FILE_BASENAME_TO_CLASS_RPG.find { |pattern, _| file_basename =~ pattern }&.last
+        matched_class or raise FileBaseNameError.new(file_basename), "Invalid file basename: #{file_basename}"
+        if object.is_a?(Array)
+          if is_compact
+            object.compact.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not an Array<#{matched_class}>"
+          else
+            object.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not an Array<#{matched_class}>"
+          end
+        elsif object.is_a?(Hash)
+          if is_compact
+            object.compact.values.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not a Hash<#{matched_class}>"
+          else
+            object.values.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not a Hash<#{matched_class}>"
+          end
+        else
+          object.is_a?(matched_class) or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not a #{matched_class}"
         end
-
-        # 将 RPG 中的对象转化为 R3EXS 对象
-        #
-        # @param object [Object] 待转化的 RPG 对象
-        # @param file_basename [String] 文件名（不包含扩展名）
-        # @param with_notes [Boolean] 是否包含注释
-        #
-        # @raise [RPGTypeError] object 的类型不在 RPG 模块中
-        # @raise [FileBaseNameError] file_basename 无法匹配到对应的类
-        #
-        # @return [Object]
-        def Utils.rpg_r3exs(object, file_basename, with_notes)
-            check_type(object, file_basename, true, :RPG)
-
-            # 首先根据 file_basename 找到对应的类
-            matched_class = Utils::FILE_BASENAME_TO_CLASS_R3EXS.find { |pattern, _| file_basename =~ pattern }.last
-
-            # 然后根据 object 的类型进行处理
-            # 如果 object 是数组，则遍历数组，对每个元素进行处理
-            # 如果 object 是哈希，则遍历哈希，对每个值进行处理
-            # 如果 object 是其他类型，则直接处理
-            if object.is_a?(Array)
-                temp = []
-                object.each_with_index do |obj, index|
-                    next if obj.nil?
-                    obj_r3exs = matched_class.new(obj, index, with_notes)
-                    temp << obj_r3exs unless obj_r3exs.empty?
-                end
-            elsif object.is_a?(Hash) # 只有 RPG::MapInfo 是 Hash，且 key 为整数
-                temp = []
-                object.each do |key, obj|
-                    next if obj.nil?
-                    temp << matched_class.new(obj, key, with_notes)
-                end
-            else
-                # 只有 RPG::Map 和 RPG::System 是单独一个对象，且不可能为 nil
-                temp = matched_class.new(object, with_notes)
-            end
-            temp
+      when :R3EXS
+        matched_class = FILE_BASENAME_TO_CLASS_R3EXS.find { |pattern, _| file_basename =~ pattern }&.last
+        matched_class or raise FileBaseNameError.new(file_basename), "Invalid file basename: #{file_basename}"
+        if object.is_a?(Array)
+          if is_compact
+            object.compact.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not an Array<#{matched_class}>"
+          else
+            object.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not an Array<#{matched_class}>"
+          end
+        elsif object.is_a?(Hash)
+          if is_compact
+            object.compact.values.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not a Hash<#{matched_class}>"
+          else
+            object.values.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not a Hash<#{matched_class}>"
+          end
+        else
+          object.is_a?(matched_class) or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not #{matched_class}"
         end
-
-        # 读取 target_dir 下的所有 rvdata2 文件，将其反序列化为对象，并调用 block
-        #
-        # @note 注意传入 block 的 object
-        #       - 如果 object 是数组或哈希，则其中可能存在 nil 元素
-        #       - 如果 object 是单独一个对象，则不可能为 nil
-        #
-        # @param target_dir [Pathname] 目标目录
-        #
-        # @yieldparam object [Object] rvdata2 文件反序列化后的对象
-        # @yieldparam file_basename [String] 文件名（不包含扩展名）
-        # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
-        # @yieldreturn [void]
-        #
-        # @raise [Rvdata2FileError] rvdata2 文件可能损坏
-        # @raise [Rvdata2DirError] target_dir 不存在
-        #
-        # @return [void]
-        def Utils.all_rvdata2_files(target_dir)
-            # 检查 target_dir 目录是否存在
-            target_dir.exist? && target_dir.directory? or raise Rvdata2DirError.new(target_dir.to_s), "rvdata2 directory not found: #{target_dir}"
-            # 递归获取 target_dir 下的所有 *.rvdata2 文件
-            target_dir.glob('**/*.rvdata2').each do |file_path|
-                file_basename = file_path.basename('.rvdata2').to_s
-                # 检查文件名是否在 RVDATA2_FILE_NAME 中与其正则表达式匹配
-                next unless RVDATA2_FILE_NAME.any? { |pattern| file_basename =~ pattern }
-
-                print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing from #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
-                object = Marshal.load(file_path.binread)
-
-                # 如果文件名不是 'Scripts'，则检查 object 的类型是否正确
-                unless file_basename == 'Scripts'
-                    # 检查 object 的类型是否正确
-                    # 这里的类型检查要用紧凑模式，因为 rvdata2 文件中可能存在 nil 元素，必须忽略
-                    begin
-                        check_type(object, file_basename, true, :RPG)
-                    rescue RPGTypeError
-                        raise Rvdata2FileError.new(file_path.to_s), "Invalid rvdata2 file: #{file_path}"
-                    end
-                end
-
-                yield object, file_basename, file_path.dirname.relative_path_from(target_dir)
-            end
-        end
-
-        # 读取 target_dir 下的所有常规 JSON 文件，将其反序列化为对象，并调用 block
-        #
-        # @note 注意传入 block 的 object
-        #       - 在 module_name 为 RPG 时，如果 object 是数组或哈希，则其中可能存在 nil 元素。如果 object 是单独一个对象，则不可能为 nil
-        #       - 在 module_name 为 R3EXS 时，object 不会为 nil
-        #
-        # @param target_dir [Pathname] 目标目录
-        # @param module_name [Symbol] 模块名
-        #
-        # @yieldparam object [Object] JSON 文件反序列化后的对象
-        # @yieldparam file_basename [String] 文件名（不包含扩展名）
-        # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
-        # @yieldreturn [void]
-        #
-        # @raise [RPGJsonFileError] json 文件不是 RPG 模块中的对象
-        # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
-        # @raise [ModuleNameError] module_name 不是 :RPG 或 :R3EXS
-        # @raise [JsonDirError] target_dir 不存在
-        #
-        # @return [void]
-        def Utils.all_json_files(target_dir, module_name)
-            # 检查 target_dir 目录是否存在
-            target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
-            # 递归获取 target_dir 下的所有 *.json 文件
-            target_dir.glob('**/*.json').each do |file_path|
-                file_basename = file_path.basename('.json').to_s
-                # 检查文件名是否在 JSON_FILE_NAME 中与其正则表达式匹配
-                next unless JSON_FILE_NAME.any? { |pattern| file_basename =~ pattern }
-
-                print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
-                object = Oj.load_file(file_path.to_s)
-
-                case module_name
-                when :RPG
-                    # 这里的类型检查要用紧凑模式，因为这是从 rvdata2 文件直接全部序列化后的 JSON 文件中读取的 object，其中可能存在 nil 元素
-                    begin
-                        check_type(object, file_basename, true, module_name)
-                    rescue RPGTypeError
-                        raise RPGJsonFileError.new(file_path.to_s), "Invalid RPG JSON file: #{file_path}"
-                    end
-                when :R3EXS
-                    # 这里的类型检查不能用紧凑模式，因为这是从 R3EXS 模块的类序列化后的 JSON 文件中读取的 object，程序设计中不应该存在 nil 元素
-                    begin
-                        check_type(object, file_basename, false, module_name)
-                    rescue R3EXSTypeError
-                        raise R3EXSJsonFileError.new(file_path.to_s), "Invalid R3EXS JSON file: #{file_path}"
-                    end
-                else
-                    raise ModuleNameError.new(module_name), "Invalid module name: #{module_name}"
-                end
-
-                yield object, file_basename, file_path.dirname.relative_path_from(target_dir)
-            end
-        end
-
-        # 读取 target_dir 下的所有 CommonEvent JSON 文件，将其反序列化为对象数组，并调用 block
-        #
-        # @note 注意传入 block 的 object
-        #       - 在 module_name 为 RPG 时，object 可能存在 nil 元素
-        #       - 在 module_name 为 R3EXS 时，object 不可能存在 nil 元素
-        #
-        # @param target_dir [Pathname] 目标目录
-        # @param module_name [Symbol] 模块名
-        #
-        # @yieldparam commonevents [Array<Object>] CommonEvent JSON 文件反序列化后的数组
-        # @yieldparam commonevents_basenames [Array<String>] CommonEvent JSON 文件名数组（不包含扩展名）
-        # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
-        # @yieldreturn [void]
-        #
-        # @raise [RPGJsonFileError] json 文件不是 RPG 模块中的对象
-        # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
-        # @raise [ModuleNameError] module_name 不是 :RPG 或 :R3EXS
-        # @raise [JsonDirError] target_dir 不存在
-        #
-        # @return [void]
-        def Utils.all_commonevent_json_files(target_dir, module_name)
-            # 检查 target_dir 目录是否存在
-            target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
-
-            # 用两个个Hash来存储每一个父目录下的所有的 CommonEvent_\d{5}.json 文件的反序列化后的对象数组以及其文件名数组
-            # Hash 的键是父目录的路径，值是一个数组，存储该目录下的所有 CommonEvent_\d{5}.json 文件的反序列化后的对象数组以及其文件名数组
-            commonevents_hash           = Hash.new { |h, k| h[k] = [] }
-            commonevents_basenames_hash = Hash.new { |h, k| h[k] = [] }
-
-            # 递归获取 target_dir 下的所有 CommonEvent_\d{5}.json 文件
-            target_dir.glob('**/CommonEvent_[0-9][0-9][0-9][0-9][0-9].json').each do |file_path|
-                print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
-                object     = Oj.load_file(file_path.to_s)
-                parent_dir = file_path.dirname
-                commonevents_hash[parent_dir] << object
-                commonevents_basenames_hash[parent_dir] << file_path.basename('.json').to_s
-            end
-
-            # 遍历每一个父目录的路径
-            commonevents_hash.each_key do |parent_dir|
-                commonevents           = commonevents_hash[parent_dir]
-                commonevents_basenames = commonevents_basenames_hash[parent_dir]
-
-                case module_name
-                when :RPG
-                    # 这里的类型检查要用紧凑模式，因为这是从 rvdata2 文件直接全部序列化后的 JSON 文件中读取的 object，其中可能存在 nil 元素
-                    begin
-                        check_type(commonevents, 'CommonEvents', true, module_name)
-                    rescue RPGTypeError
-                        raise RPGJsonFileError.new(parent_dir.to_s), "Invalid RPG CommonEvents JSON file"
-                    end
-                when :R3EXS
-                    # 这里的类型检查不能用紧凑模式，因为这是从 R3EXS 模块的类序列化后的 JSON 文件中读取的 object，程序设计中不应该存在 nil 元素
-                    begin
-                        check_type(commonevents, 'CommonEvents', false, module_name)
-                    rescue R3EXSTypeError
-                        raise R3EXSJsonFileError.new(parent_dir.to_s), "Invalid R3EXS CommonEvents JSON file"
-                    end
-                else
-                    raise ModuleNameError.new(module_name), "Invalid module name: #{module_name}"
-                end
-
-                yield commonevents, commonevents_basenames, parent_dir.relative_path_from(target_dir)
-            end
-        end
-
-        # 读取 target_dir 下的所有 Ruby 源码文件，并调用 block
-        #
-        # @note 注意这里以二进制方式读取文件，因为 Prism 里面的节点的位置是相对二进制下的位置
-        #
-        # @param target_dir [Pathname] 目标目录
-        #
-        # @yieldparam scripts [Array<String>] 读取的 Ruby 源码文件数组
-        # @yieldparam scripts_basenames [Array<String>] Ruby 源码文件名数组（不包含扩展名）
-        # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
-        # @yieldreturn [void]
-        #
-        # @raise [JsonDirError] target_dir 不存在
-        #
-        # @return [void]
-        def Utils.all_rb_files(target_dir)
-            # 检查 target_dir 目录是否存在
-            target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
-
-            # 用两个个Hash来存储每一个父目录下的所有的 \d{3}.rb 文件的反序列化后的对象数组以及其文件名数组
-            # Hash 的键是父目录的路径，值是一个数组，存储该目录下的所有 \d{3}.rb 文件的反序列化后的对象数组以及其文件名数组
-            scripts_hash           = Hash.new { |h, k| h[k] = [] }
-            scripts_basenames_hash = Hash.new { |h, k| h[k] = [] }
-
-            # 递归获取 target_dir 下的所有 \d{5}.rb 文件
-            target_dir.glob('**/[0-9][0-9][0-9].rb').each do |file_path|
-                print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
-                object     = file_path.binread
-                parent_dir = file_path.dirname
-                scripts_hash[parent_dir] << object
-                scripts_basenames_hash[parent_dir] << file_path.basename('.rb').to_s
-            end
-
-            # 遍历每一个父目录的路径
-            scripts_hash.each_key do |parent_dir|
-                scripts           = scripts_hash[parent_dir]
-                scripts_basenames = scripts_basenames_hash[parent_dir]
-                yield scripts, scripts_basenames, parent_dir.relative_path_from(target_dir)
-            end
-        end
-
-        # 将 object 序列化为 json 文件
-        #
-        # @param object [Object] 待序列化的对象
-        # @param output_file [Pathname] 输出文件路径
-        #
-        # @return [void]
-        def Utils.object_json(object, output_file)
-            output_file.dirname.mkpath unless output_file.dirname.exist?
-            output_file.write(Oj.dump(object, indent: 2))
-        end
-
-        # 将 object 序列化为 rvdata2 文件
-        #
-        # @param object [Object] 待序列化的对象
-        # @param output_file [Pathname] 输出文件路径
-        #
-        # @return [void]
-        def Utils.object_rvdata2(object, output_file)
-            output_file.dirname.mkpath unless output_file.dirname.exist?
-            output_file.binwrite(Marshal.dump(object))
-        end
+      else
+        raise ModuleNameError.new(module_name), "Invalid module name: #{module_name}"
+      end
 
     end
+
+    # 将 RPG 中的对象转化为 R3EXS 对象
+    #
+    # @param object [Object] 待转化的 RPG 对象
+    # @param file_basename [String] 文件名（不包含扩展名）
+    # @param with_notes [Boolean] 是否包含注释
+    #
+    # @raise [RPGTypeError] object 的类型不在 RPG 模块中
+    # @raise [FileBaseNameError] file_basename 无法匹配到对应的类
+    #
+    # @return [Object]
+    def Utils.rpg_r3exs(object, file_basename, with_notes)
+      check_type(object, file_basename, true, :RPG)
+
+      # 首先根据 file_basename 找到对应的类
+      matched_class = Utils::FILE_BASENAME_TO_CLASS_R3EXS.find { |pattern, _| file_basename =~ pattern }.last
+
+      # 然后根据 object 的类型进行处理
+      # 如果 object 是数组，则遍历数组，对每个元素进行处理
+      # 如果 object 是哈希，则遍历哈希，对每个值进行处理
+      # 如果 object 是其他类型，则直接处理
+      if object.is_a?(Array)
+        temp = []
+        object.each_with_index do |obj, index|
+          next if obj.nil?
+          obj_r3exs = matched_class.new(obj, index, with_notes)
+          temp << obj_r3exs unless obj_r3exs.empty?
+        end
+      elsif object.is_a?(Hash) # 只有 RPG::MapInfo 是 Hash，且 key 为整数
+        temp = []
+        object.each do |key, obj|
+          next if obj.nil?
+          temp << matched_class.new(obj, key, with_notes)
+        end
+      else
+        # 只有 RPG::Map 和 RPG::System 是单独一个对象，且不可能为 nil
+        temp = matched_class.new(object, with_notes)
+      end
+      temp
+    end
+
+    # 读取 target_dir 下的所有 rvdata2 文件，将其反序列化为对象，并调用 block
+    #
+    # @note 注意传入 block 的 object
+    #       - 如果 object 是数组或哈希，则其中可能存在 nil 元素
+    #       - 如果 object 是单独一个对象，则不可能为 nil
+    #
+    # @param target_dir [Pathname] 目标目录
+    #
+    # @yieldparam object [Object] rvdata2 文件反序列化后的对象
+    # @yieldparam file_basename [String] 文件名（不包含扩展名）
+    # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
+    # @yieldreturn [void]
+    #
+    # @raise [Rvdata2FileError] rvdata2 文件可能损坏
+    # @raise [Rvdata2DirError] target_dir 不存在
+    #
+    # @return [void]
+    def Utils.all_rvdata2_files(target_dir)
+      # 检查 target_dir 目录是否存在
+      target_dir.exist? && target_dir.directory? or raise Rvdata2DirError.new(target_dir.to_s), "rvdata2 directory not found: #{target_dir}"
+      # 递归获取 target_dir 下的所有 *.rvdata2 文件
+      target_dir.glob('**/*.rvdata2').each do |file_path|
+        file_basename = file_path.basename('.rvdata2').to_s
+        # 检查文件名是否在 RVDATA2_FILE_NAME 中与其正则表达式匹配
+        next unless RVDATA2_FILE_NAME.any? { |pattern| file_basename =~ pattern }
+
+        print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing from #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
+        object = Marshal.load(file_path.binread)
+
+        # 如果文件名不是 'Scripts'，则检查 object 的类型是否正确
+        unless file_basename == 'Scripts'
+          # 检查 object 的类型是否正确
+          # 这里的类型检查要用紧凑模式，因为 rvdata2 文件中可能存在 nil 元素，必须忽略
+          begin
+            check_type(object, file_basename, true, :RPG)
+          rescue RPGTypeError
+            raise Rvdata2FileError.new(file_path.to_s), "Invalid rvdata2 file: #{file_path}"
+          end
+        end
+
+        yield object, file_basename, file_path.dirname.relative_path_from(target_dir)
+      end
+    end
+
+    # 读取 target_dir 下的所有常规 JSON 文件，将其反序列化为对象，并调用 block
+    #
+    # @note 注意传入 block 的 object
+    #       - 在 module_name 为 RPG 时，如果 object 是数组或哈希，则其中可能存在 nil 元素。如果 object 是单独一个对象，则不可能为 nil
+    #       - 在 module_name 为 R3EXS 时，object 不会为 nil
+    #
+    # @param target_dir [Pathname] 目标目录
+    # @param module_name [Symbol] 模块名
+    #
+    # @yieldparam object [Object] JSON 文件反序列化后的对象
+    # @yieldparam file_basename [String] 文件名（不包含扩展名）
+    # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
+    # @yieldreturn [void]
+    #
+    # @raise [RPGJsonFileError] json 文件不是 RPG 模块中的对象
+    # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
+    # @raise [ModuleNameError] module_name 不是 :RPG 或 :R3EXS
+    # @raise [JsonDirError] target_dir 不存在
+    #
+    # @return [void]
+    def Utils.all_json_files(target_dir, module_name)
+      # 检查 target_dir 目录是否存在
+      target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
+      # 递归获取 target_dir 下的所有 *.json 文件
+      target_dir.glob('**/*.json').each do |file_path|
+        file_basename = file_path.basename('.json').to_s
+        # 检查文件名是否在 JSON_FILE_NAME 中与其正则表达式匹配
+        next unless JSON_FILE_NAME.any? { |pattern| file_basename =~ pattern }
+
+        print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
+        object = Oj.load_file(file_path.to_s)
+
+        case module_name
+        when :RPG
+          # 这里的类型检查要用紧凑模式，因为这是从 rvdata2 文件直接全部序列化后的 JSON 文件中读取的 object，其中可能存在 nil 元素
+          begin
+            check_type(object, file_basename, true, module_name)
+          rescue RPGTypeError
+            raise RPGJsonFileError.new(file_path.to_s), "Invalid RPG JSON file: #{file_path}"
+          end
+        when :R3EXS
+          # 这里的类型检查不能用紧凑模式，因为这是从 R3EXS 模块的类序列化后的 JSON 文件中读取的 object，程序设计中不应该存在 nil 元素
+          begin
+            check_type(object, file_basename, false, module_name)
+          rescue R3EXSTypeError
+            raise R3EXSJsonFileError.new(file_path.to_s), "Invalid R3EXS JSON file: #{file_path}"
+          end
+        else
+          raise ModuleNameError.new(module_name), "Invalid module name: #{module_name}"
+        end
+
+        yield object, file_basename, file_path.dirname.relative_path_from(target_dir)
+      end
+    end
+
+    # 读取 target_dir 下的所有 CommonEvent JSON 文件，将其反序列化为对象数组，并调用 block
+    #
+    # @note 注意传入 block 的 object
+    #       - 在 module_name 为 RPG 时，object 可能存在 nil 元素
+    #       - 在 module_name 为 R3EXS 时，object 不可能存在 nil 元素
+    #
+    # @param target_dir [Pathname] 目标目录
+    # @param module_name [Symbol] 模块名
+    #
+    # @yieldparam commonevents [Array<Object>] CommonEvent JSON 文件反序列化后的数组
+    # @yieldparam commonevents_basenames [Array<String>] CommonEvent JSON 文件名数组（不包含扩展名）
+    # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
+    # @yieldreturn [void]
+    #
+    # @raise [RPGJsonFileError] json 文件不是 RPG 模块中的对象
+    # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
+    # @raise [ModuleNameError] module_name 不是 :RPG 或 :R3EXS
+    # @raise [JsonDirError] target_dir 不存在
+    #
+    # @return [void]
+    def Utils.all_commonevent_json_files(target_dir, module_name)
+      # 检查 target_dir 目录是否存在
+      target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
+
+      # 用两个个Hash来存储每一个父目录下的所有的 CommonEvent_\d{5}.json 文件的反序列化后的对象数组以及其文件名数组
+      # Hash 的键是父目录的路径，值是一个数组，存储该目录下的所有 CommonEvent_\d{5}.json 文件的反序列化后的对象数组以及其文件名数组
+      commonevents_hash = Hash.new { |h, k| h[k] = [] }
+      commonevents_basenames_hash = Hash.new { |h, k| h[k] = [] }
+
+      # 递归获取 target_dir 下的所有 CommonEvent_\d{5}.json 文件
+      target_dir.glob('**/CommonEvent_[0-9][0-9][0-9][0-9][0-9].json').each do |file_path|
+        print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
+        object = Oj.load_file(file_path.to_s)
+        parent_dir = file_path.dirname
+        commonevents_hash[parent_dir] << object
+        commonevents_basenames_hash[parent_dir] << file_path.basename('.json').to_s
+      end
+
+      # 遍历每一个父目录的路径
+      commonevents_hash.each_key do |parent_dir|
+        commonevents = commonevents_hash[parent_dir]
+        commonevents_basenames = commonevents_basenames_hash[parent_dir]
+
+        case module_name
+        when :RPG
+          # 这里的类型检查要用紧凑模式，因为这是从 rvdata2 文件直接全部序列化后的 JSON 文件中读取的 object，其中可能存在 nil 元素
+          begin
+            check_type(commonevents, 'CommonEvents', true, module_name)
+          rescue RPGTypeError
+            raise RPGJsonFileError.new(parent_dir.to_s), "Invalid RPG CommonEvents JSON file"
+          end
+        when :R3EXS
+          # 这里的类型检查不能用紧凑模式，因为这是从 R3EXS 模块的类序列化后的 JSON 文件中读取的 object，程序设计中不应该存在 nil 元素
+          begin
+            check_type(commonevents, 'CommonEvents', false, module_name)
+          rescue R3EXSTypeError
+            raise R3EXSJsonFileError.new(parent_dir.to_s), "Invalid R3EXS CommonEvents JSON file"
+          end
+        else
+          raise ModuleNameError.new(module_name), "Invalid module name: #{module_name}"
+        end
+
+        yield commonevents, commonevents_basenames, parent_dir.relative_path_from(target_dir)
+      end
+    end
+
+    # 读取 target_dir 下的所有 Ruby 源码文件，并调用 block
+    #
+    # @note 注意这里以二进制方式读取文件，因为 Prism 里面的节点的位置是相对二进制下的位置
+    #
+    # @param target_dir [Pathname] 目标目录
+    #
+    # @yieldparam scripts [Array<String>] 读取的 Ruby 源码文件数组
+    # @yieldparam scripts_basenames [Array<String>] Ruby 源码文件名数组（不包含扩展名）
+    # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
+    # @yieldreturn [void]
+    #
+    # @raise [JsonDirError] target_dir 不存在
+    #
+    # @return [void]
+    def Utils.all_rb_files(target_dir)
+      # 检查 target_dir 目录是否存在
+      target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
+
+      # 用两个个Hash来存储每一个父目录下的所有的 \d{3}.rb 文件的反序列化后的对象数组以及其文件名数组
+      # Hash 的键是父目录的路径，值是一个数组，存储该目录下的所有 \d{3}.rb 文件的反序列化后的对象数组以及其文件名数组
+      scripts_hash = Hash.new { |h, k| h[k] = [] }
+      scripts_basenames_hash = Hash.new { |h, k| h[k] = [] }
+
+      # 递归获取 target_dir 下的所有 \d{5}.rb 文件
+      target_dir.glob('**/[0-9][0-9][0-9].rb').each do |file_path|
+        print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
+        object = file_path.binread
+        parent_dir = file_path.dirname
+        scripts_hash[parent_dir] << object
+        scripts_basenames_hash[parent_dir] << file_path.basename('.rb').to_s
+      end
+
+      # 遍历每一个父目录的路径
+      scripts_hash.each_key do |parent_dir|
+        scripts = scripts_hash[parent_dir]
+        scripts_basenames = scripts_basenames_hash[parent_dir]
+        yield scripts, scripts_basenames, parent_dir.relative_path_from(target_dir)
+      end
+    end
+
+    # 将 object 序列化为 json 文件
+    #
+    # @param object [Object] 待序列化的对象
+    # @param output_file [Pathname] 输出文件路径
+    #
+    # @return [void]
+    def Utils.object_json(object, output_file)
+      output_file.dirname.mkpath unless output_file.dirname.exist?
+      output_file.write(Oj.dump(object, indent: 2))
+    end
+
+    # 将 object 序列化为 rvdata2 文件
+    #
+    # @param object [Object] 待序列化的对象
+    # @param output_file [Pathname] 输出文件路径
+    #
+    # @return [void]
+    def Utils.object_rvdata2(object, output_file)
+      output_file.dirname.mkpath unless output_file.dirname.exist?
+      output_file.binwrite(Marshal.dump(object))
+    end
+
+  end
 
 end
