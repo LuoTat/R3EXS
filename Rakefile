@@ -23,6 +23,7 @@ task :clean do
     ./Data_NEW
     ./Graphics
     ./JSON
+    ./JSON_NEW
     ./pkg
     ./tmp
     ./ManualTransFile.json
