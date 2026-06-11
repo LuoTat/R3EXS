@@ -590,17 +590,11 @@ module R3EXS
         matched_class = FILE_BASENAME_TO_CLASS_RPG.find { |pattern, _| file_basename =~ pattern }&.last
         matched_class or raise FileBaseNameError.new(file_basename), "Invalid file basename: #{file_basename}"
         if object.is_a?(Array)
-          if is_compact
-            object.compact.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not an Array<#{matched_class}>"
-          else
-            object.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not an Array<#{matched_class}>"
-          end
+          items = is_compact ? object.compact : object
+          items.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not an Array<#{matched_class}>"
         elsif object.is_a?(Hash)
-          if is_compact
-            object.compact.values.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not a Hash<#{matched_class}>"
-          else
-            object.values.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not a Hash<#{matched_class}>"
-          end
+          values = is_compact ? object.compact.values : object.values
+          values.all? { |item| item.is_a?(matched_class) } or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not a Hash<#{matched_class}>"
         else
           object.is_a?(matched_class) or raise RPGTypeError.new(object), "Invalid Object: #{object}, it's not a #{matched_class}"
         end
@@ -608,17 +602,11 @@ module R3EXS
         matched_class = FILE_BASENAME_TO_CLASS_R3EXS.find { |pattern, _| file_basename =~ pattern }&.last
         matched_class or raise FileBaseNameError.new(file_basename), "Invalid file basename: #{file_basename}"
         if object.is_a?(Array)
-          if is_compact
-            object.compact.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not an Array<#{matched_class}>"
-          else
-            object.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not an Array<#{matched_class}>"
-          end
+          items = is_compact ? object.compact : object
+          items.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not an Array<#{matched_class}>"
         elsif object.is_a?(Hash)
-          if is_compact
-            object.compact.values.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not a Hash<#{matched_class}>"
-          else
-            object.values.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not a Hash<#{matched_class}>"
-          end
+          values = is_compact ? object.compact.values : object.values
+          values.all? { |item| item.is_a?(matched_class) } or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not a Hash<#{matched_class}>"
         else
           object.is_a?(matched_class) or raise R3EXSTypeError.new(object), "Invalid object: #{object}, it's not #{matched_class}"
         end
