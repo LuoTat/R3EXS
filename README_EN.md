@@ -207,7 +207,7 @@ R3EXS help
 To build and run the project, first clone the entire repository:
 
 ```bash
-git clone git@github.com:LuoTat/R3EXS.git
+git clone https://github.com/LuoTat/R3EXS.git
 ```
 
 Then use `bundle` to install dependencies:

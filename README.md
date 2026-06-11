@@ -207,7 +207,7 @@ R3EXS help
 如果想要构建项目并运行，首先克隆整个项目
 
 ```bash
-git clone git@github.com:LuoTat/R3EXS.git
+git clone https://github.com/LuoTat/R3EXS.git
 ```
 
 然后使用 `bundle` 安装依赖
