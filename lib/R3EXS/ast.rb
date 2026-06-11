@@ -3,10 +3,8 @@
 require 'prism'
 
 module R3EXS
-
   # 用来提取源码生成的 AST 中的字符串和符号
   class StringsExtractor < Prism::Visitor
-
     # 提取后存储的字符串数组
     #
     # @return [Array<String>]
@@ -24,6 +22,7 @@ module R3EXS
     #
     # @return [StringsExtractor]
     def initialize(strings, with_symbol)
+      super()
       @strings = strings
       @with_symbol = with_symbol
     end
@@ -51,10 +50,8 @@ module R3EXS
 
   # 用来替换源码里面的字符串和符号
   class StringsInjector < Prism::Visitor
-
     # 用来记录字符串的位置
     class Location
-
       # 字符串在二进制源文件中的起始位置
       #
       # @return [Integer]
@@ -90,6 +87,7 @@ module R3EXS
     #
     # @return [StringsInjector]
     def initialize(hash)
+      super()
       @strings_hash = hash
       @content_loc = []
       @code = []
@@ -103,7 +101,7 @@ module R3EXS
     def visit_string_node(node)
       location = node.content_loc
       value = location.slice
-      if @strings_hash.has_key?(value) && @strings_hash[value].to_s != ''
+      if @strings_hash.key?(value) && @strings_hash[value].to_s != ''
         @content_loc << Location.new(location.start_offset, location.length, value)
       end
       super
@@ -119,7 +117,7 @@ module R3EXS
       # 如果 location 不为 nil，说明这个符号是一个字符串
       if location
         value = location.slice
-        if @strings_hash.has_key?(value) && @strings_hash[value].to_s != ''
+        if @strings_hash.key?(value) && @strings_hash[value].to_s != ''
           @content_loc << Location.new(location.start_offset, location.length, value)
         end
       end
@@ -138,7 +136,7 @@ module R3EXS
 
       # 然后开始替换 code 中的字符串
       # 先将 @content_loc 按照 start_offset 从小到大排序
-      @content_loc.sort_by! { |loc| loc.start_offset }
+      @content_loc.sort_by!(&:start_offset)
 
       #  然后将 code 切片，将字符串替换成新的字符串
       start_offset = 0
@@ -147,12 +145,11 @@ module R3EXS
         @code << @strings_hash[loc.content]
         start_offset = loc.start_offset + loc.length
       end
-      @code << script[start_offset..-1]
+      @code << script[start_offset..]
 
       # 将 @code 里面的字符串全部改为二进制编码
-      @code.map! { |str| str.force_encoding('ASCII-8BIT') unless str.nil? }
+      @code.map! { |str| str&.force_encoding('ASCII-8BIT') }
       @code.join
     end
   end
-
 end

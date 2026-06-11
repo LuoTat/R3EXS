@@ -5,11 +5,9 @@ require_relative 'RGSS3'
 require_relative 'RGSS3_R3EXS'
 
 module R3EXS
-
   # 工具模块
   # 主要用来提供一些读取，写入，转换等功能
   module Utils
-
     # 用来匹配读取的 rvdata2 文件名
     RVDATA2_FILE_NAME =
       [
@@ -29,7 +27,7 @@ module R3EXS
         /\ATilesets\z/,
         /\ATroops\z/,
         /\AWeapons\z/
-      ]
+      ].freeze
 
     # 用来匹配读取的 JSON 文件名
     JSON_FILE_NAME =
@@ -48,7 +46,7 @@ module R3EXS
         /\ATilesets\z/,
         /\ATroops\z/,
         /\AWeapons\z/
-      ]
+      ].freeze
 
     # 用来匹配读取的文件名到对应的R3EXS的类
     FILE_BASENAME_TO_CLASS_R3EXS = {
@@ -67,7 +65,7 @@ module R3EXS
       /\ATilesets\z/ => R3EXS::Tileset,
       /\ATroops\z/ => R3EXS::Troop,
       /\AWeapons\z/ => R3EXS::Weapon
-    }
+    }.freeze
 
     # 用来匹配读取的文件名到对应的RPG的类
     FILE_BASENAME_TO_CLASS_RPG = {
@@ -86,593 +84,426 @@ module R3EXS
       /\ATilesets\z/ => RPG::Tileset,
       /\ATroops\z/ => RPG::Troop,
       /\AWeapons\z/ => RPG::Weapon
-    }
+    }.freeze
 
     # 事件指令的命令名称
     EVENT_COMMANDS = {
       0 => 'Empty',
 
-=begin
-    [string(Face Graphic name)]---[int(Face Graphic index)]---[int:{0:Normal Window, 1:Dim Background, 2:Transparent}]---[int:{0:Top, 1:Middle, 2:Bottom}]---END
-=end
+      #     [string(Face Graphic name)]---[int(Face Graphic index)]---[int:{0:Normal Window, 1:Dim Background, 2:Transparent}]---[int:{0:Top, 1:Middle, 2:Bottom}]---END
       101 => 'ShowTextAttributes',
 
-=begin
-    [Array<string>(Choices Array)]---[int:{0:Disallow, 1:Choice 1, 2:Choice 2, 3:Choice 3, 4:Choice 4, 5:Branch}(When Cancel)]---END
-=end
+      #     [Array<string>(Choices Array)]---[int:{0:Disallow, 1:Choice 1, 2:Choice 2, 3:Choice 3, 4:Choice 4, 5:Branch}(When Cancel)]---END
       102 => 'ShowChoices',
 
-=begin
-    [int(Variable for Number)]---[int:{1~8}(Digits)]---END
-=end
+      #     [int(Variable for Number)]---[int:{1~8}(Digits)]---END
       103 => 'InputNumber',
 
-=begin
-    [int(Variable for Item ID)]---END
-=end
+      #     [int(Variable for Item ID)]---END
       104 => 'SelectKeyItem',
 
-=begin
-    [int:{1~8}(Speed)]---[bool(No Fast Forward)]---END
-=end
+      #     [int:{1~8}(Speed)]---[bool(No Fast Forward)]---END
       105 => 'ShowScrollingTextAttributes',
 
-=begin
-    [string]---END
-=end
+      #     [string]---END
       108 => 'Comment',
 
-=begin
-    |--[int:0(Switch)]---[int(Switch ID)]---[int{0:ON, 1:OFF}]---END
-    |
-    |                                          |--[int:0(Compare to Constant)]---[int(Number)]-------|
-    |--[int:1(Variable)]---[int(Variable ID)]--|                                                     |--[int{0:==, 1:>=, 2:<=, 3:>, 4:<, 5:!=}]---END
-    |                                          |--[int:1(Compare to Variable)]---[int(Variable ID)]--|
-    |
-    |--[int:2(Self Switch)]---[string{'A', 'B', 'C', 'D'}]---[int{0:ON, 1:OFF}]---END
-    |
-    |--[int:3(Timer)]---[int:{0~5999}(sec)]---[int{0:>=, 1:<=}]---END
-    |
-    |                                          |--[int:0(In the Party)]---END
-    |                                          |
-    |                                          |--[int:1(Name)]---[string]---END
-    |                                          |
-    |                                          |--[int:2(Class)]---[int(Class ID)]---END
-    |                                          |
-    |--[int:4(Actor)]---[int(Actor ID)]--------|--[int:3(Skill)]---[int(Skill ID)]---END
-    |                                          |
-    |                                          |--[int:4(Weapon)]---[int(Wwapon ID)]---END
-    |                                          |
-    |                                          |--[int:5(Armor)]---[int(Armor ID)]---END
-    |                                          |
-    |                                          |--[int:6(State)]---[int(State ID)]---END
-    |
-    |                                          |--[int:0(Appeared)---END
-    |--[int:5(Enemy)]---[int(Enemy ID)]--------|
-    |                                          |--[int:1(State)]---[int(State ID)]---END
-    |
-    |--[int:6(Character)]---[int:{-1:Player, 0:This event, 1:EV001, ...}]---[int:{2:Down, 4:Left, 6:Right, 8:Up}]---END
-    |
-    |--[int:7(Gold)]---[int(Money)]---[int{0:>=, 1:<=, 2:<}]---END
-    |
-    |--[int:8(Item)]---[int(Item ID)]---END
-    |
-    |--[int:9(Weapon)]---[int(Weapon ID)]---[bool(Include Equipments)]---END
-    |
-    |--[int:10(Armor)]---[int(Armor ID)]---[bool(Include Equipments)]---END
-    |
-    |--[int:11(Button)]---[int:{2:Down, 4:Left, 6:Right, 8:Up, 11:A, 12:B, 13:C, 14:X, 15:Y, 16:Z, 17:L, 18:R}]---END
-    |
-    |--[int:12(Script)]---[string]---END
-    |
-    |--[int:13(Vehicle)]---[int:{0:Boat, 1:Ship, 2:Airship}]---END
-=end
+      #     |--[int:0(Switch)]---[int(Switch ID)]---[int{0:ON, 1:OFF}]---END
+      #     |
+      #     |                                          |--[int:0(Compare to Constant)]---[int(Number)]-------|
+      #     |--[int:1(Variable)]---[int(Variable ID)]--|                                                     |--[int{0:==, 1:>=, 2:<=, 3:>, 4:<, 5:!=}]---END
+      #     |                                          |--[int:1(Compare to Variable)]---[int(Variable ID)]--|
+      #     |
+      #     |--[int:2(Self Switch)]---[string{'A', 'B', 'C', 'D'}]---[int{0:ON, 1:OFF}]---END
+      #     |
+      #     |--[int:3(Timer)]---[int:{0~5999}(sec)]---[int{0:>=, 1:<=}]---END
+      #     |
+      #     |                                          |--[int:0(In the Party)]---END
+      #     |                                          |
+      #     |                                          |--[int:1(Name)]---[string]---END
+      #     |                                          |
+      #     |                                          |--[int:2(Class)]---[int(Class ID)]---END
+      #     |                                          |
+      #     |--[int:4(Actor)]---[int(Actor ID)]--------|--[int:3(Skill)]---[int(Skill ID)]---END
+      #     |                                          |
+      #     |                                          |--[int:4(Weapon)]---[int(Wwapon ID)]---END
+      #     |                                          |
+      #     |                                          |--[int:5(Armor)]---[int(Armor ID)]---END
+      #     |                                          |
+      #     |                                          |--[int:6(State)]---[int(State ID)]---END
+      #     |
+      #     |                                          |--[int:0(Appeared)---END
+      #     |--[int:5(Enemy)]---[int(Enemy ID)]--------|
+      #     |                                          |--[int:1(State)]---[int(State ID)]---END
+      #     |
+      #     |--[int:6(Character)]---[int:{-1:Player, 0:This event, 1:EV001, ...}]---[int:{2:Down, 4:Left, 6:Right, 8:Up}]---END
+      #     |
+      #     |--[int:7(Gold)]---[int(Money)]---[int{0:>=, 1:<=, 2:<}]---END
+      #     |
+      #     |--[int:8(Item)]---[int(Item ID)]---END
+      #     |
+      #     |--[int:9(Weapon)]---[int(Weapon ID)]---[bool(Include Equipments)]---END
+      #     |
+      #     |--[int:10(Armor)]---[int(Armor ID)]---[bool(Include Equipments)]---END
+      #     |
+      #     |--[int:11(Button)]---[int:{2:Down, 4:Left, 6:Right, 8:Up, 11:A, 12:B, 13:C, 14:X, 15:Y, 16:Z, 17:L, 18:R}]---END
+      #     |
+      #     |--[int:12(Script)]---[string]---END
+      #     |
+      #     |--[int:13(Vehicle)]---[int:{0:Boat, 1:Ship, 2:Airship}]---END
       111 => 'ConditionalBranch',
       112 => 'Loop',
       113 => 'BreakLoop',
       115 => 'ExitEventProcessing',
 
-=begin
-    [int(Common Event ID)]---END
-=end
+      #     [int(Common Event ID)]---END
       117 => 'CallCommonEvent',
 
-=begin
-    [string]---END
-=end
+      #     [string]---END
       118 => 'Label',
 
-=begin
-
-    [string]---END
-=end
+      #     [string]---END
       119 => 'JumpToLabel',
 
-=begin
-    [int(Switch Begin ID)]---[int(Switch End ID)]---[int:{0:ON, 1:OFF}]---END
-=end
+      #     [int(Switch Begin ID)]---[int(Switch End ID)]---[int:{0:ON, 1:OFF}]---END
       121 => 'ControlSwitches',
 
-=begin
-                                                                                                          |--[int:0(Constant)]---[int(Number)]---END
-                                                                                                          |
-                                                                                                          |--[int:1(Variable)]---[int(Variable ID)]---END
-                                                                                                          |
-                                                                                                          |--[int:2(Random)]---[int(Min)]---[int(Max)]---END
-                                                                                                          |
-                                                                                                          |                      |--[int:{0:Item, 1:Weapon, 2:Armor}]---[int(Corresponded Item ID)]---[int:0]---END
-                                                                                                          |                      |
-    [int(Variable Begin ID)]---[int(Variable End ID)]---[int:{0:Set, 1:Add, 2:Sub, 3:Mul, 4:Div, 5:Mod}]--|                      |--[int:3(Actor)]---[int:(Actor ID)]---[int:{0:Level, 1:EXP, 2:HP, 3:MP, 4:MHP, 5:MMP, 6:ATK, 7:DEF, 8:MAT, 9:MDF, 10:AGI, 11:LUK}]---END
-                                                                                                          |                      |
-                                                                                                          |                      |--[int:4(Enemy)]---[int:(Enemy ID)]---[int:{0:HP, 1:MP, 2:MHP, 3:MMP, 4:ATK, 5:DEF, 6:MAT, 7:MDF, 8:AGI, 9:LUK}]---END
-                                                                                                          |--[int:3(Game Data)]--|
-                                                                                                          |                      |--[int:5(Character)]---[int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int:{0:Map X, 1:Map Y, 2:Direction, 3:Screen X ,4:Screen Y}]---END
-                                                                                                          |                      |
-                                                                                                          |                      |--[int:6(Party)]---[int:{0~7}(Member ID)]---[int:0]---END
-                                                                                                          |                      |
-                                                                                                          |                      |--[int:7(Other)]---[int:{0(Map ID), 1(Party Members), 2(Gold), 3(Steps), 4(Play Time), 5(Timer), 6(Save Count), 7(Battle Count)}]---[int:0]---END
-                                                                                                          |
-                                                                                                          |--[int:4(Scripts)]---[string]---END
-=end
+      #                                                                                                           |--[int:0(Constant)]---[int(Number)]---END
+      #                                                                                                           |
+      #                                                                                                           |--[int:1(Variable)]---[int(Variable ID)]---END
+      #                                                                                                           |
+      #                                                                                                           |--[int:2(Random)]---[int(Min)]---[int(Max)]---END
+      #                                                                                                           |
+      #                                                                                                           |                      |--[int:{0:Item, 1:Weapon, 2:Armor}]---[int(Corresponded Item ID)]---[int:0]---END
+      #                                                                                                           |                      |
+      #     [int(Variable Begin ID)]---[int(Variable End ID)]---[int:{0:Set, 1:Add, 2:Sub, 3:Mul, 4:Div, 5:Mod}]--|                      |--[int:3(Actor)]---[int:(Actor ID)]---[int:{0:Level, 1:EXP, 2:HP, 3:MP, 4:MHP, 5:MMP, 6:ATK, 7:DEF, 8:MAT, 9:MDF, 10:AGI, 11:LUK}]---END
+      #                                                                                                           |                      |
+      #                                                                                                           |                      |--[int:4(Enemy)]---[int:(Enemy ID)]---[int:{0:HP, 1:MP, 2:MHP, 3:MMP, 4:ATK, 5:DEF, 6:MAT, 7:MDF, 8:AGI, 9:LUK}]---END
+      #                                                                                                           |--[int:3(Game Data)]--|
+      #                                                                                                           |                      |--[int:5(Character)]---[int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int:{0:Map X, 1:Map Y, 2:Direction, 3:Screen X ,4:Screen Y}]---END
+      #                                                                                                           |                      |
+      #                                                                                                           |                      |--[int:6(Party)]---[int:{0~7}(Member ID)]---[int:0]---END
+      #                                                                                                           |                      |
+      #                                                                                                           |                      |--[int:7(Other)]---[int:{0(Map ID), 1(Party Members), 2(Gold), 3(Steps), 4(Play Time), 5(Timer), 6(Save Count), 7(Battle Count)}]---[int:0]---END
+      #                                                                                                           |
+      #                                                                                                           |--[int:4(Scripts)]---[string]---END
       122 => 'ControlVariables',
 
-=begin
-    [string:{'A', 'B', 'C', 'D'}(Self Switch Name)]---[int:{0:ON, 1:OFF}]---END
-=end
+      #     [string:{'A', 'B', 'C', 'D'}(Self Switch Name)]---[int:{0:ON, 1:OFF}]---END
       123 => 'ControlSelfSwitch',
 
-=begin
-    [int:{0:Start, 1:Stop}]---[int:{0~5999}(sec)]---END
-=end
+      #     [int:{0:Start, 1:Stop}]---[int:{0~5999}(sec)]---END
       124 => 'ControlTimer',
 
-=begin
-                                    |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
-    [int:{0:Increase, 1:Decrease}]--|
-                                    |--[int:1(Variable)]---[int(Variable ID)]---END
-=end
+      #                                     |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
+      #     [int:{0:Increase, 1:Decrease}]--|
+      #                                     |--[int:1(Variable)]---[int(Variable ID)]---END
       125 => 'ChangeGold',
 
-=begin
-                                                     |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
-    [int(Item ID)]---[int:{0:Increase, 1:Decrease}]--|
-                                                     |--[int:1(Variable)]---[int(Variable ID)]---END
-=end
+      #                                                      |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
+      #     [int(Item ID)]---[int:{0:Increase, 1:Decrease}]--|
+      #                                                      |--[int:1(Variable)]---[int(Variable ID)]---END
       126 => 'ChangeItems',
 
-=begin
-                                            |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
-                      |--[int:0(Increase)]--|                                                 |--[bool:false(Include Equipment)]---END
-                      |                     |--[int:1(Variable)]---[int(Variable ID)]---------|
-    [int(Weapon ID)]--|
-                      |                     |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
-                      |--[int:1(Decrease)]--|                                                 |--[bool(Include Equipment)]---END
-                                            |--[int:1(Variable)]---[int(Variable ID)]---------|
-=end
+      #                                             |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
+      #                       |--[int:0(Increase)]--|                                                 |--[bool:false(Include Equipment)]---END
+      #                       |                     |--[int:1(Variable)]---[int(Variable ID)]---------|
+      #     [int(Weapon ID)]--|
+      #                       |                     |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
+      #                       |--[int:1(Decrease)]--|                                                 |--[bool(Include Equipment)]---END
+      #                                             |--[int:1(Variable)]---[int(Variable ID)]---------|
       127 => 'ChangeWeapons',
 
-=begin
-                                           |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
-                     |--[int:0(Increase)]--|                                                 |--[bool:false(Include Equipment)]---END
-                     |                     |--[int:1(Variable)]---[int(Variable ID)]---------|
-    [int(Armor ID)]--|
-                     |                     |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
-                     |--[int:1(Decrease)]--|                                                 |--[bool(Include Equipment)]---END
-                                           |--[int:1(Variable)]---[int(Variable ID)]---------|
-=end
+      #                                            |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
+      #                      |--[int:0(Increase)]--|                                                 |--[bool:false(Include Equipment)]---END
+      #                      |                     |--[int:1(Variable)]---[int(Variable ID)]---------|
+      #     [int(Armor ID)]--|
+      #                      |                     |--[int:0(Constant)]---[int:{0~9999999}(Number)]--|
+      #                      |--[int:1(Decrease)]--|                                                 |--[bool(Include Equipment)]---END
+      #                                            |--[int:1(Variable)]---[int(Variable ID)]---------|
       128 => 'ChangeArmor',
 
-=begin
-    [int(Actor ID)]---[int:{0:Add, 1:Remove}]---[int:{0:NO, 1:YES}(Initialize)]---END
-=end
+      #     [int(Actor ID)]---[int:{0:Add, 1:Remove}]---[int:{0:NO, 1:YES}(Initialize)]---END
       129 => 'ChangePartyMember',
 
-=begin
-    [RPG::BGM]---END
-=end
+      #     [RPG::BGM]---END
       132 => 'ChangeBattleBGM',
 
-=begin
-    [RPG::ME]---END
-=end
+      #     [RPG::ME]---END
       133 => 'ChangeBattleEndME',
 
-=begin
-    [int:{0:Disable, 1:Enable}]---END
-=end
+      #     [int:{0:Disable, 1:Enable}]---END
       134 => 'ChangeSaveAccess',
 
-=begin
-    [int:{0:Disable, 1:Enable}]---END
-=end
+      #     [int:{0:Disable, 1:Enable}]---END
       135 => 'ChangeMenuAccess',
 
-=begin
-    [int:{0:Disable, 1:Enable}]---END
-=end
+      #     [int:{0:Disable, 1:Enable}]---END
       136 => 'ChangeEncounter',
 
-=begin
-    [int:{0:Disable, 1:Enable}]---END
-=end
+      #     [int:{0:Disable, 1:Enable}]---END
       137 => 'ChangeFormationAccess',
 
-=begin
-    [RPG::Tone]---END
-=end
+      #     [RPG::Tone]---END
       138 => 'ChangeWindowColor',
 
-=begin
-    |--[int:0(Direct Designation)]---[int(Map ID)]---[int(Map X)]---[int(Map Y)]-------------------------------------------------------------------------------------|
-    |                                                                                                                                                                |--[int:{0:Retain, 2:Down, 4:Left, 6:Right, 8:Up}(Direction)]---[int:{0:Normal, 1:White, 2:None}(Fade)]---END
-    |--[int:1(Designation with Variables)]---[int(Map ID Corresponded Variable ID)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
-=end
+      #     |--[int:0(Direct Designation)]---[int(Map ID)]---[int(Map X)]---[int(Map Y)]-------------------------------------------------------------------------------------|
+      #     |                                                                                                                                                                |--[int:{0:Retain, 2:Down, 4:Left, 6:Right, 8:Up}(Direction)]---[int:{0:Normal, 1:White, 2:None}(Fade)]---END
+      #     |--[int:1(Designation with Variables)]---[int(Map ID Corresponded Variable ID)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
       201 => 'TransferPlayer',
 
-=begin
-                                       |--[int:0(Direct Designation)]---[int(Map ID)]---[int(Map X)]---[int(Map Y)]---END
-    [int:{0:Boat, 1:Ship, 2:Airship}]--|
-                                       |--[int:1(Designation with Variables)]---[int(Map ID Corresponded Variable ID)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]---END
-=end
+      #                                        |--[int:0(Direct Designation)]---[int(Map ID)]---[int(Map X)]---[int(Map Y)]---END
+      #     [int:{0:Boat, 1:Ship, 2:Airship}]--|
+      #                                        |--[int:1(Designation with Variables)]---[int(Map ID Corresponded Variable ID)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]---END
       202 => 'SetVehicleLocation',
 
-=begin
-                                                |--[int:0(Direct Designation)]---[int(Map X)]---[int(Map Y)]------------------------------------------------------------|
-                                                |                                                                                                                       |
-    [int:{0:This Event, 1:EV001, ...}]----------|--[int:1(Designation with Variables)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|--[int:{0:Retain, 2:Down, 4:Left, 6:Right, 8:Up}(Direction)]---END
-                                                |                                                                                                                       |
-                                                |--[int:2(Exchange with Another Event)]---[int(Exchanged Event ID)]---[int:0]-------------------------------------------|
-=end
+      #                                                 |--[int:0(Direct Designation)]---[int(Map X)]---[int(Map Y)]------------------------------------------------------------|
+      #                                                 |                                                                                                                       |
+      #     [int:{0:This Event, 1:EV001, ...}]----------|--[int:1(Designation with Variables)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|--[int:{0:Retain, 2:Down, 4:Left, 6:Right, 8:Up}(Direction)]---END
+      #                                                 |                                                                                                                       |
+      #                                                 |--[int:2(Exchange with Another Event)]---[int(Exchanged Event ID)]---[int:0]-------------------------------------------|
       203 => 'SetEventLocation',
 
-=begin
-    [int:{2:Down, 4:Left, 6:Right, 8:Up}]---[int:{0~100}(Distance)]---[int:{1:1/8 Speed, 2:1/4 Speed, 3:1/2 Speed, 4:Normal, 5:2 Speed, 6:4 Speed}]---END
-=end
+      #     [int:{2:Down, 4:Left, 6:Right, 8:Up}]---[int:{0~100}(Distance)]---[int:{1:1/8 Speed, 2:1/4 Speed, 3:1/2 Speed, 4:Normal, 5:2 Speed, 6:4 Speed}]---END
       204 => 'ScrollMap',
 
-=begin
-    [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[RPG::MoveRoute(45 is Script)]---END
-=end
+      #     [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[RPG::MoveRoute(45 is Script)]---END
       205 => 'SetMoveRoute',
 
-=begin
-    END
-=end
+      #     END
       206 => 'GetSwitchVehicle',
 
-=begin
-    [int:{0:ON, 1:OFF}]---END
-=end
+      #     [int:{0:ON, 1:OFF}]---END
       211 => 'ChangeTransparency',
 
-=begin
-    [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int(Animation ID)]---[bool(Wait for Completion)]---END
-=end
+      #     [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int(Animation ID)]---[bool(Wait for Completion)]---END
       212 => 'ShowAnimation',
 
-=begin
-    [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int(Ballon Icon ID)]---[bool(Wait for Completion)]---END
-=end
+      #     [int:{-1:Player, 0:This Event, 1:EV001, ...}]---[int(Ballon Icon ID)]---[bool(Wait for Completion)]---END
       213 => 'ShowBalloonIcon',
       214 => 'EraseEvent',
 
-=begin
-    [int:{0:ON, 1:OFF}]---END
-=end
+      #     [int:{0:ON, 1:OFF}]---END
       216 => 'ChangePlayerFollowers',
       217 => 'GatherFollowers',
       221 => 'FadeoutScreen',
       222 => 'FadeinScreen',
 
-=begin
-    [RPG::Tone]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
-=end
+      #     [RPG::Tone]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
       223 => 'TintScreen',
 
-=begin
-    [RPG::Color]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
-=end
+      #     [RPG::Color]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
       224 => 'FlashScreen',
 
-=begin
-    [int:{1~9}(Power)]---[int:{1~9}(Speed)]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
-=end
+      #     [int:{1~9}(Power)]---[int:{1~9}(Speed)]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
       225 => 'ShakeScreen',
 
-=begin
-    [int:{0~999}(Time 1/60 sec)]---END
-=end
+      #     [int:{0~999}(Time 1/60 sec)]---END
       230 => 'Wait',
 
-=begin
-                                                                                                     |--[int:0(Constant)]---[int:{-9999~9999}(Map X)]---[int:{-9999~9999}(Map Y)]--------------------------|
-    [int:{1~100}(Number)]---[string(Picture Graphic Name)]---[int:{0:Upper Left, 1:Center}(Origin)]--|                                                                                                     |--[int:{0~2000}(Width %)]---[int:{0~2000}(Height %)]---[int:{0~255}(Opacity)]---[int:{0:Normal, 1:Add, 2:Sub}]---END
-                                                                                                     |--[int:1(Variable)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
-=end
+      #                                                                                                      |--[int:0(Constant)]---[int:{-9999~9999}(Map X)]---[int:{-9999~9999}(Map Y)]--------------------------|
+      #     [int:{1~100}(Number)]---[string(Picture Graphic Name)]---[int:{0:Upper Left, 1:Center}(Origin)]--|                                                                                                     |--[int:{0~2000}(Width %)]---[int:{0~2000}(Height %)]---[int:{0~255}(Opacity)]---[int:{0:Normal, 1:Add, 2:Sub}]---END
+      #                                                                                                      |--[int:1(Variable)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
       231 => 'ShowPicture',
 
-=begin
-                                                                    |--[int:0(Constant)]---[int:{-9999~9999}(Map X)]---[int:{-9999~9999}(Map Y)]--------------------------|
-    [int:{1~100}(Number)]---[int:{0:Upper Left, 1:Center}(Origin)]--|                                                                                                     |--[int:{0~2000}(Width %)]---[int:{0~2000}(Height %)]---[int:{0~255}(Opacity)]---[int:{0:Normal, 1:Add, 2:Sub}]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
-                                                                    |--[int:1(Variable)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
-=end
+      #                                                                     |--[int:0(Constant)]---[int:{-9999~9999}(Map X)]---[int:{-9999~9999}(Map Y)]--------------------------|
+      #     [int:{1~100}(Number)]---[int:{0:Upper Left, 1:Center}(Origin)]--|                                                                                                     |--[int:{0~2000}(Width %)]---[int:{0~2000}(Height %)]---[int:{0~255}(Opacity)]---[int:{0:Normal, 1:Add, 2:Sub}]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
+      #                                                                     |--[int:1(Variable)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]--|
       232 => 'MovePicture',
 
-=begin
-    [int:{1~100}(Number)]-[int:{-90~90}(Speed)]--END
-=end
+      #     [int:{1~100}(Number)]-[int:{-90~90}(Speed)]--END
       233 => 'RotatePicture',
 
-=begin
-    [int:{1~100}(Number)]---[RPG::Tone]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
-=end
+      #     [int:{1~100}(Number)]---[RPG::Tone]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
       234 => 'TintPicture',
 
-=begin
-    [int:{1~100}(Number)]---END
-=end
+      #     [int:{1~100}(Number)]---END
       235 => 'ErasePicture',
 
-=begin
-    [string:{":none", ":rain", ":storm", ":snow"}]---[int:{0~9}(Power)]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
-=end
+      #     [string:{":none", ":rain", ":storm", ":snow"}]---[int:{0~9}(Power)]---[int:{0~600}(Time 1/60 sec)]---[bool(Wait for Completion)]---END
       236 => 'SetWeatherEffects',
 
-=begin
-    [RPG::BGM]---END
-=end
+      #     [RPG::BGM]---END
       241 => 'PlayBGM',
 
-=begin
-    [int:{1~60}(Time sec)]---END
-=end
+      #     [int:{1~60}(Time sec)]---END
       242 => 'FadeoutBGM',
       243 => 'SaveBGM',
       244 => 'ReplayBGM',
 
-=begin
-    [RPG::BGM]---END
-=end
+      #     [RPG::BGM]---END
       245 => 'PlayBGS',
 
-=begin
-    [int:{1~60}(Time sec)]---END
-=end
+      #     [int:{1~60}(Time sec)]---END
       246 => 'FadeoutBGS',
 
-=begin
-    [RPG::ME]---END
-=end
+      #     [RPG::ME]---END
       249 => 'PlayME',
 
-=begin
-    [RPG::SE]---END
-=end
+      #     [RPG::SE]---END
       250 => 'PlaySE',
       251 => 'StopSE',
 
-=begin
-    [string(Movie Name)]---END
-=end
+      #     [string(Movie Name)]---END
       261 => 'PlayMovie',
 
-=begin
-    [int:{0:ON, 1:OFF}]---END
-=end
+      #     [int:{0:ON, 1:OFF}]---END
       281 => 'ChangeMapNameDisplay',
 
-=begin
-    [int(Tileset ID)]---END
-=end
+      #     [int(Tileset ID)]---END
       282 => 'ChangeTileset',
 
-=begin
-    [string(Floor Picture)]---[string(Wall Picture)]---END
-=end
+      #     [string(Floor Picture)]---[string(Wall Picture)]---END
       283 => 'ChangeBattleBack',
 
-=begin
-    [string(Distant view Picture)]---[bool(Loop Horizontal)]---[bool(Loop Vertical)]---[int(-32~32)(Horizontal Scroll)]---[int(-32~32)(Vertical Scrool)]---END
-=end
+      #     [string(Distant view Picture)]---[bool(Loop Horizontal)]---[bool(Loop Vertical)]---[int(-32~32)(Horizontal Scroll)]---[int(-32~32)(Vertical Scrool)]---END
       284 => 'ChangeParallaxBack',
 
-=begin
-                                                                                                                                                  |--[int:0(Direct Designation)]---[int(Map X)]---[int(Map Y)]---END
-    [int(Variable for Info)]---[int:{0:Terrain, 1:Event ID, 2:Tile ID(Layer 1), 3:Tile ID(Layer 2), 4:Tile ID(Layer 3), 5:Region ID}(Info Type)]--|
-                                                                                                                                                  |--[int:1(Designation with Variables)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]---END
-=end
+      #                                                                                                                                                   |--[int:0(Direct Designation)]---[int(Map X)]---[int(Map Y)]---END
+      #     [int(Variable for Info)]---[int:{0:Terrain, 1:Event ID, 2:Tile ID(Layer 1), 3:Tile ID(Layer 2), 4:Tile ID(Layer 3), 5:Region ID}(Info Type)]--|
+      #                                                                                                                                                   |--[int:1(Designation with Variables)]---[int(Map X Corresponded Variable ID)]---[int(Map Y Corresponded Variable ID)]---END
       285 => 'GetLocationInfo',
 
-=begin
-    |--[int:0(Direct Designation)]---[int(Enemy ID)]-----------------------------------|
-    |                                                                                  |--[bool(Can Escape)]---[bool(Continue Even When Loser)]---END
-    |--[int:1(Designation with Variables)]---[int(Enemy ID Corresponded Variable ID)]--|
-=end
+      #     |--[int:0(Direct Designation)]---[int(Enemy ID)]-----------------------------------|
+      #     |                                                                                  |--[bool(Can Escape)]---[bool(Continue Even When Loser)]---END
+      #     |--[int:1(Designation with Variables)]---[int(Enemy ID Corresponded Variable ID)]--|
       301 => 'BattleProcessing',
 
-=begin
-                                                                     |--[int:0(Price: Standard)]---[int:0]------------------|
-    [int:{0:Item, 1:Weapon, 2:Armor}]---[int(Corresponded Item ID)]--|                                                      |--[bool(Purchase Only)]---END
-                                                                     |--[int:1(Price: Specify)]---[int:{0~9999999}(Price)]--|
-=end
+      #                                                                      |--[int:0(Price: Standard)]---[int:0]------------------|
+      #     [int:{0:Item, 1:Weapon, 2:Armor}]---[int(Corresponded Item ID)]--|                                                      |--[bool(Purchase Only)]---END
+      #                                                                      |--[int:1(Price: Specify)]---[int:{0~9999999}(Price)]--|
       302 => 'ShopProcessing',
 
-=begin
-    [int(Actor ID)]---[int:{1~16}(Max Characters)]---END
-=end
+      #     [int(Actor ID)]---[int:{1~16}(Max Characters)]---END
       303 => 'NameInputProcessing',
 
-=begin
-                                                                                        |--[int:0(Constant)]---[int:{1~9999}(Number)]--|
-                                                                  |--[int:0(Increase)]--|                                              |--[bool:false(Allow Knockout)]---END
-                                                                  |                     |--[int:1(Variable)]---[int(Variable ID)]------|
-    |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
-    |                                                             |                     |--[int:0(Constant)]---[int:{1~9999}(Number)]--|
-    |                                                             |--[int:1(Decrease)]--|                                              |--[bool(Allow Knockout)]---END
-    |                                                                                   |--[int:1(Variable)]---[int(Variable ID)]------|
-    |
-    |                                                                                     |--[int:0(Constant)]---[int:{1~9999}(Number)]--|
-    |                                                               |--[int:0(Increase)]--|                                              |--[bool:false(Allow Knockout)]---END
-    |                                                               |                     |--[int:1(Variable)]---[int(Variable ID)]------|
-    |--[int:1(Variable)]---[int(Variable ID)]-----------------------|
-                                                                    |                     |--[int:0(Constant)]---[int:{1~9999}(Number)]--|
-                                                                    |--[int:1(Decrease)]--|                                              |--[bool(Allow Knockout)]---END
-                                                                                          |--[int:1(Variable)]---[int(Variable ID)]------|
-=end
+      #                                                                                         |--[int:0(Constant)]---[int:{1~9999}(Number)]--|
+      #                                                                   |--[int:0(Increase)]--|                                              |--[bool:false(Allow Knockout)]---END
+      #                                                                   |                     |--[int:1(Variable)]---[int(Variable ID)]------|
+      #     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
+      #     |                                                             |                     |--[int:0(Constant)]---[int:{1~9999}(Number)]--|
+      #     |                                                             |--[int:1(Decrease)]--|                                              |--[bool(Allow Knockout)]---END
+      #     |                                                                                   |--[int:1(Variable)]---[int(Variable ID)]------|
+      #     |
+      #     |                                                                                     |--[int:0(Constant)]---[int:{1~9999}(Number)]--|
+      #     |                                                               |--[int:0(Increase)]--|                                              |--[bool:false(Allow Knockout)]---END
+      #     |                                                               |                     |--[int:1(Variable)]---[int(Variable ID)]------|
+      #     |--[int:1(Variable)]---[int(Variable ID)]-----------------------|
+      #                                                                     |                     |--[int:0(Constant)]---[int:{1~9999}(Number)]--|
+      #                                                                     |--[int:1(Decrease)]--|                                              |--[bool(Allow Knockout)]---END
+      #                                                                                           |--[int:1(Variable)]---[int(Variable ID)]------|
       311 => 'ChangeHP',
 
-=begin
-    |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|                                  |--[int:0(Constant)]---[int:{1~9999}(Number)]---END
-    |                                                             |--[int:{0:Increase, 1:Decrease}]--|
-    |--[int:1(Variable)]---[int(Variable ID)]---------------------|                                  |--[int:1(Variable)]---[int(Variable ID)]---END
-=end
+      #     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|                                  |--[int:0(Constant)]---[int:{1~9999}(Number)]---END
+      #     |                                                             |--[int:{0:Increase, 1:Decrease}]--|
+      #     |--[int:1(Variable)]---[int(Variable ID)]---------------------|                                  |--[int:1(Variable)]---[int(Variable ID)]---END
       312 => 'ChangeMP',
 
-=begin
-    |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
-    |                                                             |--[int:{0:Add, 1:Remove}]---[int(State ID)]---END
-    |--[int:1(Variable)]---[int(Variable ID)]---------------------|
-=end
+      #     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
+      #     |                                                             |--[int:{0:Add, 1:Remove}]---[int(State ID)]---END
+      #     |--[int:1(Variable)]---[int(Variable ID)]---------------------|
       313 => 'ChangeState',
 
-=begin
-    |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]---END
-    |
-    |--[int:1(Variable)]---[int(Variable ID)]---END
-=end
+      #     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]---END
+      #     |
+      #     |--[int:1(Variable)]---[int(Variable ID)]---END
       314 => 'RecoverAll',
 
-=begin
-                                                                                        |--[int:0(:Constant)]---[int:{1~9999999}(Number)]--|
-                                                                  |--[int:0(Increase)]--|                                                  |--[bool(Show Level Up Message)]---END
-                                                                  |                     |--[int:1(Variable)]---[int(Variable ID)]----------|
-    |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
-    |                                                             |                     |--[int:0(Constant)]---[int:{1~9999999}(Number)]--|
-    |                                                             |--[int:1(Decrease)]--|                                                 |--[bool:false(Show Level Up Message)]---END
-    |                                                                                   |--[int:1(Variable)]------------------------------|
-    |
-    |                                                                                   |--[int:0(Constant)]---[int:{1~9999999}(Number)]--|
-    |                                                             |--[int:0(Increase)]--|                                                 |--[bool(Show Level Up Message)]---END
-    |                                                             |                     |--[int:1(Variable)]---[int(Variable ID)]---------|
-    |--[int:1(Variable)]---[int(Variable ID)]---------------------|
-                                                                  |                     |--[int:0(Constant)]---[int:{1~9999999}(Number)]--|
-                                                                  |--[int:1(Decrease)]--|                                                 |--[bool:false(Show Level Up Message)]---END
-                                                                                        |--[int:1(Variable)]---[int(Variable ID)]---------|
-=end
+      #                                                                                         |--[int:0(:Constant)]---[int:{1~9999999}(Number)]--|
+      #                                                                   |--[int:0(Increase)]--|                                                  |--[bool(Show Level Up Message)]---END
+      #                                                                   |                     |--[int:1(Variable)]---[int(Variable ID)]----------|
+      #     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
+      #     |                                                             |                     |--[int:0(Constant)]---[int:{1~9999999}(Number)]--|
+      #     |                                                             |--[int:1(Decrease)]--|                                                 |--[bool:false(Show Level Up Message)]---END
+      #     |                                                                                   |--[int:1(Variable)]------------------------------|
+      #     |
+      #     |                                                                                   |--[int:0(Constant)]---[int:{1~9999999}(Number)]--|
+      #     |                                                             |--[int:0(Increase)]--|                                                 |--[bool(Show Level Up Message)]---END
+      #     |                                                             |                     |--[int:1(Variable)]---[int(Variable ID)]---------|
+      #     |--[int:1(Variable)]---[int(Variable ID)]---------------------|
+      #                                                                   |                     |--[int:0(Constant)]---[int:{1~9999999}(Number)]--|
+      #                                                                   |--[int:1(Decrease)]--|                                                 |--[bool:false(Show Level Up Message)]---END
+      #                                                                                         |--[int:1(Variable)]---[int(Variable ID)]---------|
       315 => 'ChangeEXP',
 
-=begin
-                                                                                        |--[int:0(Constant)]---[int:{1~98}(Number)]--|
-                                                                  |--[int:0(Increase)]--|                                            |--[bool(Show Level Up Message)]---END
-                                                                  |                     |--[int:1(Variable)]---[int(Variable ID)]----|
-    |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
-    |                                                             |                     |--[int:0(Constant)]---[int:{1~98}(Number)]--|
-    |                                                             |--[int:1(Decrease)]--|                                            |--[bool:false(Show Level Up Message)]---END
-    |                                                                                   |--[int:1(Variable)]---[int(Variable ID)]----|
-    |
-    |                                                                                   |--[int:0(Constant)]---[int:{1~98}(Number)]--|
-    |                                                             |--[int:0(Increase)]--|                                            |--[bool(Show Level Up Message)]---END
-    |                                                             |                     |--[int:1(Variable)]---[int(Variable ID)]----|
-    |--[int:1(Variable)]---[int(Variable ID)]---------------------|
-                                                                  |                     |--[int:0(Constant)]---[int:{1~98}(Number)]--|
-                                                                  |--[int:1(Decrease)]--|                                            |--[bool:false(Show Level Up Message)]---END
-                                                                                      |--[int:1(Variable)]---[int(Variable ID)]------|
-=end
+      #                                                                                         |--[int:0(Constant)]---[int:{1~98}(Number)]--|
+      #                                                                   |--[int:0(Increase)]--|                                            |--[bool(Show Level Up Message)]---END
+      #                                                                   |                     |--[int:1(Variable)]---[int(Variable ID)]----|
+      #     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
+      #     |                                                             |                     |--[int:0(Constant)]---[int:{1~98}(Number)]--|
+      #     |                                                             |--[int:1(Decrease)]--|                                            |--[bool:false(Show Level Up Message)]---END
+      #     |                                                                                   |--[int:1(Variable)]---[int(Variable ID)]----|
+      #     |
+      #     |                                                                                   |--[int:0(Constant)]---[int:{1~98}(Number)]--|
+      #     |                                                             |--[int:0(Increase)]--|                                            |--[bool(Show Level Up Message)]---END
+      #     |                                                             |                     |--[int:1(Variable)]---[int(Variable ID)]----|
+      #     |--[int:1(Variable)]---[int(Variable ID)]---------------------|
+      #                                                                   |                     |--[int:0(Constant)]---[int:{1~98}(Number)]--|
+      #                                                                   |--[int:1(Decrease)]--|                                            |--[bool:false(Show Level Up Message)]---END
+      #                                                                                       |--[int:1(Variable)]---[int(Variable ID)]------|
       316 => 'ChangeLevel',
 
-=begin
-    |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|                                                                                                   |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
-    |                                                             |--[int:{0:MHP, 1:MMP, 2:ATK, 3:DEF, 4:MAT, 5:MDF, 6:AGI, 7:LUK}]---[int:{0:Increase, 1:Decrease}]--|
-    |--[int:1(Variable)]---[int(Variable ID)]---------------------|                                                                                                   |--[int:1(Variable)]---[int(Variable ID)]---END
-=end
+      #     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|                                                                                                   |--[int:0(Constant)]---[int:{0~9999999}(Number)]---END
+      #     |                                                             |--[int:{0:MHP, 1:MMP, 2:ATK, 3:DEF, 4:MAT, 5:MDF, 6:AGI, 7:LUK}]---[int:{0:Increase, 1:Decrease}]--|
+      #     |--[int:1(Variable)]---[int(Variable ID)]---------------------|                                                                                                   |--[int:1(Variable)]---[int(Variable ID)]---END
       317 => 'ChangeParameters',
 
-=begin
-    |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
-    |                                                             |--[int:{0:Learn, 1:Forget}]---[int(Skill ID)]---END
-    |--[int:1(Variable)]---[int(Variable ID)]---------------------|
-=end
+      #     |--[int:0(Fixed)]---[int:{0:Entire Party, 1:Actor 001, ...}]--|
+      #     |                                                             |--[int:{0:Learn, 1:Forget}]---[int(Skill ID)]---END
+      #     |--[int:1(Variable)]---[int(Variable ID)]---------------------|
       318 => 'ChangeSkills',
 
-=begin
-    [int(Actor ID)]---[int:{0:Weapon, 1:Shield, 2:Head, 3:Boby, 4:Accessory}]---[int:{0:None, 1:Equipment 001, ...}(Equipment ID)]---END
-=end
+      #     [int(Actor ID)]---[int:{0:Weapon, 1:Shield, 2:Head, 3:Boby, 4:Accessory}]---[int:{0:None, 1:Equipment 001, ...}(Equipment ID)]---END
       319 => 'ChangeEquipment',
 
-=begin
-    [int(Actor ID)]---[string(New Actor Name)]---END
-=end
+      #     [int(Actor ID)]---[string(New Actor Name)]---END
       320 => 'ChangeActorName',
 
-=begin
-    [int(Actor ID)]---[int(New Class ID)]---END
-=end
+      #     [int(Actor ID)]---[int(New Class ID)]---END
       321 => 'ChangeActorClass',
 
-=begin
-    [int(Actor ID)]---[string(New Actor walking Picture Name)]---[int(New Actor Walking Picture Index)]---[string(New Actor Portrait Picture Name)]---[int(New Actor Portrait Picture Index)]---END
-=end
+      #     [int(Actor ID)]---[string(New Actor walking Picture Name)]---[int(New Actor Walking Picture Index)]---[string(New Actor Portrait Picture Name)]---[int(New Actor Portrait Picture Index)]---END
       322 => 'ChangeActorGraphic',
 
-=begin
-    [int:{0:Boat, 1:Ship, 2:Airship}]---[string(New Vehicle Picture Name)]---[int(New Vehicle Picture Index)]---END
-=end
+      #     [int:{0:Boat, 1:Ship, 2:Airship}]---[string(New Vehicle Picture Name)]---[int(New Vehicle Picture Index)]---END
       323 => 'ChangeVehicleGraphic',
 
-=begin
-    [int(Actor ID)]---[string(New Actor Nickname)]---END
-=end
+      #     [int(Actor ID)]---[string(New Actor Nickname)]---END
       324 => 'ChangeActorNickname',
 
-=begin
-                                                                     |--[int:0(Constant)]---[int:{1~999999}(Number)]--|
-                                               |--[int:0(Increase)]--|                                                |--[bool:false(Allow Knockout)]---END
-                                               |                     |--[int:1(Variable)]---[int(Variable ID)]--------|
-    [int:{-1:Entire Troop, 0:Troop 001, ...}]--|
-                                               |                     |--[int:0(Constant)]---[int:{1~999999}(Number)]--|
-                                               |--[int:1(Decrease)]--|                                                |--[bool(Allow Knockout)]---END
-                                                                     |--[int:1(Variable)]---[int(Variable ID)]--------|
-
-=end
+      #                                                                      |--[int:0(Constant)]---[int:{1~999999}(Number)]--|
+      #                                                |--[int:0(Increase)]--|                                                |--[bool:false(Allow Knockout)]---END
+      #                                                |                     |--[int:1(Variable)]---[int(Variable ID)]--------|
+      #     [int:{-1:Entire Troop, 0:Troop 001, ...}]--|
+      #                                                |                     |--[int:0(Constant)]---[int:{1~999999}(Number)]--|
+      #                                                |--[int:1(Decrease)]--|                                                |--[bool(Allow Knockout)]---END
+      #                                                                      |--[int:1(Variable)]---[int(Variable ID)]--------|
+      #
       331 => 'ChangeEnemyHP',
 
-=begin
-                                                                                |--[int:0(Constant)]---[int:{1~9999}(Number)]---END
-    [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int:{0:Increase, 1:Decrease}]--|
-                                                                                |--[int:1(Variable)]---[int(Variable ID)]---END
-=end
+      #                                                                                 |--[int:0(Constant)]---[int:{1~9999}(Number)]---END
+      #     [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int:{0:Increase, 1:Decrease}]--|
+      #                                                                                 |--[int:1(Variable)]---[int(Variable ID)]---END
       332 => 'ChangeEnemyMP',
 
-=begin
-    [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int:{0:Add, 1:Remove}]---[int(State ID)]---END
-=end
+      #     [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int:{0:Add, 1:Remove}]---[int(State ID)]---END
       333 => 'ChangeEnemyState',
 
-=begin
-    [int:{-1:Entire Troop, 0:Troop 001, ...}]---END
-=end
+      #     [int:{-1:Entire Troop, 0:Troop 001, ...}]---END
       334 => 'EnemyRecoverAll',
 
-=begin
-    [int:{-1:Entire Troop, 0:Troop 001, ...}]---END
-=end
+      #     [int:{-1:Entire Troop, 0:Troop 001, ...}]---END
       335 => 'EnemyAppear',
 
-=begin
-    [int(Troop ID)]---[int(Enemy ID)]---END
-=end
+      #     [int(Troop ID)]---[int(Enemy ID)]---END
       336 => 'EnemyTransform',
 
-=begin
-    [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int(Animation ID)]---END
-=end
+      #     [int:{-1:Entire Troop, 0:Troop 001, ...}]---[int(Animation ID)]---END
       337 => 'ShowBattleAnimation',
 
-=begin
-    |--[int:0(Enemy)]---[int(Troop ID)]--|
-    |                                    |--[int(Skill ID)]---[int:{-2:Last Target, -1:Random, 0:Index 1,...}]---END
-    |--[int:1(Actor)]---[int(Actor ID)]--|
-=end
+      #     |--[int:0(Enemy)]---[int(Troop ID)]--|
+      #     |                                    |--[int(Skill ID)]---[int:{-2:Last Target, -1:Random, 0:Index 1,...}]---END
+      #     |--[int:1(Actor)]---[int(Actor ID)]--|
       339 => 'ForceAction',
       340 => 'AbortBattle',
       351 => 'OpenMenuScreen',
@@ -680,56 +511,41 @@ module R3EXS
       353 => 'GameOver',
       354 => 'ReturnToTitleScreen',
 
-=begin
-    [string]---END
-=end
+      #     [string]---END
       355 => 'Script',
 
-=begin
-    [string]---END
-=end
+      #     [string]---END
       401 => 'ShowText',
 
-=begin
-    [int(Choice Index)]---[string(Choice Name)]---END
-=end
+      #     [int(Choice Index)]---[string(Choice Name)]---END
       402 => 'When',
       403 => 'WhenCancel',
       404 => 'ChoicesEnd',
 
-=begin
-    [string]---END
-=end
+      #     [string]---END
       405 => 'ShowScrollingText',
 
-=begin
-    [string]---END
-=end
+      #     [string]---END
       408 => 'CommentMore',
       411 => 'Else',
       412 => 'BranchEnd',
       413 => 'RepeatAbove',
 
-=begin
-    [RPG::MoveCommand(45 is script)]---END
-=end
+      #     [RPG::MoveCommand(45 is script)]---END
       505 => 'MoveRoute',
       601 => 'IfWin',
       602 => 'IfEscape',
       603 => 'IfLose',
       604 => 'BattleProcessingEnd',
 
-=begin
-                                                                     |--[int:0(Price: Standard)]---[int:0]---END
-    [int:{0:Item, 1:Weapon, 2:Armor}]---[int(Corresponded Item ID)]--|
-                                                                     |--[int:1(Price: Specify)]---[int:{0~9999999}(Price)]---END
-=end
+      #                                                                      |--[int:0(Price: Standard)]---[int:0]---END
+      #     [int:{0:Item, 1:Weapon, 2:Armor}]---[int(Corresponded Item ID)]--|
+      #                                                                      |--[int:1(Price: Specify)]---[int:{0~9999999}(Price)]---END
       605 => 'ShopItem',
 
-=begin
-    [string]---END
-=end
-      655 => 'ScriptMore' }
+      #     [string]---END
+      655 => 'ScriptMore'
+    }.freeze
 
     # 红色
     RED_COLOR = "\e[31m"
@@ -768,7 +584,7 @@ module R3EXS
     # @raise [FileBaseNameError] file_basename 无法匹配到对应的类
     #
     # @return [void]
-    def Utils.check_type(object, file_basename, is_compact, module_name)
+    def self.check_type(object, file_basename, is_compact, module_name)
       case module_name
       when :RPG
         matched_class = FILE_BASENAME_TO_CLASS_RPG.find { |pattern, _| file_basename =~ pattern }&.last
@@ -809,7 +625,6 @@ module R3EXS
       else
         raise ModuleNameError.new(module_name), "Invalid module name: #{module_name}"
       end
-
     end
 
     # 将 RPG 中的对象转化为 R3EXS 对象
@@ -822,7 +637,7 @@ module R3EXS
     # @raise [FileBaseNameError] file_basename 无法匹配到对应的类
     #
     # @return [Object]
-    def Utils.rpg_r3exs(object, file_basename, with_notes)
+    def self.rpg_r3exs(object, file_basename, with_notes)
       check_type(object, file_basename, true, :RPG)
 
       # 首先根据 file_basename 找到对应的类
@@ -836,6 +651,7 @@ module R3EXS
         temp = []
         object.each_with_index do |obj, index|
           next if obj.nil?
+
           obj_r3exs = matched_class.new(obj, index, with_notes)
           temp << obj_r3exs unless obj_r3exs.empty?
         end
@@ -843,6 +659,7 @@ module R3EXS
         temp = []
         object.each do |key, obj|
           next if obj.nil?
+
           temp << matched_class.new(obj, key, with_notes)
         end
       else
@@ -869,7 +686,7 @@ module R3EXS
     # @raise [Rvdata2DirError] target_dir 不存在
     #
     # @return [void]
-    def Utils.all_rvdata2_files(target_dir)
+    def self.all_rvdata2_files(target_dir)
       # 检查 target_dir 目录是否存在
       target_dir.exist? && target_dir.directory? or raise Rvdata2DirError.new(target_dir.to_s), "rvdata2 directory not found: #{target_dir}"
       # 递归获取 target_dir 下的所有 *.rvdata2 文件
@@ -878,7 +695,9 @@ module R3EXS
         # 检查文件名是否在 RVDATA2_FILE_NAME 中与其正则表达式匹配
         next unless RVDATA2_FILE_NAME.any? { |pattern| file_basename =~ pattern }
 
-        print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing from #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
+        if $global_options[:verbose]
+          print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing from #{RESET_COLOR}#{file_path}...\r"
+        end
         object = Marshal.load(file_path.binread)
 
         # 如果文件名不是 'Scripts'，则检查 object 的类型是否正确
@@ -916,7 +735,7 @@ module R3EXS
     # @raise [JsonDirError] target_dir 不存在
     #
     # @return [void]
-    def Utils.all_json_files(target_dir, module_name)
+    def self.all_json_files(target_dir, module_name)
       # 检查 target_dir 目录是否存在
       target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
       # 递归获取 target_dir 下的所有 *.json 文件
@@ -925,7 +744,9 @@ module R3EXS
         # 检查文件名是否在 JSON_FILE_NAME 中与其正则表达式匹配
         next unless JSON_FILE_NAME.any? { |pattern| file_basename =~ pattern }
 
-        print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
+        if $global_options[:verbose]
+          print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r"
+        end
         object = Oj.load_file(file_path.to_s)
 
         case module_name
@@ -971,7 +792,7 @@ module R3EXS
     # @raise [JsonDirError] target_dir 不存在
     #
     # @return [void]
-    def Utils.all_commonevent_json_files(target_dir, module_name)
+    def self.all_commonevent_json_files(target_dir, module_name)
       # 检查 target_dir 目录是否存在
       target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
 
@@ -982,7 +803,9 @@ module R3EXS
 
       # 递归获取 target_dir 下的所有 CommonEvent_\d{5}.json 文件
       target_dir.glob('**/CommonEvent_[0-9][0-9][0-9][0-9][0-9].json').each do |file_path|
-        print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
+        if $global_options[:verbose]
+          print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r"
+        end
         object = Oj.load_file(file_path.to_s)
         parent_dir = file_path.dirname
         commonevents_hash[parent_dir] << object
@@ -1000,14 +823,14 @@ module R3EXS
           begin
             check_type(commonevents, 'CommonEvents', true, module_name)
           rescue RPGTypeError
-            raise RPGJsonFileError.new(parent_dir.to_s), "Invalid RPG CommonEvents JSON file"
+            raise RPGJsonFileError.new(parent_dir.to_s), 'Invalid RPG CommonEvents JSON file'
           end
         when :R3EXS
           # 这里的类型检查不能用紧凑模式，因为这是从 R3EXS 模块的类序列化后的 JSON 文件中读取的 object，程序设计中不应该存在 nil 元素
           begin
             check_type(commonevents, 'CommonEvents', false, module_name)
           rescue R3EXSTypeError
-            raise R3EXSJsonFileError.new(parent_dir.to_s), "Invalid R3EXS CommonEvents JSON file"
+            raise R3EXSJsonFileError.new(parent_dir.to_s), 'Invalid R3EXS CommonEvents JSON file'
           end
         else
           raise ModuleNameError.new(module_name), "Invalid module name: #{module_name}"
@@ -1031,7 +854,7 @@ module R3EXS
     # @raise [JsonDirError] target_dir 不存在
     #
     # @return [void]
-    def Utils.all_rb_files(target_dir)
+    def self.all_rb_files(target_dir)
       # 检查 target_dir 目录是否存在
       target_dir.exist? && target_dir.directory? or raise JsonDirError.new(target_dir.to_s), "JSON directory not found: #{target_dir}"
 
@@ -1042,7 +865,9 @@ module R3EXS
 
       # 递归获取 target_dir 下的所有 \d{5}.rb 文件
       target_dir.glob('**/[0-9][0-9][0-9].rb').each do |file_path|
-        print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r" if $global_options[:verbose]
+        if $global_options[:verbose]
+          print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r"
+        end
         object = file_path.binread
         parent_dir = file_path.dirname
         scripts_hash[parent_dir] << object
@@ -1063,7 +888,7 @@ module R3EXS
     # @param output_file [Pathname] 输出文件路径
     #
     # @return [void]
-    def Utils.object_json(object, output_file)
+    def self.object_json(object, output_file)
       output_file.dirname.mkpath unless output_file.dirname.exist?
       output_file.write(Oj.dump(object, indent: 2))
     end
@@ -1074,11 +899,9 @@ module R3EXS
     # @param output_file [Pathname] 输出文件路径
     #
     # @return [void]
-    def Utils.object_rvdata2(object, output_file)
+    def self.object_rvdata2(object, output_file)
       output_file.dirname.mkpath unless output_file.dirname.exist?
       output_file.binwrite(Marshal.dump(object))
     end
-
   end
-
 end

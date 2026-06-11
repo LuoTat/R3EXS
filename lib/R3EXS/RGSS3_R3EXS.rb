@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module R3EXS
-
   # 基础物品类
   class BaseItem
-
     # 在原始数组中的索引
     #
     # @return [Integer]
@@ -37,7 +35,7 @@ module R3EXS
       @name = baseitem.name
       @description = baseitem.description
       @note = baseitem.note
-      self.remove_instance_variable(:@note) unless with_note
+      remove_instance_variable(:@note) unless with_note
     end
 
     # 注入到 RPG::BaseItem 对象
@@ -47,8 +45,8 @@ module R3EXS
     # @return [void]
     def inject_to(baseitem)
       baseitem.name = @name
-      baseitem.description = @description if self.instance_variable_defined?(:@description)
-      baseitem.note = @note if self.instance_variable_defined?(:@note)
+      baseitem.description = @description if instance_variable_defined?(:@description)
+      baseitem.note = @note if instance_variable_defined?(:@note)
     end
 
     # 提取所有的字符串
@@ -57,8 +55,8 @@ module R3EXS
     def ex_strings
       strings = []
       strings << @name
-      strings << @description if self.instance_variable_defined?(:@description)
-      strings << @note if self.instance_variable_defined?(:@note)
+      strings << @description if instance_variable_defined?(:@description)
+      strings << @note if instance_variable_defined?(:@note)
       strings
     end
 
@@ -69,8 +67,8 @@ module R3EXS
     # @return [void]
     def in_strings(hash)
       @name = hash[@name] || @name
-      @description = hash[@description] || @description if self.instance_variable_defined?(:@description)
-      @note = hash[@note] || @note if self.instance_variable_defined?(:@note)
+      @description = hash[@description] || @description if instance_variable_defined?(:@description)
+      @note = hash[@note] || @note if instance_variable_defined?(:@note)
     end
 
     # 判断是否为空
@@ -83,7 +81,6 @@ module R3EXS
 
   # 角色类
   class Actor < BaseItem
-
     # 昵称
     #
     # @return [String]
@@ -140,7 +137,6 @@ module R3EXS
 
   # 动画类
   class Animation
-
     # 在原始数组中的索引
     #
     # @return [Integer]
@@ -198,100 +194,15 @@ module R3EXS
   # 可装备物品类
   class EquipItem < BaseItem
 
-    # 用 RPG::EquipItem 初始化
-    #
-    # @param equipitem [RPG::EquipItem] 待处理的 RPG::EquipItem 对象
-    # @param index [Integer] 在原始数组中的索引
-    # @param with_note [Boolean] 是否处理 note 字段
-    #
-    # @return [R3EXS::EquipItem]
-    def initialize(equipitem, index, with_note)
-      super(equipitem, index, with_note)
-    end
-
-    # 注入到 RPG::EquipItem 对象
-    #
-    # @param equipitem [RPG::EquipItem] 待注入的 RPG::EquipItem 对象
-    #
-    # @return [void]
-    def inject_to(equipitem)
-      super
-    end
-
-    # 提取所有的字符串
-    #
-    # @return [Array<String>]
-    def ex_strings
-      super
-    end
-
-    # 将所有的字符串替换为指定的字符串
-    #
-    # @param hash [Hash<String, String>] 字符串翻译表
-    #
-    # @return [void]
-    def in_strings(hash)
-      super(hash)
-    end
-
-    # 判断是否为空
-    #
-    # @return [Boolean]
-    def empty?
-      super
-    end
   end
 
   # 护甲类
   class Armor < EquipItem
 
-    # 用 RPG::Armor 初始化
-    #
-    # @param armor [RPG::Armor] 待处理的 RPG::Armor 对象
-    # @param index [Integer] 在原始数组中的索引
-    # @param with_note [Boolean] 是否处理 note 字段
-    #
-    # @return [R3EXS::Armor]
-    def initialize(armor, index, with_note)
-      super(armor, index, with_note)
-    end
-
-    # 注入到 RPG::Armor 对象
-    #
-    # @param armor [RPG::Armor] 待注入的 RPG::Armor 对象
-    #
-    # @return [void]
-    def inject_to(armor)
-      super
-    end
-
-    # 提取所有的字符串
-    #
-    # @return [Array<String>]
-    def ex_strings
-      super
-    end
-
-    # 将所有的字符串替换为指定的字符串
-    #
-    # @param hash [Hash<String, String>] 字符串翻译表
-    #
-    # @return [void]
-    def in_strings(hash)
-      super(hash)
-    end
-
-    # 判断是否为空
-    #
-    # @return [Boolean]
-    def empty?
-      super
-    end
   end
 
   # 职业类
   class Class < BaseItem
-
     # 职业的学习技能列表
     #
     # @return [Array<R3EXS::Class::Learning>]
@@ -299,7 +210,6 @@ module R3EXS
 
     # 学习技能类
     class Learning
-
       # 在原始数组中的索引
       #
       # @return [Integer]
@@ -365,12 +275,13 @@ module R3EXS
       super(klass, index, with_note)
       @learnings = []
       klass.learnings.each_with_index do |learning, learning_index|
-        next if learning == nil
+        next if learning.nil?
+
         learning_r3exs = R3EXS::Class::Learning.new(learning, learning_index)
         @learnings << learning_r3exs unless learning_r3exs.empty?
       end
-      self.remove_instance_variable(:@description)
-      self.remove_instance_variable(:@learnings) unless with_note
+      remove_instance_variable(:@description)
+      remove_instance_variable(:@learnings) unless with_note
     end
 
     # 注入到 RPG::Class 对象
@@ -380,10 +291,10 @@ module R3EXS
     # @return [void]
     def inject_to(klass)
       super(klass)
-      if self.instance_variable_defined?(:@learnings)
-        @learnings.each do |learning|
-          learning.inject_to(klass.learnings[learning.index])
-        end
+      return unless instance_variable_defined?(:@learnings)
+
+      @learnings.each do |learning|
+        learning.inject_to(klass.learnings[learning.index])
       end
     end
 
@@ -392,7 +303,7 @@ module R3EXS
     # @return [Array<String>]
     def ex_strings
       strings = super
-      if self.instance_variable_defined?(:@learnings)
+      if instance_variable_defined?(:@learnings)
         @learnings.each do |learning|
           strings.concat(learning.ex_strings)
         end
@@ -407,10 +318,10 @@ module R3EXS
     # @return [void]
     def in_strings(hash)
       super(hash)
-      if self.instance_variable_defined?(:@learnings)
-        @learnings.each do |learning|
-          learning.in_strings(hash)
-        end
+      return unless instance_variable_defined?(:@learnings)
+
+      @learnings.each do |learning|
+        learning.in_strings(hash)
       end
     end
 
@@ -424,7 +335,6 @@ module R3EXS
 
   # 移动指令类
   class MoveCommand
-
     # 在原始数组中的索引
     #
     # @return [Integer]
@@ -497,7 +407,6 @@ module R3EXS
 
   # 移动路线类
   class MoveRoute
-
     # 移动指令列表
     #
     # @return [Array<R3EXS::MoveCommand>]
@@ -511,7 +420,8 @@ module R3EXS
     def initialize(moveroute)
       @list = []
       moveroute.list.each_with_index do |movecommand, index|
-        next if movecommand == nil
+        next if movecommand.nil?
+
         movecommand_r3exs = R3EXS::MoveCommand.new(movecommand, index)
         @list << movecommand_r3exs unless movecommand_r3exs.empty?
       end
@@ -560,7 +470,6 @@ module R3EXS
 
   # 事件指令类
   class EventCommand
-
     # 在原始数组中的索引
     #
     # @return [Integer]
@@ -794,7 +703,6 @@ module R3EXS
 
   # 公共事件类
   class CommonEvent
-
     # 在原始数组中的索引
     #
     # @return [Integer]
@@ -821,7 +729,8 @@ module R3EXS
       @name = commonevent.name
       @list = []
       commonevent.list.each_with_index do |eventcommand, eventcommand_index|
-        next if eventcommand == nil
+        next if eventcommand.nil?
+
         eventcommand_r3exs = R3EXS::EventCommand.new(eventcommand, eventcommand_index)
         @list << eventcommand_r3exs unless eventcommand_r3exs.empty?
       end
@@ -872,7 +781,6 @@ module R3EXS
 
   # 敌人类
   class Enemy < BaseItem
-
     # 用 RPG::Enemy 初始化
     #
     # @param enemy [RPG::Enemy] 待处理的 RPG::Enemy 对象
@@ -882,139 +790,20 @@ module R3EXS
     # @return [R3EXS::Enemy]
     def initialize(enemy, index, with_note)
       super(enemy, index, with_note)
-      self.remove_instance_variable(:@description)
-    end
-
-    # 注入到 RPG::Enemy 对象
-    #
-    # @param enemy [RPG::Enemy] 待注入的 RPG::Enemy 对象
-    #
-    # @return [void]
-    def inject_to(enemy)
-      super
-    end
-
-    # 提取所有的字符串
-    #
-    # @return [Array<String>]
-    def ex_strings
-      super
-    end
-
-    # 将所有的字符串替换为指定的字符串
-    #
-    # @param hash [Hash<String, String>] 字符串翻译表
-    #
-    # @return [void]
-    def in_strings(hash)
-      super(hash)
-    end
-
-    # 判断是否为空
-    #
-    # @return [Boolean]
-    def empty?
-      super
+      remove_instance_variable(:@description)
     end
   end
 
   # 可使用物品类
   class UsableItem < BaseItem
-
-    # 用 RPG::UsableItem 初始化
-    #
-    # @param usableitem [RPG::UsableItem] 待处理的 RPG::UsableItem 对象
-    # @param index [Integer] 在原始数组中的索引
-    # @param with_note [Boolean] 是否处理 note 字段
-    #
-    # @return [R3EXS::UsableItem]
-    def initialize(usableitem, index, with_note)
-      super(usableitem, index, with_note)
-    end
-
-    # 注入到 RPG::UsableItem 对象
-    #
-    # @param usableitem [RPG::UsableItem] 待注入的 RPG::UsableItem 对象
-    #
-    # @return [void]
-    def inject_to(usableitem)
-      super
-    end
-
-    # 提取所有的字符串
-    #
-    # @return [Array<String>]
-    def ex_strings
-      super
-    end
-
-    # 将所有的字符串替换为指定的字符串
-    #
-    # @param hash [Hash<String, String>] 字符串翻译表
-    #
-    # @return [void]
-    def in_strings(hash)
-      super(hash)
-    end
-
-    # 判断是否为空
-    #
-    # @return [Boolean]
-    def empty?
-      super
-    end
   end
 
   # 物品类
   class Item < UsableItem
-
-    # 用 RPG::Item 初始化
-    #
-    # @param item [RPG::Item] 待处理的 RPG::Item 对象
-    # @param index [Integer] 在原始数组中的索引
-    # @param with_note [Boolean] 是否处理 note 字段
-    #
-    # @return [R3EXS::Item]
-    def initialize(item, index, with_note)
-      super(item, index, with_note)
-    end
-
-    # 注入到 RPG::Item 对象
-    #
-    # @param item [RPG::Item] 待注入的 RPG::Item 对象
-    #
-    # @return [void]
-    def inject_to(item)
-      super
-    end
-
-    # 提取所有的字符串
-    #
-    # @return [Array<String>]
-    def ex_strings
-      super
-    end
-
-    # 将所有的字符串替换为指定的字符串
-    #
-    # @param hash [Hash<String, String>] 字符串翻译表
-    #
-    # @return [void]
-    def in_strings(hash)
-      super(hash)
-    end
-
-    # 判断是否为空
-    #
-    # @return [Boolean]
-    def empty?
-      super
-    end
   end
 
   # 事件类
   class Event
-
     # 在原始哈希表中的键
     #
     # @return [Integer]
@@ -1032,7 +821,6 @@ module R3EXS
 
     # 事件页类
     class Page
-
       # 在原始数组中的索引
       #
       # @return [Integer]
@@ -1053,7 +841,8 @@ module R3EXS
         @index = index
         @list = []
         page.list.each_with_index do |eventcommand, eventcommand_index|
-          next if eventcommand == nil
+          next if eventcommand.nil?
+
           eventcommand_r3exs = R3EXS::EventCommand.new(eventcommand, eventcommand_index)
           @list << eventcommand_r3exs unless eventcommand_r3exs.empty?
         end
@@ -1111,7 +900,8 @@ module R3EXS
       @name = event.name
       @pages = []
       event.pages.each_with_index do |page, page_index|
-        next if page == nil
+        next if page.nil?
+
         page_r3exs = R3EXS::Event::Page.new(page, page_index)
         @pages << page_r3exs unless page_r3exs.empty?
       end
@@ -1162,7 +952,6 @@ module R3EXS
 
   # 地图类
   class Map
-
     # 地图显示名称
     #
     # @return [String]
@@ -1189,11 +978,12 @@ module R3EXS
       @note = map.note
       @events = []
       map.events.each do |key, event|
-        next if event == nil
+        next if event.nil?
+
         event_r3exs = R3EXS::Event.new(event, key)
         @events << event_r3exs unless event_r3exs.empty?
       end
-      self.remove_instance_variable(:@note) unless with_note
+      remove_instance_variable(:@note) unless with_note
     end
 
     # 注入到 RPG::Map 对象
@@ -1203,7 +993,7 @@ module R3EXS
     # @return [void]
     def inject_to(map)
       map.display_name = @display_name
-      map.note = @note if self.instance_variable_defined?(:@note)
+      map.note = @note if instance_variable_defined?(:@note)
       @events.each do |event|
         event.inject_to(map.events[event.index])
       end
@@ -1215,7 +1005,7 @@ module R3EXS
     def ex_strings
       strings = []
       strings << @display_name
-      strings << @note if self.instance_variable_defined?(:@note)
+      strings << @note if instance_variable_defined?(:@note)
       @events.each do |event|
         strings.concat(event.ex_strings)
       end
@@ -1229,7 +1019,7 @@ module R3EXS
     # @return [void]
     def in_strings(hash)
       @display_name = hash[@display_name] || @display_name
-      @note = hash[@note] || @note if self.instance_variable_defined?(:@note)
+      @note = hash[@note] || @note if instance_variable_defined?(:@note)
       @events.each do |event|
         event.in_strings(hash)
       end
@@ -1238,7 +1028,6 @@ module R3EXS
 
   # 地图信息类
   class MapInfo
-
     # 在原始哈希表中的键
     #
     # @return [Integer]
@@ -1288,7 +1077,6 @@ module R3EXS
 
   # 技能类
   class Skill < UsableItem
-
     # 技能使用时的消息
     #
     # @return [String]
@@ -1354,7 +1142,6 @@ module R3EXS
 
   # 状态类
   class State < BaseItem
-
     # 状态应用队员时的消息
     #
     # @return [String]
@@ -1388,7 +1175,7 @@ module R3EXS
       @message2 = state.message2
       @message3 = state.message3
       @message4 = state.message4
-      self.remove_instance_variable(:@description)
+      remove_instance_variable(:@description)
     end
 
     # 注入到 RPG::State 对象
@@ -1439,7 +1226,6 @@ module R3EXS
 
   # 系统类
   class System
-
     # 游戏标题
     #
     # @return [String]
@@ -1487,7 +1273,6 @@ module R3EXS
 
     # 术语类
     class Terms
-
       # 基本术语
       #
       # @return [Array<String>]
@@ -1628,7 +1413,6 @@ module R3EXS
 
   # 图块类
   class Tileset
-
     # 在原始数组中的索引
     #
     # @return [Integer]
@@ -1655,7 +1439,7 @@ module R3EXS
       @index = index
       @name = tileset.name
       @note = tileset.note
-      self.remove_instance_variable(:@note) unless with_note
+      remove_instance_variable(:@note) unless with_note
     end
 
     # 注入到 RPG::Tileset 对象
@@ -1665,7 +1449,7 @@ module R3EXS
     # @return [void]
     def inject_to(tileset)
       tileset.name = @name
-      tileset.note = @note if self.instance_variable_defined?(:@note)
+      tileset.note = @note if instance_variable_defined?(:@note)
     end
 
     # 提取所有的字符串
@@ -1674,7 +1458,7 @@ module R3EXS
     def ex_strings
       strings = []
       strings << @name
-      strings << @note if self.instance_variable_defined?(:@note)
+      strings << @note if instance_variable_defined?(:@note)
       strings
     end
 
@@ -1685,7 +1469,7 @@ module R3EXS
     # @return [void]
     def in_strings(hash)
       @name = hash[@name] || @name
-      @note = hash[@note] || @note if self.instance_variable_defined?(:@note)
+      @note = hash[@note] || @note if instance_variable_defined?(:@note)
     end
 
     # 判断是否为空
@@ -1698,7 +1482,6 @@ module R3EXS
 
   # 敌群类
   class Troop
-
     # 在原始数组中的索引
     #
     # @return [Integer]
@@ -1716,7 +1499,6 @@ module R3EXS
 
     # 敌群页类
     class Page
-
       # 在原始数组中的索引
       #
       # @return [Integer]
@@ -1737,7 +1519,8 @@ module R3EXS
         @index = index
         @list = []
         page.list.each_with_index do |eventcommand, eventcommand_index|
-          next if eventcommand == nil
+          next if eventcommand.nil?
+
           eventcommand_r3exs = R3EXS::EventCommand.new(eventcommand, eventcommand_index)
           @list << eventcommand_r3exs unless eventcommand_r3exs.empty?
         end
@@ -1795,7 +1578,8 @@ module R3EXS
       @name = troop.name
       @pages = []
       troop.pages.each_with_index do |page, page_index|
-        next if page == nil
+        next if page.nil?
+
         page_r3exs = R3EXS::Troop::Page.new(page, page_index)
         @pages << page_r3exs unless page_r3exs.empty?
       end
@@ -1846,49 +1630,5 @@ module R3EXS
 
   # 武器类
   class Weapon < EquipItem
-
-    # 用 RPG::Weapon 初始化
-    #
-    # @param weapon [RPG::Weapon] 待处理的 RPG::Weapon 对象
-    # @param index [Integer] 在原始数组中的索引
-    # @param with_note [Boolean] 是否处理 note 字段
-    #
-    # @return [R3EXS::Weapon]
-    def initialize(weapon, index, with_note)
-      super(weapon, index, with_note)
-    end
-
-    # 注入到 RPG::Weapon 对象
-    #
-    # @param weapon [RPG::Weapon] 待注入的 RPG::Weapon 对象
-    #
-    # @return [void]
-    def inject_to(weapon)
-      super
-    end
-
-    # 提取所有的字符串
-    #
-    # @return [Array<String>]
-    def ex_strings
-      super
-    end
-
-    # 将所有的字符串替换为指定的字符串
-    #
-    # @param hash [Hash<String, String>] 字符串翻译表
-    #
-    # @return [void]
-    def in_strings(hash)
-      super(hash)
-    end
-
-    # 判断是否为空
-    #
-    # @return [Boolean]
-    def empty?
-      super
-    end
   end
-
 end
