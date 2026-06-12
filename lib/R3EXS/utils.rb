@@ -3,6 +3,7 @@
 require 'oj'
 require_relative 'RGSS3'
 require_relative 'RGSS3_R3EXS'
+require_relative 'logger'
 
 module R3EXS
   # 工具模块
@@ -547,30 +548,6 @@ module R3EXS
       655 => 'ScriptMore'
     }.freeze
 
-    # 红色
-    RED_COLOR = "\e[31m"
-
-    # 绿色
-    GREEN_COLOR = "\e[32m"
-
-    # 黄色
-    YELLOW_COLOR = "\e[33m"
-
-    # 蓝色
-    BLUE_COLOR = "\e[34m"
-
-    # 紫色
-    MAGENTA_COLOR = "\e[35m"
-
-    # 青色
-    CYAN_COLOR = "\e[36m"
-
-    # 重置颜色
-    RESET_COLOR = "\e[0m"
-
-    # 清除行
-    ESCAPE = "\e[2K"
-
     # 根据 file_basename 检查 object 的类型在 module_name 中是否正确
     #
     # @param object [Object] 待检查的对象
@@ -683,9 +660,7 @@ module R3EXS
         # 检查文件名是否在 RVDATA2_FILE_NAME 中与其正则表达式匹配
         next unless RVDATA2_FILE_NAME.any? { |pattern| file_basename =~ pattern }
 
-        if $global_options[:verbose]
-          print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing from #{RESET_COLOR}#{file_path}...\r"
-        end
+        Logger.debug("Reading and Deserializing from #{file_path}...")
         object = Marshal.load(file_path.binread)
 
         # 如果文件名不是 'Scripts'，则检查 object 的类型是否正确
@@ -732,9 +707,7 @@ module R3EXS
         # 检查文件名是否在 JSON_FILE_NAME 中与其正则表达式匹配
         next unless JSON_FILE_NAME.any? { |pattern| file_basename =~ pattern }
 
-        if $global_options[:verbose]
-          print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r"
-        end
+        Logger.debug("Reading and Deserializing #{file_path}...")
         object = Oj.load_file(file_path.to_s)
 
         case module_name
@@ -791,9 +764,7 @@ module R3EXS
 
       # 递归获取 target_dir 下的所有 CommonEvent_\d{5}.json 文件
       target_dir.glob('**/CommonEvent_[0-9][0-9][0-9][0-9][0-9].json').each do |file_path|
-        if $global_options[:verbose]
-          print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r"
-        end
+        Logger.debug("Reading and Deserializing #{file_path}...")
         object = Oj.load_file(file_path.to_s)
         parent_dir = file_path.dirname
         commonevents_hash[parent_dir] << object
@@ -853,9 +824,7 @@ module R3EXS
 
       # 递归获取 target_dir 下的所有 \d{5}.rb 文件
       target_dir.glob('**/[0-9][0-9][0-9].rb').each do |file_path|
-        if $global_options[:verbose]
-          print "#{ESCAPE}#{BLUE_COLOR}Reading and Deserializing #{RESET_COLOR}#{file_path}...\r"
-        end
+        Logger.debug("Reading and Deserializing #{file_path}...")
         object = file_path.binread
         parent_dir = file_path.dirname
         scripts_hash[parent_dir] << object

@@ -2,6 +2,7 @@
 
 require 'zlib'
 require_relative 'utils'
+require_relative 'logger'
 
 module R3EXS
   # 将 Script 对象数组序列化为 Ruby 源码
@@ -21,23 +22,15 @@ module R3EXS
 
       scripts_info_array << { index: index, name: script[1] }
       script_file_path = full_dir.join("#{format('%03d', index)}.rb")
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{script_file_path}...\r"
-      end
+      Logger.debug("Serializing to #{script_file_path}...")
       script_file_path.write(Zlib::Inflate.inflate(script[2]).encode(universal_newline: true))
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{script_file_path}\n"
-      end
+      Logger.debug("Serialized #{script_file_path}")
     end
 
     script_info_file_path = full_dir.join('Scripts_info.json')
-    if $global_options[:verbose]
-      print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{script_info_file_path}\r"
-    end
+    Logger.debug("Serializing to #{script_info_file_path}")
     Utils.object_json(scripts_info_array, script_info_file_path)
-    return unless $global_options[:verbose]
-
-    print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{script_info_file_path}\n"
+    Logger.debug("Serialized #{script_info_file_path}")
   end
 
   # 将 CommonEvents 对象数组序列化为分开的 JSON 文件
@@ -54,26 +47,18 @@ module R3EXS
     if complete
       commonevents.each_with_index do |commonevent, index|
         commonevent_file_path = full_dir.join("#{format('CommonEvent_%05d', index)}.json")
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{commonevent_file_path}...\r"
-        end
+        Logger.debug("Serializing to #{commonevent_file_path}...")
         Utils.object_json(commonevent, commonevent_file_path)
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{commonevent_file_path}\n"
-        end
+        Logger.debug("Serialized #{commonevent_file_path}")
       end
     else
       commonevents = Utils.rpg_r3exs(commonevents, 'CommonEvents', with_notes)
       commonevents.each do |commonevent|
         index = commonevent.index
         commonevent_file_path = full_dir.join("#{format('CommonEvent_%05d', index)}.json")
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{commonevent_file_path}...\r"
-        end
+        Logger.debug("Serializing to #{commonevent_file_path}...")
         Utils.object_json(commonevent, commonevent_file_path)
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{commonevent_file_path}\n"
-        end
+        Logger.debug("Serialized #{commonevent_file_path}")
       end
     end
   end
@@ -98,17 +83,13 @@ module R3EXS
         commonevents_json(object, output_dir.join(parent_relative_dir), complete, with_notes)
       else
         file_path = output_dir.join(parent_relative_dir, "#{file_basename}.json")
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{file_path}...\r"
-        end
+        Logger.debug("Serializing to #{file_path}...")
         if complete
           Utils.object_json(object, file_path)
         else
           Utils.object_json(Utils.rpg_r3exs(object, file_basename, with_notes), file_path)
         end
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{file_path}\n"
-        end
+        Logger.debug("Serialized #{file_path}")
       end
     end
   end

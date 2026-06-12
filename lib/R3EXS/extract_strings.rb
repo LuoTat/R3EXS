@@ -3,6 +3,7 @@
 require 'zlib'
 require_relative 'ast'
 require_relative 'utils'
+require_relative 'logger'
 
 module R3EXS
   # 将指定目录下的所有已经序列化为 R3EXS 后的 JOSN 文件中的字符串提取出来
@@ -23,9 +24,7 @@ module R3EXS
     # 处理常规的 JSON 文件
     Utils.all_json_files(target_dir, :R3EXS) do |object, file_basename, parent_relative_dir|
       file_path = target_dir.join(parent_relative_dir, "#{file_basename}.json")
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Extracting from #{Utils::RESET_COLOR}#{file_path}...\r"
-      end
+        Logger.debug("Extracting from #{file_path}...")
       if object.is_a?(Array)
         object.each do |obj|
           all_ex_strings.concat(obj.ex_strings)
@@ -33,22 +32,16 @@ module R3EXS
       else
         all_ex_strings.concat(object.ex_strings)
       end
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Extracted #{Utils::RESET_COLOR}#{file_path}\n"
-      end
+        Logger.debug("Extracted #{file_path}")
     end
 
     # 处理 CommonEvent_\d{5}.json 文件
     Utils.all_commonevent_json_files(target_dir, :R3EXS) do |commonevents, commonevents_basenames, parent_relative_dir|
       commonevents.zip(commonevents_basenames).each do |commonevent, commonevent_basename|
         file_path = target_dir.join(parent_relative_dir, "#{commonevent_basename}.json")
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Extracting from #{Utils::RESET_COLOR}#{file_path}...\r"
-        end
+          Logger.debug("Extracting from #{file_path}...")
         all_ex_strings.concat(commonevent.ex_strings)
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Extracted #{Utils::RESET_COLOR}#{file_path}\n"
-        end
+          Logger.debug("Extracted #{file_path}")
       end
     end
 
@@ -60,13 +53,9 @@ module R3EXS
       Utils.all_rb_files(target_dir) do |scripts, scripts_basenames, parent_relative_dir|
         scripts.zip(scripts_basenames).each do |script, script_basename|
           file_path = target_dir.join(parent_relative_dir, "#{script_basename}.rb")
-          if $global_options[:verbose]
-            print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Extracting from #{Utils::RESET_COLOR}#{file_path}...\r"
-          end
+            Logger.debug("Extracting from #{file_path}...")
           strings_extractor.visit(Prism.parse(script).value)
-          if $global_options[:verbose]
-            print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Extracted #{Utils::RESET_COLOR}#{file_path}\n"
-          end
+            Logger.debug("Extracted #{file_path}")
         end
       end
 

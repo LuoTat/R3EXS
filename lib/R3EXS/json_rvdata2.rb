@@ -2,6 +2,7 @@
 
 require 'zlib'
 require_relative 'utils'
+require_relative 'logger'
 
 module R3EXS
   # 将指定目录下的所有JSON文件转换为 rvdata2 文件
@@ -25,17 +26,13 @@ module R3EXS
     Utils.all_json_files(target_dir, complete ? :RPG : :R3EXS) do |object, file_basename, parent_relative_dir|
       output_file_path = output_dir.join(parent_relative_dir, "#{file_basename}.rvdata2")
       if complete
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{output_file_path}...\r"
-        end
+        Logger.debug("Serializing to #{output_file_path}...")
         Utils.object_rvdata2(object, output_file_path)
       else
         # 检查 original_dir 是否存在
         original_dir.exist? or raise Rvdata2DirError.new(original_dir.to_s), "Original rvdata2 directory not found: #{original_dir}"
         original_file_path = original_dir.join(parent_relative_dir, "#{file_basename}.rvdata2")
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::BLUE_COLOR}Reading and Deserializing #{Utils::RESET_COLOR}#{original_file_path}...\r"
-        end
+        Logger.debug("Reading and Deserializing #{original_file_path}...")
         original_object = Marshal.load(original_file_path.binread)
 
         # 这里的类型检查要用紧凑模式，因为 rvdata2 文件中可能存在 nil 元素，必须忽略
@@ -45,9 +42,7 @@ module R3EXS
           raise Rvdata2FileError.new(original_file_path.to_s), "Invalid rvdata2 file: #{original_file_path}"
         end
 
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{output_file_path}...\r"
-        end
+        Logger.debug("Serializing to #{output_file_path}...")
 
         # 根据是否为数组进行不同的处理
         if object.is_a?(Array)
@@ -59,26 +54,20 @@ module R3EXS
         end
         Utils.object_rvdata2(original_object, output_file_path)
       end
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{output_file_path}\n"
-      end
+      Logger.debug("Serialized #{output_file_path}")
     end
 
     # 处理 CommonEvent_\d{5}.json 文件
     Utils.all_commonevent_json_files(target_dir, complete ? :RPG : :R3EXS) do |commonevents, _, parent_relative_dir|
       output_file_path = output_dir.join(parent_relative_dir.parent, 'CommonEvents.rvdata2')
       if complete
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{output_file_path}...\r"
-        end
+        Logger.debug("Serializing to #{output_file_path}...")
         Utils.object_rvdata2(commonevents, output_file_path)
       else
         # 检查 original_dir 是否存在
         original_dir.exist? or raise Rvdata2DirError.new(original_dir.to_s), "Original rvdata2 directory not found: #{original_dir}"
         original_file_path = original_dir.join(parent_relative_dir.parent, 'CommonEvents.rvdata2')
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::BLUE_COLOR}Reading and Deserializing #{Utils::RESET_COLOR}#{original_file_path}...\r"
-        end
+        Logger.debug("Reading and Deserializing #{original_file_path}...")
         original_object = Marshal.load(original_file_path.binread)
 
         # 这里的类型检查要用紧凑模式，因为 rvdata2 文件中可能存在 nil 元素，必须忽略
@@ -88,9 +77,7 @@ module R3EXS
           raise Rvdata2FileError.new(original_file_path.to_s), "Invalid rvdata2 file: #{original_file_path}"
         end
 
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{output_file_path}...\r"
-        end
+        Logger.debug("Serializing to #{output_file_path}...")
 
         commonevents.each do |commonevent|
           commonevent.inject_to(original_object[commonevent.index])
@@ -98,9 +85,7 @@ module R3EXS
 
         Utils.object_rvdata2(original_object, output_file_path)
       end
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{output_file_path}\n"
-      end
+      Logger.debug("Serialized #{output_file_path}")
     end
 
     # 处理 \d{5}.rb 文件
@@ -111,13 +96,9 @@ module R3EXS
       script_info_file_path = target_dir.join(parent_relative_dir, 'Scripts_info.json')
       script_info_file_path.exist? or raise ScriptsInfoPathError.new(script_info_file_path.to_s), "Scripts_info.json not found: #{script_info_file_path}"
 
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Serializing to #{Utils::RESET_COLOR}#{output_file_path}...\r"
-      end
+      Logger.debug("Serializing to #{output_file_path}...")
 
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::YELLOW_COLOR}Reading from #{Utils::RESET_COLOR}#{script_info_file_path}...\r"
-      end
+      Logger.debug("Reading from #{script_info_file_path}...")
       scripts_info_array = Oj.load_file(script_info_file_path.to_s)
 
       output_scripts_array = []
@@ -127,9 +108,7 @@ module R3EXS
         output_scripts_array << [114_514, script_info[:name], Zlib::Deflate.deflate(script)]
       end
       Utils.object_rvdata2(output_scripts_array, output_file_path)
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Serialized #{Utils::RESET_COLOR}#{output_file_path}\n"
-      end
+      Logger.debug("Serialized #{output_file_path}")
     end
   end
 end

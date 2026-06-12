@@ -3,6 +3,7 @@
 require 'zlib'
 require_relative 'ast'
 require_relative 'utils'
+require_relative 'logger'
 
 module R3EXS
   # 将指定目录下的所有已经序列化为 R3EXS 后的 JOSN 文件按照 ManualTransFile.json 翻译注入
@@ -26,9 +27,7 @@ module R3EXS
     # 处理常规的 JSON 文件
     Utils.all_json_files(target_dir, :R3EXS) do |object, file_basename, parent_relative_dir|
       file_path = output_dir.join(parent_relative_dir, "#{file_basename}.json")
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Injecting to #{Utils::RESET_COLOR}#{file_path}...\r"
-      end
+      Logger.debug("Injecting to #{file_path}...")
       if object.is_a?(Array)
         object.each do |obj|
           obj.in_strings(manual_trans_hash)
@@ -37,23 +36,17 @@ module R3EXS
         object.in_strings(manual_trans_hash)
       end
       Utils.object_json(object, file_path)
-      if $global_options[:verbose]
-        print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Injected #{Utils::RESET_COLOR}#{file_path}\n"
-      end
+      Logger.debug("Injected #{file_path}")
     end
 
     # 处理 CommonEvent_\d{5}.json 文件
     Utils.all_commonevent_json_files(target_dir, :R3EXS) do |commonevents, commonevents_basenames, parent_relative_dir|
       commonevents.zip(commonevents_basenames).each do |commonevent, commonevent_basename|
         file_path = output_dir.join(parent_relative_dir, "#{commonevent_basename}.json")
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::MAGENTA_COLOR}Injecting to #{Utils::RESET_COLOR}#{file_path}...\r"
-        end
+        Logger.debug("Injecting to #{file_path}...")
         commonevent.in_strings(manual_trans_hash)
         Utils.object_json(commonevent, file_path)
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Injected #{Utils::RESET_COLOR}#{file_path}\n"
-        end
+        Logger.debug("Injected #{file_path}")
       end
     end
 
@@ -71,10 +64,9 @@ module R3EXS
 
       scripts.zip(scripts_basenames).each do |script, script_basename|
         output_file_path = full_output_dir.join("#{script_basename}.rb")
+        Logger.debug("Injecting to #{output_file_path}...")
         output_file_path.binwrite(StringsInjector.new(manual_trans_hash).rewrite(script, Prism.parse(script).value))
-        if $global_options[:verbose]
-          print "#{Utils::ESCAPE}#{Utils::GREEN_COLOR}Injected #{Utils::RESET_COLOR}#{output_file_path}\n"
-        end
+        Logger.debug("Injected #{output_file_path}")
       end
     end
   end
