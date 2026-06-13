@@ -9,10 +9,6 @@
 #include <span>
 #include <unordered_set>
 #include <vector>
-#ifdef _WIN32
-    #include <clocale>
-    #include <windows.h>
-#endif
 
 #define GREEN_COLOR(str)   "\e[32m" str "\e[0m"    // 绿色
 #define MAGENTA_COLOR(str) "\e[35m" str "\e[0m"    // 紫色
@@ -330,10 +326,6 @@ extern "C"
      */
     void Init_R3EXS()
     {
-#ifdef _WIN32
-        setlocale(LC_ALL, ".utf-8");    // 设置标准库调用系统 API 所用的编码
-#endif
-
         // 定义 R3EXS 模块
         VALUE R3EXS {rb_define_module("R3EXS")};
         // 定义 rgss3a_rvdata2 方法
