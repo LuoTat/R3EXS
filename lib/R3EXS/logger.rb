@@ -34,9 +34,9 @@ module R3EXS
         when INFO
           puts("#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} [INFO]: #{message}")
         when WARN
-          warn("#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} [WARN]: #{message}")
+          ::Kernel.warn("#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} [WARN]: #{message}")
         else
-          warn("#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} [UNKNOWN]: #{message}")
+          ::Kernel.warn("#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} [UNKNOWN]: #{message}")
         end
       end
     end
