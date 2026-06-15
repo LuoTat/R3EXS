@@ -6,7 +6,7 @@ require_relative 'utils'
 require_relative 'logger'
 
 module R3EXS
-  # 提取已序列化为 R3EXS 格式的 CommonEvent 文件中的字符串
+  # 提取 R3EXS 格式的 CommonEvent 文件中的字符串
   #
   # @param target_dir [Pathname] 目标目录
   #
@@ -33,7 +33,6 @@ module R3EXS
   def self.ex_scripts(target_dir, with_symbol)
     ex_strings = []
     strings_extractor = StringsExtractor.new(ex_strings, with_symbol)
-
     Utils.all_rb_files(target_dir) do |scripts, scripts_basenames, parent_relative_dir|
       scripts.zip(scripts_basenames).each do |script, script_basename|
         file_path = target_dir.join(parent_relative_dir, "#{script_basename}.rb")
@@ -45,7 +44,7 @@ module R3EXS
     ex_strings
   end
 
-  # 提取指定目录下所有已序列化为 R3EXS 格式的 JOSN 文件中的字符串
+  # 提取指定目录下 R3EXS 格式的 JOSN 文件中的字符串
   #
   # @param target_dir [Pathname] 目标目录
   # @param output_dir [Pathname] 输出目录
@@ -53,8 +52,8 @@ module R3EXS
   # @param with_symbol [Boolean] 是否包含脚本中的符号
   # @param with_scripts_separate [Boolean] 是否将脚本提取的字符串单独存放
   #
-  # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
   # @raise [JsonDirError] target_dir 不存在
+  # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
   #
   # @return [void]
   def self.ex_strings(target_dir, output_dir, with_scripts, with_symbol, with_scripts_separate)
@@ -63,7 +62,7 @@ module R3EXS
     # 处理 CommonEvent_\d{5}.json 文件
     all_ex_strings.concat(ex_commonevents(target_dir))
 
-    # 处理 \d{5}.rb 文件
+    # 处理 Script_\d{3}.rb 文件
     if with_scripts
       rb_strings = ex_scripts(target_dir, with_symbol)
       # 单独输出脚本提取的字符串
@@ -74,15 +73,11 @@ module R3EXS
       end
     end
 
-    # 处理常规的 JSON 文件
-    Utils.all_json_files(target_dir, :R3EXS) do |object, file_basename, parent_relative_dir|
+    # 处理常规 JSON 文件
+    Utils.all_common_json_files(target_dir, :R3EXS) do |object, file_basename, parent_relative_dir|
       file_path = target_dir.join(parent_relative_dir, "#{file_basename}.json")
       Logger.debug("Extracting from #{file_path}...")
-      if object.is_a?(Array)
-        object.each { |obj| all_ex_strings.concat(obj.ex_strings) }
-      else
-        all_ex_strings.concat(object.ex_strings)
-      end
+      all_ex_strings.concat(Utils.ex_r3exs(object))
       Logger.debug("Extracted #{file_path}")
     end
 
