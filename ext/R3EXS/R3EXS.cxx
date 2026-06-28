@@ -36,7 +36,7 @@ public:
     {}
 };
 
-template <class T>
+template <typename T>
 requires std::is_trivially_copyable_v<T>
 [[nodiscard]]
 inline T load_little_data(char*& data) noexcept
@@ -248,7 +248,7 @@ void r3exs_rgss3a_rvdata2_cxx(
 
     // 处理所有的解密任务,并记录需要创建的目录
     std::unordered_set<std::filesystem::path> dirs;
-    for (auto& task : tasks)
+    for (auto&& task : tasks)
     {
         decrypt_file_name(task.filename, task.filename_magickey);
         decrypt_file_data_dispatch(task.data, task.data_magickey);
@@ -258,12 +258,12 @@ void r3exs_rgss3a_rvdata2_cxx(
         dirs.emplace(task.output_full_path.parent_path());
     }
     // 创建所有需要的目录
-    for (const auto& dir : dirs)
+    for (auto&& dir : dirs)
     {
         std::filesystem::create_directories(dir);
     }
     // 写入文件
-    for (const auto& task : tasks)
+    for (auto&& task : tasks)
     {
         write_file(task.output_full_path, task.data);
         if (verbose) [[unlikely]]
