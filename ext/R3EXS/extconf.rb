@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mkmf'
 
 $CXXFLAGS << ' -std=c++23' # 添加对C++23的支持
