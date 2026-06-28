@@ -14,21 +14,18 @@ module R3EXS
   #
   # @return [void]
   def self.commonevents_json(commonevents, output_dir, complete, with_notes)
-    full_dir = output_dir.join('CommonEvents')
     if complete
       commonevents.each_with_index do |commonevent, index|
-        commonevent_file_path = full_dir.join("#{format('CommonEvent_%05d', index)}.json")
-        Logger.debug("Serializing to #{commonevent_file_path}...")
-        Utils.object_json(commonevent, commonevent_file_path)
-        Logger.debug("Serialized #{commonevent_file_path}")
+        file_path = output_dir.join("#{format('CommonEvent_%05d', index)}.json")
+        Utils.object_json(commonevent, file_path)
+        Logger.debug("Serialize   #{file_path}")
       end
     else
       commonevents = Utils.rpg_r3exs(commonevents, R3EXS::CommonEvent, with_notes)
       commonevents.each do |commonevent|
-        commonevent_file_path = full_dir.join("#{format('CommonEvent_%05d', commonevent.index)}.json")
-        Logger.debug("Serializing to #{commonevent_file_path}...")
-        Utils.object_json(commonevent, commonevent_file_path)
-        Logger.debug("Serialized #{commonevent_file_path}")
+        file_path = output_dir.join("#{format('CommonEvent_%05d', commonevent.index)}.json")
+        Utils.object_json(commonevent, file_path)
+        Logger.debug("Serialize   #{file_path}")
       end
     end
   end
@@ -40,21 +37,18 @@ module R3EXS
   #
   # @return [void]
   def self.scripts_rb(scripts, output_dir)
-    full_dir = output_dir.join('Scripts')
-    script_info_file_path = full_dir.join('Scripts_info.json')
-    scripts_info_array = []
+    scripts_info = []
+    script_info_file_path = output_dir.join('Scripts_info.json')
     scripts.each_with_index do |script, index|
       next if script.nil?
 
-      scripts_info_array << { index: index, name: script[1] }
-      script_file_path = full_dir.join("#{format('Script_%03d', index)}.rb")
-      Logger.debug("Serializing to #{script_file_path}...")
-      Utils.script_rb(script, script_file_path)
-      Logger.debug("Serialized #{script_file_path}")
+      scripts_info << { index: index, name: script[1] }
+      file_path = output_dir.join("#{format('Script_%03d', index)}.rb")
+      Utils.script_rb_compressing(script[2], file_path)
+      Logger.debug("Serialize   #{file_path}")
     end
-    Logger.debug("Serializing to #{script_info_file_path}")
-    Utils.object_json(scripts_info_array, script_info_file_path)
-    Logger.debug("Serialized #{script_info_file_path}")
+    Utils.object_json(scripts_info, script_info_file_path)
+    Logger.debug("Serialize   #{script_info_file_path}")
   end
 
   # 将指定目录下的所有 rvdata2 文件序列化为 JSON 格式
@@ -69,21 +63,19 @@ module R3EXS
   #
   # @return [void]
   def self.rvdata2_json(target_dir, output_dir, complete, with_scripts, with_notes)
-    Utils.all_rvdata2_files(target_dir) do |object, klass, file_basename, parent_relative_dir|
-      full_dir = output_dir.join(parent_relative_dir)
+    Utils.all_rvdata2_files(target_dir) do |object, klass, file_basename, rvdata2_path|
+      file_path = output_dir.join(rvdata2_path.relative_path_from(target_dir)).sub_ext('.json')
       if file_basename.to_s == 'CommonEvents'
-        commonevents_json(object, full_dir, complete, with_notes)
+        commonevents_json(object, file_path.sub_ext(''), complete, with_notes)
       elsif file_basename.to_s == 'Scripts'
-        scripts_rb(object, full_dir) if with_scripts
+        scripts_rb(object, file_path.sub_ext('')) if with_scripts
       else
-        file_path = full_dir.join("#{file_basename}.json")
-        Logger.debug("Serializing to #{file_path}...")
         if complete
           Utils.object_json(object, file_path)
         else
           Utils.object_json(Utils.rpg_r3exs(object, klass, with_notes), file_path)
         end
-        Logger.debug("Serialized #{file_path}")
+        Logger.debug("Serialize   #{file_path}")
       end
     end
   end

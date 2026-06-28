@@ -10,15 +10,16 @@ module R3EXS
   #
   # @param target_dir [Pathname] 目标目录
   #
+  # @raise [JsonDirError] target_dir 不存在
+  # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
+  #
   # @return [Array<String>]
   def self.ex_commonevents(target_dir)
     ex_strings = []
-    Utils.all_commonevent_json_files(target_dir, :R3EXS) do |commonevents, commonevents_basenames, parent_relative_dir|
-      commonevents.zip(commonevents_basenames).each do |commonevent, commonevent_basename|
-        file_path = target_dir.join(parent_relative_dir, "#{commonevent_basename}.json")
-        Logger.debug("Extracting from #{file_path}...")
+    Utils.all_commonevent_json_files(target_dir, :R3EXS) do |commonevents, commonevents_paths, _|
+      commonevents.zip(commonevents_paths).each do |commonevent, commonevents_path|
         ex_strings.concat(commonevent.ex_strings)
-        Logger.debug("Extracted #{file_path}")
+        Logger.debug("Extract     #{commonevents_path}")
       end
     end
     ex_strings
@@ -29,16 +30,15 @@ module R3EXS
   # @param target_dir [Pathname] 目标目录
   # @param with_symbol [Boolean] 是否包含脚本中的符号
   #
+  # @raise [JsonDirError] target_dir 不存在
+  #
   # @return [Array<String>]
   def self.ex_scripts(target_dir, with_symbol)
     ex_strings = []
-    strings_extractor = StringsExtractor.new(ex_strings, with_symbol)
-    Utils.all_rb_files(target_dir) do |scripts, scripts_basenames, parent_relative_dir|
-      scripts.zip(scripts_basenames).each do |script, script_basename|
-        file_path = target_dir.join(parent_relative_dir, "#{script_basename}.rb")
-        Logger.debug("Extracting from #{file_path}...")
-        strings_extractor.visit(Prism.parse(script).value)
-        Logger.debug("Extracted #{file_path}")
+    Utils.all_rb_files(target_dir) do |scripts, _, scripts_paths, _, _|
+      scripts.zip(scripts_paths).each do |script, scripts_path|
+        ex_strings.concat(StringsExtractor.extract(script, with_symbol))
+        Logger.debug("Extract     #{scripts_path}")
       end
     end
     ex_strings
@@ -74,11 +74,9 @@ module R3EXS
     end
 
     # 处理常规 JSON 文件
-    Utils.all_common_json_files(target_dir, :R3EXS) do |object, file_basename, parent_relative_dir|
-      file_path = target_dir.join(parent_relative_dir, "#{file_basename}.json")
-      Logger.debug("Extracting from #{file_path}...")
+    Utils.all_common_json_files(target_dir, :R3EXS) do |object, file_path|
       all_ex_strings.concat(Utils.ex_r3exs(object))
-      Logger.debug("Extracted #{file_path}")
+      Logger.debug("Extract     #{file_path}")
     end
 
     # 去除 nil 元素

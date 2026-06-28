@@ -47,9 +47,7 @@ module R3EXS
     def inject_to(map)
       map.display_name = @display_name
       map.note = @note if instance_variable_defined?(:@note)
-      @events.each do |event|
-        event.inject_to(map.events[event.index])
-      end
+      @events.each { |event| event.inject_to(map.events[event.index]) }
     end
 
     # 提取所有的字符串
@@ -59,9 +57,7 @@ module R3EXS
       strings = []
       strings << @display_name
       strings << @note if instance_variable_defined?(:@note)
-      @events.each do |event|
-        strings.concat(event.ex_strings)
-      end
+      @events.each { |event| strings.concat(event.ex_strings) }
       strings
     end
 
@@ -73,9 +69,7 @@ module R3EXS
     def in_strings(hash)
       @display_name = hash[@display_name] || @display_name
       @note = hash[@note] || @note if instance_variable_defined?(:@note)
-      @events.each do |event|
-        event.in_strings(hash)
-      end
+      @events.each { |event| event.in_strings(hash) }
     end
   end
 
@@ -170,9 +164,7 @@ module R3EXS
     # @return [void]
     def inject_to(event)
       event.name = @name
-      @pages.each do |page|
-        page.inject_to(event.pages[page.index])
-      end
+      @pages.each { |page| page.inject_to(event.pages[page.index]) }
     end
 
     # 提取所有的字符串
@@ -180,9 +172,7 @@ module R3EXS
     # @return [Array<String>]
     def ex_strings
       strings = [@name]
-      @pages.each do |page|
-        strings.concat(page.ex_strings)
-      end
+      @pages.each { |page| strings.concat(page.ex_strings) }
       strings
     end
 
@@ -193,9 +183,7 @@ module R3EXS
     # @return [void]
     def in_strings(hash)
       @name = hash[@name] || @name
-      @pages.each do |page|
-        page.in_strings(hash)
-      end
+      @pages.each { |page| page.in_strings(hash) }
     end
 
     # 判断是否为空
@@ -240,9 +228,7 @@ module R3EXS
       #
       # @return [void]
       def inject_to(page)
-        @list.each do |eventcommand|
-          eventcommand.inject_to(page.list[eventcommand.index])
-        end
+        @list.each { |eventcommand| eventcommand.inject_to(page.list[eventcommand.index]) }
       end
 
       # 提取所有的字符串
@@ -250,9 +236,7 @@ module R3EXS
       # @return [Array<String>]
       def ex_strings
         strings = []
-        @list.each do |eventcommand|
-          strings.concat(eventcommand.ex_strings)
-        end
+        @list.each { |eventcommand| strings.concat(eventcommand.ex_strings) }
         strings
       end
 
@@ -262,9 +246,7 @@ module R3EXS
       #
       # @return [void]
       def in_strings(hash)
-        @list.each do |eventcommand|
-          eventcommand.in_strings(hash)
-        end
+        @list.each { |eventcommand| eventcommand.in_strings(hash) }
       end
 
       # 判断是否为空
@@ -537,9 +519,7 @@ module R3EXS
     #
     # @return [void]
     def inject_to(moveroute)
-      @list.each do |movecommand|
-        movecommand.inject_to(moveroute.list[movecommand.index])
-      end
+      @list.each { |movecommand| movecommand.inject_to(moveroute.list[movecommand.index]) }
     end
 
     # 提取所有的字符串
@@ -547,9 +527,7 @@ module R3EXS
     # @return [Array<String>]
     def ex_strings
       strings = []
-      @list.each do |movecommand|
-        strings.concat(movecommand.ex_strings)
-      end
+      @list.each { |movecommand| strings.concat(movecommand.ex_strings) }
       strings
     end
 
@@ -559,9 +537,7 @@ module R3EXS
     #
     # @return [void]
     def in_strings(hash)
-      @list.each do |movecommand|
-        movecommand.in_strings(hash)
-      end
+      @list.each { |movecommand| movecommand.in_strings(hash) }
     end
 
     # 判断是否为空
@@ -814,9 +790,7 @@ module R3EXS
       super(klass)
       return unless instance_variable_defined?(:@learnings)
 
-      @learnings.each do |learning|
-        learning.inject_to(klass.learnings[learning.index])
-      end
+      @learnings.each { |learning| learning.inject_to(klass.learnings[learning.index]) }
     end
 
     # 提取所有的字符串
@@ -825,9 +799,7 @@ module R3EXS
     def ex_strings
       strings = super
       if instance_variable_defined?(:@learnings)
-        @learnings.each do |learning|
-          strings.concat(learning.ex_strings)
-        end
+        @learnings.each { |learning| strings.concat(learning.ex_strings) }
       end
       strings
     end
@@ -841,9 +813,7 @@ module R3EXS
       super(hash)
       return unless instance_variable_defined?(:@learnings)
 
-      @learnings.each do |learning|
-        learning.in_strings(hash)
-      end
+      @learnings.each { |learning| learning.in_strings(hash) }
     end
 
     # 判断是否为空
@@ -1136,9 +1106,7 @@ module R3EXS
     # @return [void]
     def inject_to(troop)
       troop.name = @name
-      @pages.each do |page|
-        page.inject_to(troop.pages[page.index])
-      end
+      @pages.each { |page| page.inject_to(troop.pages[page.index]) }
     end
 
     # 提取所有的字符串
@@ -1146,9 +1114,7 @@ module R3EXS
     # @return [Array<String>]
     def ex_strings
       strings = [@name]
-      @pages.each do |page|
-        strings.concat(page.ex_strings)
-      end
+      @pages.each { |page| strings.concat(page.ex_strings) }
       strings
     end
 
@@ -1159,9 +1125,7 @@ module R3EXS
     # @return [void]
     def in_strings(hash)
       @name = hash[@name] || @name
-      @pages.each do |page|
-        page.in_strings(hash)
-      end
+      @pages.each { |page| page.in_strings(hash) }
     end
 
     # 判断是否为空
@@ -1206,9 +1170,7 @@ module R3EXS
       #
       # @return [void]
       def inject_to(page)
-        @list.each do |eventcommand|
-          eventcommand.inject_to(page.list[eventcommand.index])
-        end
+        @list.each { |eventcommand| eventcommand.inject_to(page.list[eventcommand.index]) }
       end
 
       # 提取所有的字符串
@@ -1216,9 +1178,7 @@ module R3EXS
       # @return [Array<String>]
       def ex_strings
         strings = []
-        @list.each do |eventcommand|
-          strings.concat(eventcommand.ex_strings)
-        end
+        @list.each { |eventcommand| strings.concat(eventcommand.ex_strings) }
         strings
       end
 
@@ -1228,9 +1188,7 @@ module R3EXS
       #
       # @return [void]
       def in_strings(hash)
-        @list.each do |eventcommand|
-          eventcommand.in_strings(hash)
-        end
+        @list.each { |eventcommand| eventcommand.in_strings(hash) }
       end
 
       # 判断是否为空
@@ -1409,9 +1367,7 @@ module R3EXS
     # @return [void]
     def inject_to(commonevent)
       commonevent.name = @name
-      @list.each do |eventcommand|
-        eventcommand.inject_to(commonevent.list[eventcommand.index])
-      end
+      @list.each { |eventcommand| eventcommand.inject_to(commonevent.list[eventcommand.index]) }
     end
 
     # 提取所有的字符串
@@ -1419,9 +1375,7 @@ module R3EXS
     # @return [Array<String>]
     def ex_strings
       strings = [@name]
-      @list.each do |eventcommand|
-        strings.concat(eventcommand.ex_strings)
-      end
+      @list.each { |eventcommand| strings.concat(eventcommand.ex_strings) }
       strings
     end
 
@@ -1432,9 +1386,7 @@ module R3EXS
     # @return [void]
     def in_strings(hash)
       @name = hash[@name] || @name
-      @list.each do |eventcommand|
-        eventcommand.in_strings(hash)
-      end
+      @list.each { |eventcommand| eventcommand.in_strings(hash) }
     end
 
     # 判断是否为空

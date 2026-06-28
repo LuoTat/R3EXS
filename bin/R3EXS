@@ -55,9 +55,6 @@ class App
     c.action do |_global_options, options, args|
       R3EXS.rvdata2_json(Pathname(args[0]), Pathname(options[:output_dir]), options[:complete], options[:with_scripts], options[:with_notes])
       R3EXS::Logger.info("All JSON files have been written to #{options[:output_dir]}")
-    rescue R3EXS::Rvdata2FileError => e
-      R3EXS::Logger.warn(e.message)
-      R3EXS::Logger.warn('Please make sure the rvdata2 files are not corrupted.')
     rescue R3EXS::Rvdata2DirError => e
       R3EXS::Logger.warn(e.message)
     end
@@ -85,6 +82,8 @@ class App
     c.action do |_global_options, options, args|
       R3EXS.json_rvdata2(Pathname(args[0]), Pathname(options[:output_dir]), Pathname(options[:original_dir]), options[:complete], options[:with_scripts])
       R3EXS::Logger.info("All new rvdata2 files have been written to #{options[:output_dir]}")
+    rescue R3EXS::JsonDirError => e
+      R3EXS::Logger.warn(e.message)
     rescue R3EXS::RPGJsonFileError => e
       R3EXS::Logger.warn(e.message)
       R3EXS::Logger.warn('Your JSON files are not in RPG module')
@@ -97,14 +96,8 @@ class App
       R3EXS::Logger.warn("You are NOT supposed to use '-c' or '--complete' to enable complete serialization in rvdata2_json subcommand")
       R3EXS::Logger.warn("Or use '-c' or '--complete' to enable complete deserialization in json_rvdata2 subcommand")
       R3EXS::Logger.warn("For more information, please enter 'R3EXS help json_rvdata2'")
-    rescue R3EXS::Rvdata2FileError => e
+    rescue R3EXS::Rvdata2PathError => e
       R3EXS::Logger.warn(e.message)
-      R3EXS::Logger.warn('Your original rvdata2 file seem to be corrupted')
-    rescue R3EXS::JsonDirError => e
-      R3EXS::Logger.warn(e.message)
-    rescue R3EXS::Rvdata2DirError => e
-      R3EXS::Logger.warn(e.message)
-      R3EXS::Logger.warn('You are supposed to privide the original rvdata2 dir in complete deserialization mode')
     rescue R3EXS::ScriptsInfoPathError => e
       R3EXS::Logger.warn(e.message)
       R3EXS::Logger.warn('Make sure the Scripts_info.json is in the Scripts directory')
@@ -136,13 +129,13 @@ class App
       else
         R3EXS::Logger.info("All strings have been extracted to #{File.join(options[:output_dir], 'ManualTransFile.json')}")
       end
+    rescue R3EXS::JsonDirError => e
+      R3EXS::Logger.warn(e.message)
     rescue R3EXS::R3EXSJsonFileError => e
       R3EXS::Logger.warn(e.message)
       R3EXS::Logger.warn('Your JSON files are not in R3EXS module')
       R3EXS::Logger.warn("You are NOT supposed to use '-c' or '--complete' to enable complete serialization in rvdata2_json subcommand")
       R3EXS::Logger.warn("For more information, please enter 'R3EXS help json_rvdata2'")
-    rescue R3EXS::JsonDirError => e
-      R3EXS::Logger.warn(e.message)
     end
   end
 
@@ -165,21 +158,21 @@ class App
     c.action do |_global_options, options, args|
       R3EXS.in_strings(Pathname(args[0]), Pathname(options[:output_dir]), Pathname(options[:manualtransfile_path]), options[:with_scripts])
       R3EXS::Logger.info("All new JSON files have been written to #{options[:output_dir]}")
+    rescue R3EXS::ManualTransFilePathError => e
+      R3EXS::Logger.warn(e.message)
+      R3EXS::Logger.warn('You are supposed to use ex_strings subcommand to generate the ManualTransFile.json')
+      R3EXS::Logger.warn("For more information, please enter 'R3EXS help ex_strings'")
+    rescue R3EXS::JsonDirError => e
+      R3EXS::Logger.warn(e.message)
     rescue R3EXS::R3EXSJsonFileError => e
       R3EXS::Logger.warn(e.message)
       R3EXS::Logger.warn('Your JSON files are not in R3EXS module')
       R3EXS::Logger.warn("You are NOT supposed to use '-c' or '--complete' to enable complete serialization in rvdata2_json subcommand")
       R3EXS::Logger.warn("For more information, please enter 'R3EXS help json_rvdata2'")
-    rescue R3EXS::JsonDirError => e
-      R3EXS::Logger.warn(e.message)
     rescue R3EXS::ScriptsInfoPathError => e
       R3EXS::Logger.warn(e.message)
       R3EXS::Logger.warn('Make sure the Scripts_info.json is in the Scripts directory')
       R3EXS::Logger.warn("For more information, please enter 'R3EXS help rvdata2_json'")
-    rescue R3EXS::ManualTransFilePathError => e
-      R3EXS::Logger.warn(e.message)
-      R3EXS::Logger.warn('You are supposed to use ex_strings subcommand to generate the ManualTransFile.json')
-      R3EXS::Logger.warn("For more information, please enter 'R3EXS help ex_strings'")
     end
   end
 
@@ -192,11 +185,9 @@ class App
   end
 
   on_error do |exception|
-    # Error logic here
-    # return false to skip default error handling
     R3EXS::Logger.warn(exception.message)
-    R3EXS::Logger.warn(exception.backtrace)
-    true
+    exception.backtrace.each { |line| R3EXS::Logger.warn(line) }
+    false
   end
 end
 

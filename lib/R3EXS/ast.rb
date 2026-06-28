@@ -15,16 +15,22 @@ module R3EXS
     # @return [Boolean]
     attr_reader :with_symbol
 
+    # AST 根节点
+    #
+    # @return [Prism::Node]
+    attr_reader :root_node
+
     # 初始化 StringsExtractor
     #
-    # @param strings [Array<String>] 存储提取出的字符串的数组
+    # @param script [String] Ruby 源码
     # @param with_symbol [Boolean] 是否包含脚本中的符号
     #
     # @return [StringsExtractor]
-    def initialize(strings, with_symbol)
+    def initialize(script, with_symbol)
       super()
-      @strings = strings
+      @strings = []
       @with_symbol = with_symbol
+      @root_node = Prism.parse(script).value
     end
 
     # 处理类型为 StringNode 的节点
@@ -46,10 +52,48 @@ module R3EXS
       @strings << node.value if @with_symbol
       super
     end
+
+    # 提取 script 源码中的字符串
+    #
+    # @return [Array<String>]
+    def extract
+      visit(@root_node)
+      @strings
+    end
+
+    # 提取 script 源码中的字符串
+    # @param script [String] Ruby 源码
+    # @param with_symbol [Boolean] 是否包含脚本中的符号
+    #
+    # @return [Array<String>]
+    def self.extract(script, with_symbol)
+      extractor = new(script, with_symbol)
+      extractor.extract
+    end
   end
 
   # 用来替换源码里面的字符串和符号
   class StringsInjector < Prism::Visitor
+    # 字符串在二进制源文件中的位置
+    #
+    # @return [Array<Location>]
+    attr_reader :content_loc
+
+    # Ruby 源码
+    #
+    # @return [String]
+    attr_reader :script
+
+    # 字符串翻译表
+    #
+    # @return [Hash<String, String>]
+    attr_reader :strings_hash
+
+    # AST 根节点
+    #
+    # @return [Prism::Node]
+    attr_reader :root_node
+
     # 用来记录字符串的位置
     class Location
       # 字符串在二进制源文件中的起始位置
@@ -83,14 +127,16 @@ module R3EXS
 
     # 初始化 StringsInjector
     #
+    # @param script [String] Ruby 源码
     # @param hash [Hash<String, String>] 字符串翻译表
     #
     # @return [StringsInjector]
-    def initialize(hash)
+    def initialize(script, hash)
       super()
-      @strings_hash = hash
       @content_loc = []
-      @code = []
+      @script = script
+      @strings_hash = hash
+      @root_node = Prism.parse(script).value
     end
 
     # 处理类型为 StringNode 的节点
@@ -126,30 +172,38 @@ module R3EXS
 
     # 将 script 源码中的字符串替换成 @strings_hash 翻译后的字符串
     #
-    # @param script [String] Ruby 源码，以二进制编码打开
-    # @param ast_root [Prism::ProgramNode] AST 树根节点
-    #
     # @return [String]
-    def rewrite(script, ast_root)
+    def inject
+      code = []
       # 首先遍历一遍，找到所有需要替换的字符串的位置
-      visit(ast_root)
+      visit(@root_node)
 
       # 然后开始替换 code 中的字符串
       # 先将 @content_loc 按照 start_offset 从小到大排序
       @content_loc.sort_by!(&:start_offset)
 
-      #  然后将 code 切片，将字符串替换成新的字符串
+      # 然后将 code 切片，将字符串替换成新的字符串
+      # 注意 Prism.parse 得到的位置是字节的偏移量，而 UTF-8 是变长编码，所以需要使用 byteslice 来切片
       start_offset = 0
       @content_loc.each do |loc|
-        @code << script[start_offset...loc.start_offset]
-        @code << @strings_hash[loc.content]
+        code << @script.byteslice(start_offset...loc.start_offset)
+        code << @strings_hash[loc.content]
         start_offset = loc.start_offset + loc.length
       end
-      @code << script[start_offset..]
+      code << @script.byteslice(start_offset..)
 
-      # 将 @code 里面的字符串全部改为二进制编码
-      @code.map! { |str| str&.force_encoding('ASCII-8BIT') }
-      @code.join
+      code.join
+    end
+
+    # 将 script 源码中的字符串替换成 @strings_hash 翻译后的字符串
+    #
+    # @param script [String] Ruby 源码
+    # @param hash [Hash<String, String>] 字符串翻译表
+    #
+    # @return [String]
+    def self.inject(script, hash)
+      injector = new(script, hash)
+      injector.inject
     end
   end
 end

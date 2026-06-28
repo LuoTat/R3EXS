@@ -12,34 +12,32 @@ module R3EXS
   # @param original_dir [Pathname]  原始 rvdata2 文件目录
   # @param complete [Boolean]  是否完全转换
   #
+  # @raise [JsonDirError] target_dir 不存在
+  # @raise [RPGJsonFileError] json 文件不是 RPG 模块中的对象
+  # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
+  # @raise [Rvdata2PathError] 原始 rvdata2 文件不存在
+  #
   # @return [void]
   def self.commonevents_rvdata2(target_dir, output_dir, original_dir, complete)
-    Utils.all_commonevent_json_files(target_dir, complete ? :RPG : :R3EXS) do |commonevents, _, parent_relative_dir|
-      output_file_path = output_dir.join(parent_relative_dir.parent, 'CommonEvents.rvdata2')
-      if complete
-        Logger.debug("Serializing to #{output_file_path}...")
-        Utils.object_rvdata2(commonevents, output_file_path)
-      else
-        # 检查 original_dir 是否存在
-        original_dir.exist? or raise Rvdata2DirError.new(original_dir.to_s), "Original rvdata2 directory not found: #{original_dir}"
-        original_file_path = original_dir.join(parent_relative_dir.parent, 'CommonEvents.rvdata2')
-        Logger.debug("Reading and Deserializing #{original_file_path}...")
-        original_object = Marshal.load(original_file_path.binread)
-
-        # 这里的类型检查要用紧凑模式，因为 rvdata2 文件中可能存在 nil 元素，必须忽略
-        begin
-          Utils.check_type(original_object, 'CommonEvents', true, :RPG)
-        rescue RPGTypeError
-          raise Rvdata2FileError.new(original_file_path.to_s), "Invalid rvdata2 file: #{original_file_path}"
-        end
-
-        Logger.debug("Serializing to #{output_file_path}...")
-
-        commonevents.each { |commonevent| commonevent.inject_to(original_object[commonevent.index]) }
-
-        Utils.object_rvdata2(original_object, output_file_path)
+    if complete
+      Utils.all_commonevent_json_files(target_dir, :RPG) do |commonevents, _, parent_relative_dir|
+        file_path = output_dir.join(parent_relative_dir.parent, 'CommonEvents.rvdata2')
+        Utils.object_rvdata2(commonevents, file_path)
+        Logger.debug("Serialize   #{file_path}")
       end
-      Logger.debug("Serialized #{output_file_path}")
+    else
+      Utils.all_commonevent_json_files(target_dir, :R3EXS) do |commonevents, _, parent_relative_dir|
+        file_path = output_dir.join(parent_relative_dir.parent, 'CommonEvents.rvdata2')
+        original_file_path = original_dir.join(parent_relative_dir.parent, 'CommonEvents.rvdata2')
+        # 检查 original_file_path 是否存在
+        original_file_path.exist? or raise Rvdata2PathError, "Original rvdata2 file not found: #{original_file_path}"
+
+        original_commonevents = Marshal.load(original_file_path.binread)
+        Logger.debug("Deserialize #{original_file_path}")
+        Utils.r3exs_rpg(commonevents, original_commonevents)
+        Utils.object_rvdata2(original_commonevents, file_path)
+        Logger.debug("Serialize   #{file_path}")
+      end
     end
   end
 
@@ -48,26 +46,22 @@ module R3EXS
   # @param target_dir [Pathname] 目标目录
   # @param output_dir [Pathname] 输出目录
   #
+  # @raise [JsonDirError] target_dir 不存在
+  # @raise [ScriptsInfoPathError] Scripts_info.json 不存在
+  #
   # @return [void]
   def self.scripts_rvdata2(target_dir, output_dir)
-    Utils.all_rb_files(target_dir) do |scripts, _, parent_relative_dir|
-      output_file_path = output_dir.join(parent_relative_dir.parent, 'Scripts.rvdata2')
-      script_info_file_path = target_dir.join(parent_relative_dir, 'Scripts_info.json')
-      script_info_file_path.exist? or raise ScriptsInfoPathError.new(script_info_file_path.to_s), "Scripts_info.json not found: #{script_info_file_path}"
+    Utils.all_rb_files(target_dir) do |scripts, script_info, _, _, parent_relative_dir|
+      file_path = output_dir.join(parent_relative_dir.parent, 'Scripts.rvdata2')
 
-      Logger.debug("Serializing to #{output_file_path}...")
-
-      Logger.debug("Reading from #{script_info_file_path}...")
-      scripts_info_array = Oj.load_file(script_info_file_path.to_s)
-
-      output_scripts_array = []
-      scripts_info_array.each do |script_info|
-        index = script_info[:index]
+      output_scripts = []
+      script_info.each do |info|
+        index = info[:index]
         script = scripts[index]
-        output_scripts_array << [114_514, script_info[:name], Zlib::Deflate.deflate(script)]
+        output_scripts << [114_514, info[:name], Zlib::Deflate.deflate(script)]
       end
-      Utils.object_rvdata2(output_scripts_array, output_file_path)
-      Logger.debug("Serialized #{output_file_path}")
+      Utils.object_rvdata2(output_scripts, file_path)
+      Logger.debug("Serialize   #{file_path}")
     end
   end
 
@@ -79,11 +73,10 @@ module R3EXS
   # @param complete [Boolean]  是否完全转换
   # @param with_scripts [Boolean]  是否转换Scripts
   #
+  # @raise [JsonDirError] target_dir 不存在
   # @raise [RPGJsonFileError] json 文件不是 RPG 模块中的对象
   # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
-  # @raise [Rvdata2FileError] 原始 rvdata2 文件可能损坏
-  # @raise [JsonDirError] target_dir 不存在
-  # @raise [Rvdata2DirError] original_dir 不存在
+  # @raise [Rvdata2PathError] 原始 rvdata2 文件不存在
   # @raise [ScriptsInfoPathError] Scripts_info.json 文件不存在
   #
   # @return [void]
@@ -91,42 +84,29 @@ module R3EXS
     # 处理 CommonEvent_\d{5}.json 文件
     commonevents_rvdata2(target_dir, output_dir, original_dir, complete)
 
-    # 处理 \d{5}.rb 文件
-    if with_scripts
-      scripts_rvdata2(target_dir, output_dir)
-    end
+    # 处理 Script_\d{3}.rb 文件
+    scripts_rvdata2(target_dir, output_dir) if with_scripts
 
-    # 处理常规的 JSON 文件
-    Utils.all_json_files(target_dir, complete ? :RPG : :R3EXS) do |object, file_basename, parent_relative_dir|
-      output_file_path = output_dir.join(parent_relative_dir, "#{file_basename}.rvdata2")
-      if complete
-        Logger.debug("Serializing to #{output_file_path}...")
-        Utils.object_rvdata2(object, output_file_path)
-      else
-        # 检查 original_dir 是否存在
-        original_dir.exist? or raise Rvdata2DirError.new(original_dir.to_s), "Original rvdata2 directory not found: #{original_dir}"
-        original_file_path = original_dir.join(parent_relative_dir, "#{file_basename}.rvdata2")
-        Logger.debug("Reading and Deserializing #{original_file_path}...")
-        original_object = Marshal.load(original_file_path.binread)
-
-        # 这里的类型检查要用紧凑模式，因为 rvdata2 文件中可能存在 nil 元素，必须忽略
-        begin
-          Utils.check_type(original_object, file_basename, true, :RPG)
-        rescue RPGTypeError
-          raise Rvdata2FileError.new(original_file_path.to_s), "Invalid rvdata2 file: #{original_file_path}"
-        end
-
-        Logger.debug("Serializing to #{output_file_path}...")
-
-        # 根据是否为数组进行不同的处理
-        if object.is_a?(Array)
-          object.each { |obj| obj.inject_to(original_object[obj.index]) }
-        else
-          object.inject_to(original_object)
-        end
-        Utils.object_rvdata2(original_object, output_file_path)
+    # 处理常规 JSON 文件
+    if complete
+      Utils.all_common_json_files(target_dir, :RPG) do |object, obj_path|
+        file_path = output_dir.join(obj_path.relative_path_from(target_dir)).sub_ext('.rvdata2')
+        Utils.object_rvdata2(object, file_path)
+        Logger.debug("Serialize   #{file_path}")
       end
-      Logger.debug("Serialized #{output_file_path}")
+    else
+      Utils.all_common_json_files(target_dir, :R3EXS) do |object, obj_path|
+        file_path = output_dir.join(obj_path.relative_path_from(target_dir)).sub_ext('.rvdata2')
+        original_file_path = original_dir.join(obj_path.relative_path_from(target_dir)).sub_ext('.rvdata2')
+        # 检查 original_file_path 是否存在
+        original_file_path.exist? or raise Rvdata2PathError, "Original rvdata2 file not found: #{original_file_path}"
+
+        original_object = Marshal.load(original_file_path.binread)
+        Logger.debug("Deserialize #{original_file_path}")
+        Utils.r3exs_rpg(object, original_object)
+        Utils.object_rvdata2(original_object, file_path)
+        Logger.debug("Serialize   #{file_path}")
+      end
     end
   end
 end
