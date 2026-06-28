@@ -23,8 +23,8 @@ class Color
     r, g, b, a = obj.unpack('D4')
     instance = Color.allocate
     instance.red = r
-    instance.blue = g
-    instance.green = b
+    instance.green = g
+    instance.blue = b
     instance.alpha = a
     instance
   end
@@ -68,8 +68,8 @@ class Tone
     r, g, b, y = obj.unpack('D4')
     instance = Tone.allocate
     instance.red = r
-    instance.blue = g
-    instance.green = b
+    instance.green = g
+    instance.blue = b
     instance.gray = y
     instance
   end
