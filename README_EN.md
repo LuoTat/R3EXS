@@ -44,19 +44,6 @@ It uses [Prism](https://github.com/ruby/prism) to accurately extract strings and
 gem install R3EXS
 ```
 
-### Download executable file directly
-
-Click to download [R3EXS.exe](https://github.com/LuoTat/R3EXS/releases)
-
-Since the R3EXS.exe file is packaged using [Ocran](https://github.com/Largo/ocran)
-and [Tebako](https://github.com/tamatebako/tebako)
-
-The `Windows` environment provides `R3EXS-windows_Ocran` and `R3EXS-windows_Tebako`
-
-The `Linux (GLIBC >= 2.31)` environment provides `R3EXS-linux_Tebako`
-
-it will extract the Ruby environment the first time it runs, so the first run may be slower.
-
 ## [Usage](#contents)
 
 The following commands assume they are run in the game’s root directory, ensuring the `./Game.rgss3a` file exists or has
@@ -233,12 +220,6 @@ Build the local documentation:
 yardoc
 ```
 
-Build the `R3EXS_Ocran.exe` file:
-
-```bash
-rake ocran
-```
-
 View all rake tasks:
 
 ```bash
@@ -254,8 +235,6 @@ rake -T
 - [oj](https://github.com/ohler55/oj)
 - [gli](https://github.com/davetron5000/gli)
 - [Prism](https://github.com/ruby/prism)
-- [Ocran](https://github.com/Largo/ocran)
-- [Tebako](https://github.com/tamatebako/tebako)
 - [RGSS3](https://github.com/taroxd/RGSS3)
 - [rvdata2json](https://github.com/DICE2000/rvdata2json)
 - [VX-Ace-Translator](https://github.com/AhmedAhmedEG/VX-Ace-Translator)

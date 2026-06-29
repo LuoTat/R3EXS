@@ -44,18 +44,6 @@ R3EXS 是一个基于 Ruby 语言，用来提取和翻译 RGSS3 游戏里字符�
 gem install R3EXS
 ```
 
-### 直接下载 exe 可执行文件
-
-点击下载 [R3EXS.exe](https://github.com/LuoTat/R3EXS/releases)
-
-使用 [Ocran](https://github.com/Largo/ocran) 和 [Tebako](https://github.com/tamatebako/tebako) 两个打包工具
-
-`Windows` 环境提供 `R3EXS-windows-Ocran` 和 `R3EXS-windows-Tebako`
-
-`Linux (GLIBC>=2.31)` 环境提供 `R3EXS-linux-Tebako`
-
-在首次运行时会解压 Ruby 环境，所以首次运行会比较慢
-
 ## [使用方法](#目录)
 
 以下代码均假设在游戏根目录下运行，确保 `./Game.rgss3a` 文件存在，或者已经解包到 `./Data` 文件夹下
@@ -230,12 +218,6 @@ rake compile
 yardoc
 ```
 
-构建 `R3EXS_Ocran.exe` 可执行文件
-
-```bash
-rake ocran
-```
-
 查看所有 rake 任务
 
 ```bash
@@ -251,8 +233,6 @@ rake -T
 - [oj](https://github.com/ohler55/oj)
 - [gli](https://github.com/davetron5000/gli)
 - [Prism](https://github.com/ruby/prism)
-- [Ocran](https://github.com/Largo/ocran)
-- [Tebako](https://github.com/tamatebako/tebako)
 - [RGSS3](https://github.com/taroxd/RGSS3)
 - [rvdata2json](https://github.com/DICE2000/rvdata2json)
 - [VX-Ace-Translator](https://github.com/AhmedAhmedEG/VX-Ace-Translator)
