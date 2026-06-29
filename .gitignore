@@ -1,13 +1,14 @@
 /.idea
 /.yardoc
 
-# 解包提取时生成的文件
+# 运行时生成的文件
 /Data
 /Data_NEW
 /Graphics
 /JSON
 /JSON_NEW
 Game.rgss3a
+Gemfile.lock
 ManualTransFile.json
 ManualTransFile_scripts.json
 
@@ -16,5 +17,3 @@ ManualTransFile_scripts.json
 /pkg
 /tmp
 /lib/R3EXS/R3EXS.so
-R3EXS-windows_Tebako.exe
-R3EXS-windows_Ocran.exe
