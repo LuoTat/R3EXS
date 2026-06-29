@@ -16,12 +16,19 @@ Gem::Specification.new do |s|
     'documentation_uri' => 'https://rubydoc.info/gems/R3EXS',
     'source_code_uri' => 'https://github.com/LuoTat/R3EXS'
   }
-  s.files = Dir['bin/R3EXS', '{lib,ext}/**/*.{rb,h,c}', '.yardopts', 'CHANGELOG.md', 'LICENSE', 'README.md', 'README_EN.md']
+  s.files = Dir[
+    'bin/R3EXS',
+    '{lib,ext}/**/*.{rb,cxx}',
+    '.yardopts',
+    'CHANGELOG.md',
+    'LICENSE',
+    'README.md',
+    'README_EN.md'
+  ]
   s.bindir = 'bin'
   s.executables << 'R3EXS'
   s.platform = Gem::Platform::RUBY
   s.required_ruby_version = '>= 4.0.0'
-  s.add_development_dependency('ocran', '~>1.4.3') # For packaging
   s.add_development_dependency('rake', '~> 13.4.2')
   s.add_development_dependency('rake-compiler', '~> 1.3.1') # For building C extension
   s.add_development_dependency('rubocop', '~> 1.87') # For code linting
