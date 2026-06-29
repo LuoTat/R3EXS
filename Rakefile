@@ -17,6 +17,7 @@ task :clean do
     ./Graphics
     ./JSON
     ./JSON_NEW
+    ./doc
     ./pkg
     ./tmp
     ./ManualTransFile.json
