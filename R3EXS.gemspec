@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.bindir = 'bin'
   s.executables << 'R3EXS'
   s.platform = Gem::Platform::RUBY
-  s.required_ruby_version = '>= 4.0.0'
+  s.required_ruby_version = '>= 3.0.0'
   s.add_development_dependency('rake', '~> 13.4.2')
   s.add_development_dependency('rake-compiler', '~> 1.3.1') # For building C extension
   s.add_development_dependency('rubocop', '~> 1.87') # For code linting
