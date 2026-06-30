@@ -82,7 +82,6 @@ SYNOPSIS
 
 COMMAND OPTIONS
     -c, --[no-]complete        - 开启完全序列化
-    -n, --[no-]with_notes      - 开启注释序列化
     -o, --output_dir=DIRECTORY - *.json 文件的输出目录 (默认: ./JSON)
     -s, --[no-]with_scripts    - 开启 Scripts 脚本序列化
 ```

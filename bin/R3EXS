@@ -44,16 +44,13 @@ class App
     c.desc 'Enable Scripts.rvdata2 serialization'
     c.switch %i[s with_scripts]
 
-    c.desc 'Enable notes attribute serialization'
-    c.switch %i[n with_notes]
-
     c.desc 'The *.json output dir'
     c.default_value './JSON'
     c.arg_name 'DIRECTORY'
     c.flag %i[o output_dir]
 
     c.action do |_global_options, options, args|
-      R3EXS.rvdata2_json(Pathname(args[0]), Pathname(options[:output_dir]), options[:complete], options[:with_scripts], options[:with_notes])
+      R3EXS.rvdata2_json(Pathname(args[0]), Pathname(options[:output_dir]), options[:complete], options[:with_scripts])
       R3EXS::Logger.info("All JSON files have been written to #{options[:output_dir]}")
     rescue R3EXS::Rvdata2DirError => e
       R3EXS::Logger.warn(e.message)

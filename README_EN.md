@@ -84,7 +84,6 @@ SYNOPSIS
 
 COMMAND OPTIONS
     -c, --[no-]complete        - Enable complete serialization
-    -n, --[no-]with_notes      - Enable notes attribute serialization
     -o, --output_dir=DIRECTORY - The *.json output dir (default: ./JSON)
     -s, --[no-]with_scripts    - Enable Scripts.rvdata2 serialization
 ```
