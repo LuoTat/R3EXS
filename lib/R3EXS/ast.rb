@@ -86,7 +86,7 @@ module R3EXS
 
     # 字符串翻译表
     #
-    # @return [Hash<String, String>]
+    # @return [Hash{String => String}]
     attr_reader :strings_hash
 
     # AST 根节点
@@ -128,7 +128,7 @@ module R3EXS
     # 初始化 StringsInjector
     #
     # @param script [String] Ruby 源码
-    # @param hash [Hash<String, String>] 字符串翻译表
+    # @param hash [Hash{String => String}] 字符串翻译表
     #
     # @return [StringsInjector]
     def initialize(script, hash)
@@ -198,7 +198,7 @@ module R3EXS
     # 将 script 源码中的字符串替换成 @strings_hash 翻译后的字符串
     #
     # @param script [String] Ruby 源码
-    # @param hash [Hash<String, String>] 字符串翻译表
+    # @param hash [Hash{String => String}] 字符串翻译表
     #
     # @return [String]
     def self.inject(script, hash)

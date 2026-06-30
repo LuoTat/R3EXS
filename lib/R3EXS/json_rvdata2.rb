@@ -20,15 +20,15 @@ module R3EXS
   # @return [void]
   def self.commonevents_rvdata2(target_dir, output_dir, original_dir, complete)
     if complete
-      Utils.all_commonevent_json_files(target_dir, :RPG) do |commonevents, _, parent_relative_dir|
-        file_path = output_dir.join(parent_relative_dir.parent, 'CommonEvents.rvdata2')
+      Utils.all_commonevent_json_files(target_dir, :RPG) do |commonevents, _, rvdata2_file_path|
+        file_path = output_dir.join(rvdata2_file_path.relative_path_from(target_dir))
         Utils.object_rvdata2(commonevents, file_path)
         Logger.debug("Serialize   #{file_path}")
       end
     else
-      Utils.all_commonevent_json_files(target_dir, :R3EXS) do |commonevents, _, parent_relative_dir|
-        file_path = output_dir.join(parent_relative_dir.parent, 'CommonEvents.rvdata2')
-        original_file_path = original_dir.join(parent_relative_dir.parent, 'CommonEvents.rvdata2')
+      Utils.all_commonevent_json_files(target_dir, :R3EXS) do |commonevents, _, rvdata2_file_path|
+        file_path = output_dir.join(rvdata2_file_path.relative_path_from(target_dir))
+        original_file_path = original_dir.join(rvdata2_file_path.relative_path_from(target_dir))
         # 检查 original_file_path 是否存在
         original_file_path.exist? or raise Rvdata2PathError, "Original rvdata2 file not found: #{original_file_path}"
 
@@ -51,8 +51,8 @@ module R3EXS
   #
   # @return [void]
   def self.scripts_rvdata2(target_dir, output_dir)
-    Utils.all_rb_files(target_dir) do |scripts, script_info, _, _, parent_relative_dir|
-      file_path = output_dir.join(parent_relative_dir.parent, 'Scripts.rvdata2')
+    Utils.all_rb_files(target_dir) do |scripts, script_info, _, _, rvdata2_file_path|
+      file_path = output_dir.join(rvdata2_file_path.relative_path_from(target_dir))
 
       output_scripts = []
       script_info.each do |info|
@@ -89,13 +89,13 @@ module R3EXS
 
     # 处理常规 JSON 文件
     if complete
-      Utils.all_common_json_files(target_dir, :RPG) do |object, obj_path|
+      Utils.all_regular_json_files(target_dir, :RPG) do |object, obj_path|
         file_path = output_dir.join(obj_path.relative_path_from(target_dir)).sub_ext('.rvdata2')
         Utils.object_rvdata2(object, file_path)
         Logger.debug("Serialize   #{file_path}")
       end
     else
-      Utils.all_common_json_files(target_dir, :R3EXS) do |object, obj_path|
+      Utils.all_regular_json_files(target_dir, :R3EXS) do |object, obj_path|
         file_path = output_dir.join(obj_path.relative_path_from(target_dir)).sub_ext('.rvdata2')
         original_file_path = original_dir.join(obj_path.relative_path_from(target_dir)).sub_ext('.rvdata2')
         # 检查 original_file_path 是否存在

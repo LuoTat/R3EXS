@@ -74,7 +74,7 @@ module R3EXS
     end
 
     # 处理常规 JSON 文件
-    Utils.all_common_json_files(target_dir, :R3EXS) do |object, file_path|
+    Utils.all_regular_json_files(target_dir, :R3EXS) do |object, file_path|
       all_ex_strings.concat(Utils.ex_r3exs(object))
       Logger.debug("Extract     #{file_path}")
     end
