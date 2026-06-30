@@ -102,7 +102,7 @@ module R3EXS
     # @raise [ModuleNameError] module_name 不是 :RPG 或 :R3EXS
     #
     # @return [void]
-    def self.all_common_json_files(target_dir, module_name)
+    def self.all_regular_json_files(target_dir, module_name)
       # 检查 target_dir 目录是否存在
       target_dir.exist? && target_dir.directory? or raise JsonDirError, "JSON directory not found: #{target_dir}"
 
@@ -146,9 +146,9 @@ module R3EXS
     # @param target_dir [Pathname] 目标目录
     # @param module_name [Symbol] 模块名
     #
-    # @yieldparam commonevents [Array<RPG::CommonEvent>, Array<R3EXS::CommonEvent>] CommonEvent JSON 文件反序列化后的数组
+    # @yieldparam commonevents [Array<RPG::CommonEvent, R3EXS::CommonEvent>] CommonEvent JSON 文件反序列化后的数组
     # @yieldparam commonevents_paths [Array<Pathname>] CommonEvent JSON 文件路径数组
-    # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
+    # @yieldparam rvdata2_file_path [Pathname] 所属 CommonEvents.rvdata2 的路径
     # @yieldreturn [void]
     #
     # @raise [JsonDirError] target_dir 不存在
@@ -197,7 +197,7 @@ module R3EXS
       commonevents_hash.each_key do |parent_dir|
         commonevents = commonevents_hash[parent_dir]
         commonevents_paths = commonevents_path_hash[parent_dir]
-        yield commonevents, commonevents_paths, parent_dir.relative_path_from(target_dir)
+        yield commonevents, commonevents_paths, parent_dir.parent.join('CommonEvents.rvdata2')
       end
     end
 
@@ -209,7 +209,7 @@ module R3EXS
     # @yieldparam scripts_info [Array<Hash>] Scripts_info.json 反序列化后的对象
     # @yieldparam scripts_paths [Array<Pathname>] Ruby 源码文件名路径数组
     # @yieldparam script_info_file_path [Pathname] Scripts_info.json 文件路径
-    # @yieldparam parent_relative_dir [Pathname] 文件所在目录的相对路径
+    # @yieldparam rvdata2_file_path [Pathname] 所属 Scripts.rvdata2 的路径
     # @yieldreturn [void]
     #
     # @raise [JsonDirError] target_dir 不存在
@@ -242,7 +242,7 @@ module R3EXS
         scripts = scripts_hash[parent_dir]
         script_info = Oj.load_file(script_info_file_path.to_s)
         scripts_paths = scripts_path_hash[parent_dir]
-        yield scripts, script_info, scripts_paths, script_info_file_path, parent_dir.relative_path_from(target_dir)
+        yield scripts, script_info, scripts_paths, script_info_file_path, parent_dir.parent.join('Scripts.rvdata2')
       end
     end
 
@@ -308,16 +308,15 @@ module R3EXS
     #
     # @param object [Object] 待转化的 RPG 对象
     # @param klass [::Class] 对应的 R3EXS 模块中的类
-    # @param with_notes [Boolean] 是否包含注释
     #
     # @return [Object]
-    def self.rpg_r3exs(object, klass, with_notes)
+    def self.rpg_r3exs(object, klass)
       if object.is_a?(Array)
         temp = []
         object.each_with_index do |obj, index|
           next if obj.nil?
 
-          obj_r3exs = klass.new(obj, index, with_notes)
+          obj_r3exs = klass.new(obj, index)
           temp << obj_r3exs unless obj_r3exs.empty?
         end
       elsif object.is_a?(Hash) # 只有 RPG::MapInfo 是 Hash，且 key 为整数
@@ -325,11 +324,12 @@ module R3EXS
         object.each do |key, obj|
           next if obj.nil?
 
-          temp[key] = klass.new(obj, key, with_notes)
+          obj_r3exs = klass.new(obj)
+          temp[key] = obj_r3exs unless obj_r3exs.empty?
         end
       else
         # 只有 RPG::Map 和 RPG::System 是单独一个对象，且不可能为 nil
-        temp = klass.new(object, with_notes)
+        temp = klass.new(object)
       end
       temp
     end
@@ -337,7 +337,7 @@ module R3EXS
     # 提取 R3EXS 对象中的字符串
     #
     # @param object [Object] 待注入的 R3EXS 对象
-    # @param manual_trans_hash[Hash<String, String>] 翻译结果
+    # @param manual_trans_hash[Hash{String => String}] 翻译结果
     #
     # @return [Array<String>]
     def self.in_r3exs(object, manual_trans_hash)
@@ -408,6 +408,23 @@ module R3EXS
     def self.object_rvdata2(object, file_path)
       file_path.parent.mkpath unless file_path.parent.exist?
       file_path.binwrite(Marshal.dump(object))
+    end
+  end
+end
+
+class String
+  unless method_defined?(:blank?) && ' '.blank?
+    # Checks whether a string is blank. A string is considered blank if it
+    # is either empty or contains only whitespace characters.
+    #
+    # @return [Boolean] true is the string is blank, false otherwise
+    #
+    # @example
+    #   ''.blank?       #=> true
+    #   '    '.blank?   #=> true
+    #   '  test'.blank? #=> false
+    def blank?
+      empty? || lstrip.empty?
     end
   end
 end
