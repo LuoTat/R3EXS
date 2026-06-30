@@ -15,8 +15,6 @@
     <EXTENSION ID="org.jetbrains.plugins.ruby.rails.run.RailsRunConfigurationExtension" SCRATCH_USE_RAILS_RUNNER="false" />
     <RUBY_RUN_CONFIG NAME="SCRIPT_PATH" VALUE="$MODULE_DIR$/bin/R3EXS" />
     <RUBY_RUN_CONFIG NAME="SCRIPT_ARGS" VALUE="-v decrypt ./Game.rgss3a" />
-    <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="compile: R3EXS" run_configuration_type="RakeRunConfigurationType" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>
