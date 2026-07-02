@@ -64,6 +64,7 @@ module R3EXS
     else
       Utils.object_json(Utils.rpg_r3exs(obj, klass), file_path)
     end
+    Logger.debug("Serialize   #{file_path}")
   end
 
   # 将指定目录下的所有 rvdata2 文件序列化为 JSON 格式
@@ -85,7 +86,6 @@ module R3EXS
         scripts_rb(obj, file_path.sub_ext('')) if with_scripts
       else
         regular_json(obj, klass, file_path, complete)
-        Logger.debug("Serialize   #{file_path}")
       end
     end
   end
