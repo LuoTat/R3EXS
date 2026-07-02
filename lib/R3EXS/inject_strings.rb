@@ -48,6 +48,25 @@ module R3EXS
     end
   end
 
+  # 注入 R3EXS 格式的 常规 JSON 文件中的字符串
+  #
+  # @param target_dir [Pathname] 目标目录
+  # @param output_dir [Pathname] 输出目录
+  # @param manual_trans_hash[Hash{String => String}] 翻译结果
+  #
+  # @raise [JsonDirError] target_dir 不存在
+  # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
+  #
+  # @return [void]
+  def self.in_regular(target_dir, output_dir, manual_trans_hash)
+    Utils.all_regular_json_files(target_dir, :R3EXS) do |obj, json_path|
+      file_path = output_dir.join(json_path.relative_path_from(target_dir))
+      Utils.in_r3exs(obj, manual_trans_hash)
+      Utils.object_json(obj, file_path)
+      Logger.debug("Inject      #{file_path}")
+    end
+  end
+
   # 将指定目录下 R3EXS 格式的 JOSN 文件按照 ManualTransFile.json 翻译注入字符串
   #
   # @param target_dir [Pathname] 目标目录
@@ -72,11 +91,6 @@ module R3EXS
     in_scripts(target_dir, output_dir, manual_trans_hash) if with_scripts
 
     # 处理常规的 JSON 文件
-    Utils.all_regular_json_files(target_dir, :R3EXS) do |object, json_path|
-      file_path = output_dir.join(json_path.relative_path_from(target_dir))
-      Utils.in_r3exs(object, manual_trans_hash)
-      Utils.object_json(object, file_path)
-      Logger.debug("Inject      #{file_path}")
-    end
+    in_regular(target_dir, output_dir, manual_trans_hash)
   end
 end

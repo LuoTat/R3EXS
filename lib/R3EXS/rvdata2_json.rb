@@ -50,6 +50,22 @@ module R3EXS
     Logger.debug("Serialize   #{script_info_file_path}")
   end
 
+  # 将常规对象数组序列化为 JSON 文件
+  #
+  # @param obj [Array<Object>] 常规对象数组
+  # @param klass [::Class] 对应 R3EXS 模块的类
+  # @param file_path [Pathname] 输出文件路径
+  # @param complete [Boolean] 是否序列化所有内容
+  #
+  # @return [void]
+  def self.regular_json(obj, klass, file_path, complete)
+    if complete
+      Utils.object_json(obj, file_path)
+    else
+      Utils.object_json(Utils.rpg_r3exs(obj, klass), file_path)
+    end
+  end
+
   # 将指定目录下的所有 rvdata2 文件序列化为 JSON 格式
   #
   # @param target_dir [Pathname] 目标目录
@@ -61,18 +77,14 @@ module R3EXS
   #
   # @return [void]
   def self.rvdata2_json(target_dir, output_dir, complete, with_scripts)
-    Utils.all_rvdata2_files(target_dir) do |object, klass, file_basename, rvdata2_path|
+    Utils.all_rvdata2_files(target_dir) do |obj, klass, file_basename, rvdata2_path|
       file_path = output_dir.join(rvdata2_path.relative_path_from(target_dir)).sub_ext('.json')
       if file_basename.to_s == 'CommonEvents'
-        commonevents_json(object, file_path.sub_ext(''), complete)
+        commonevents_json(obj, file_path.sub_ext(''), complete)
       elsif file_basename.to_s == 'Scripts'
-        scripts_rb(object, file_path.sub_ext('')) if with_scripts
+        scripts_rb(obj, file_path.sub_ext('')) if with_scripts
       else
-        if complete
-          Utils.object_json(object, file_path)
-        else
-          Utils.object_json(Utils.rpg_r3exs(object, klass), file_path)
-        end
+        regular_json(obj, klass, file_path, complete)
         Logger.debug("Serialize   #{file_path}")
       end
     end

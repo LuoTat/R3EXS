@@ -44,6 +44,23 @@ module R3EXS
     ex_strings
   end
 
+  # 提取 R3EXS 格式的 常规 JSON 文件中的字符串
+  #
+  # @param target_dir [Pathname] 目标目录
+  #
+  # @raise [JsonDirError] target_dir 不存在
+  # @raise [R3EXSJsonFileError] json 文件不是 R3EXS 模块中的对象
+  #
+  # @return [Array<String>]
+  def self.ex_regular(target_dir)
+    ex_strings = []
+    Utils.all_regular_json_files(target_dir, :R3EXS) do |obj, file_path|
+      ex_strings.concat(Utils.ex_r3exs(obj))
+      Logger.debug("Extract     #{file_path}")
+    end
+    ex_strings
+  end
+
   # 提取指定目录下 R3EXS 格式的 JOSN 文件中的字符串
   #
   # @param target_dir [Pathname] 目标目录
@@ -74,10 +91,7 @@ module R3EXS
     end
 
     # 处理常规 JSON 文件
-    Utils.all_regular_json_files(target_dir, :R3EXS) do |object, file_path|
-      all_ex_strings.concat(Utils.ex_r3exs(object))
-      Logger.debug("Extract     #{file_path}")
-    end
+    all_ex_strings.concat(ex_regular(target_dir))
 
     # 去除 nil 元素
     all_ex_strings.compact!
