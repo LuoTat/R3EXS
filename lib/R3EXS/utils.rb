@@ -51,13 +51,13 @@ module R3EXS
 
     # 读取 target_dir 下的所有 rvdata2 文件，将其反序列化为对象，并调用 block
     #
-    # @note 注意传入 block 的 object
-    #       - 如果 object 是数组或哈希，则其中可能存在 nil 元素
-    #       - 如果 object 是单独一个对象，则不可能为 nil
+    # @note 注意传入 block 的 obj
+    #       - 如果 obj 是数组或哈希，则其中可能存在 nil 元素
+    #       - 如果 obj 是单独一个对象，则不可能为 nil
     #
     # @param target_dir [Pathname] 目标目录
     #
-    # @yieldparam object [Object] rvdata2 文件反序列化后的对象
+    # @yieldparam obj [Object] rvdata2 文件反序列化后的对象
     # @yieldparam klass [::Class] rvdata2 文件所对应 R3EXS 模块的类
     # @yieldparam file_basename [Pathname] 文件名（不包含扩展名）
     # @yieldparam relative_dir [Pathname] 文件相对 target_dir 的路径
@@ -77,22 +77,22 @@ module R3EXS
         klass = name_class(file_basename, :R3EXS)
         next if klass.nil?
 
-        object = Marshal.load(file_path.binread, freeze: true)
+        obj = Marshal.load(file_path.binread, freeze: true)
         Logger.debug("Deserialize #{file_path}")
-        yield object, klass, file_basename, file_path
+        yield obj, klass, file_basename, file_path
       end
     end
 
     # 读取 target_dir 下的所有常规 JSON 文件，将其反序列化为对象，并调用 block
     #
-    # @note 注意传入 block 的 object
-    #       - 在 module_name 为 RPG 时，如果 object 是数组或哈希，则其中可能存在 nil 元素。如果 object 是单独一个对象，则不可能为 nil
+    # @note 注意传入 block 的 obj
+    #       - 在 module_name 为 RPG 时，如果 obj 是数组或哈希，则其中可能存在 nil 元素。如果 obj 是单独一个对象，则不可能为 nil
     #       - 在 module_name 为 R3EXS 时，object 不会为 nil
     #
     # @param target_dir [Pathname] 目标目录
     # @param module_name [Symbol] 模块名
     #
-    # @yieldparam object [Object] JSON 文件反序列化后的对象
+    # @yieldparam obj [Object] JSON 文件反序列化后的对象
     # @yieldparam file_path [Pathname] 文件路径
     # @yieldreturn [void]
     #
@@ -113,33 +113,33 @@ module R3EXS
         klass = name_class(file_basename, module_name)
         next if klass.nil?
 
-        object = Oj.load_file(file_path.to_s)
+        obj = Oj.load_file(file_path.to_s)
         Logger.debug("Deserialize #{file_path}")
         case module_name
         when :RPG
           # 因为这是从 rvdata2 文件直接全部序列化后的 JSON 文件中读取的 object，其中可能存在 nil 元素
           begin
-            check_type(object, klass, true)
+            check_type(obj, klass, true)
           rescue TypeError
             raise RPGJsonFileError, "Invalid RPG JSON file: #{file_path}"
           end
         when :R3EXS
           # 因为这是从 R3EXS 模块的类序列化后的 JSON 文件中读取的 object，程序设计中不应该存在 nil 元素
           begin
-            check_type(object, klass, false)
+            check_type(obj, klass, false)
           rescue TypeError
             raise R3EXSJsonFileError, "Invalid R3EXS JSON file: #{file_path}"
           end
         else
           raise ModuleNameError, "Invalid module name: #{module_name}"
         end
-        yield object, file_path
+        yield obj, file_path
       end
     end
 
     # 读取 target_dir 下的所有 CommonEvent JSON 文件，将其反序列化为对象数组，并调用 block
     #
-    # @note 注意传入 block 的 object
+    # @note 注意传入 block 的 obj
     #       - 在 module_name 为 RPG 时，object 可能存在 nil 元素
     #       - 在 module_name 为 R3EXS 时，object 不可能存在 nil 元素
     #
@@ -168,19 +168,19 @@ module R3EXS
 
       # 递归获取 target_dir 下的所有 CommonEvent_\d{5}.json 文件
       target_dir.glob('**/CommonEvent_[0-9][0-9][0-9][0-9][0-9].json').each do |file_path|
-        object = Oj.load_file(file_path.to_s)
+        obj = Oj.load_file(file_path.to_s)
         case module_name
         when :RPG
           # 因为这是从 rvdata2 文件直接全部序列化后的 JSON 文件中读取的 object，其中可能存在 nil 元素
           begin
-            check_type(object, RPG::CommonEvent, true)
+            check_type(obj, RPG::CommonEvent, true)
           rescue TypeError
             raise RPGJsonFileError, 'Invalid RPG CommonEvents JSON file'
           end
         when :R3EXS
           # 因为这是从 R3EXS 模块的类序列化后的 JSON 文件中读取的 object，程序设计中不应该存在 nil 元素
           begin
-            check_type(object, R3EXS::CommonEvent, false)
+            check_type(obj, R3EXS::CommonEvent, false)
           rescue TypeError
             raise R3EXSJsonFileError, 'Invalid R3EXS CommonEvents JSON file'
           end
@@ -189,7 +189,7 @@ module R3EXS
         end
         Logger.debug("Deserialize #{file_path}")
         parent_dir = file_path.parent
-        commonevents_hash[parent_dir] << object
+        commonevents_hash[parent_dir] << obj
         commonevents_path_hash[parent_dir] << file_path
       end
 
@@ -227,10 +227,10 @@ module R3EXS
 
       # 递归获取 target_dir 下的所有 Script_\d{3}.rb 文件
       target_dir.glob('**/Script_[0-9][0-9][0-9].rb').each do |file_path|
-        object = file_path.read
+        obj = file_path.read
         Logger.debug("Read        #{file_path}")
         parent_dir = file_path.parent
-        scripts_hash[parent_dir] << object
+        scripts_hash[parent_dir] << obj
         scripts_path_hash[parent_dir] << file_path
       end
 
@@ -246,24 +246,24 @@ module R3EXS
       end
     end
 
-    # 检查 object 的类型是否正确属于 klass
+    # 检查 obj 的类型是否正确属于 klass
     #
-    # @param object [Object] 待检查的对象
+    # @param obj [Object] 待检查的对象
     # @param klass [::Class] 期望的类
-    # @param has_nil [Boolean] 是否允许 object 中存在 nil 元素
+    # @param has_nil [Boolean] 是否允许 obj 中存在 nil 元素
     #
-    # @raise [TypeError] object 的类型不属于期望的类
+    # @raise [TypeError] obj 的类型不属于期望的类
     #
     # @return [void]
-    def self.check_type(object, klass, has_nil)
-      if object.is_a?(Array)
-        items = has_nil ? object.compact : object
+    def self.check_type(obj, klass, has_nil)
+      if obj.is_a?(Array)
+        items = has_nil ? obj.compact : obj
         items.all? { |item| item.is_a?(klass) } or raise TypeError, "Object isn't an Array<#{klass}>"
-      elsif object.is_a?(Hash)
-        values = has_nil ? object.compact.values : object.values
+      elsif obj.is_a?(Hash)
+        values = has_nil ? obj.compact.values : obj.values
         values.all? { |item| item.is_a?(klass) } or raise TypeError, "Object isn't a Hash<#{klass}>"
-      elsif !object.nil? # 需考虑 object 为 nil的情况
-        object.is_a?(klass) or raise TypeError, "Object isn't a #{klass}"
+      elsif !obj.nil? # 需考虑 obj 为 nil的情况
+        obj.is_a?(klass) or raise TypeError, "Object isn't a #{klass}"
       end
     end
 
@@ -290,7 +290,7 @@ module R3EXS
 
     # 将 R3EXS 对象中的字符串注入 RPG 对象中
     #
-    # @param object [Object] 待转化的 R3EXS 对象
+    # @param obj [Object] 待转化的 R3EXS 对象
     #
     # @return [Object]
     def self.r3exs_rpg(r3exs_obj, rpg_obj)
@@ -306,22 +306,22 @@ module R3EXS
 
     # 将 RPG 对象转化为 R3EXS 对象
     #
-    # @param object [Object] 待转化的 RPG 对象
+    # @param obj [Object] 待转化的 RPG 对象
     # @param klass [::Class] 对应的 R3EXS 模块中的类
     #
     # @return [Object]
-    def self.rpg_r3exs(object, klass)
-      if object.is_a?(Array)
+    def self.rpg_r3exs(obj, klass)
+      if obj.is_a?(Array)
         temp = []
-        object.each_with_index do |obj, index|
+        obj.each_with_index do |obj, index|
           next if obj.nil?
 
           obj_r3exs = klass.new(obj, index)
           temp << obj_r3exs unless obj_r3exs.empty?
         end
-      elsif object.is_a?(Hash) # 只有 RPG::MapInfo 是 Hash，且 key 为整数
+      elsif obj.is_a?(Hash) # 只有 RPG::MapInfo 是 Hash，且 key 为整数
         temp = {}
-        object.each do |key, obj|
+        obj.each do |key, obj|
           next if obj.nil?
 
           obj_r3exs = klass.new(obj)
@@ -329,40 +329,40 @@ module R3EXS
         end
       else
         # 只有 RPG::Map 和 RPG::System 是单独一个对象，且不可能为 nil
-        temp = klass.new(object)
+        temp = klass.new(obj)
       end
       temp
     end
 
     # 提取 R3EXS 对象中的字符串
     #
-    # @param object [Object] 待注入的 R3EXS 对象
+    # @param obj [Object] 待注入的 R3EXS 对象
     # @param manual_trans_hash[Hash{String => String}] 翻译结果
     #
     # @return [Array<String>]
-    def self.in_r3exs(object, manual_trans_hash)
-      if object.is_a?(Array)
-        object.each { |obj| obj.in_strings(manual_trans_hash) }
-      elsif object.is_a?(Hash)
-        object.each_value { |obj| obj.in_strings(manual_trans_hash) }
+    def self.in_r3exs(obj, manual_trans_hash)
+      if obj.is_a?(Array)
+        obj.each { |obj| obj.in_strings(manual_trans_hash) }
+      elsif obj.is_a?(Hash)
+        obj.each_value { |obj| obj.in_strings(manual_trans_hash) }
       else
-        object.in_strings(manual_trans_hash)
+        obj.in_strings(manual_trans_hash)
       end
     end
 
     # 提取 R3EXS 对象中的字符串
     #
-    # @param object [Object] 待提取的 R3EXS 对象
+    # @param obj [Object] 待提取的 R3EXS 对象
     #
     # @return [Array<String>]
-    def self.ex_r3exs(object)
+    def self.ex_r3exs(obj)
       ex_strings = []
-      if object.is_a?(Array)
-        object.each { |obj| ex_strings.concat(obj.ex_strings) }
-      elsif object.is_a?(Hash)
-        object.each_value { |obj| ex_strings.concat(obj.ex_strings) }
+      if obj.is_a?(Array)
+        obj.each { |obj| ex_strings.concat(obj.ex_strings) }
+      elsif obj.is_a?(Hash)
+        obj.each_value { |obj| ex_strings.concat(obj.ex_strings) }
       else
-        ex_strings.concat(object.ex_strings)
+        ex_strings.concat(obj.ex_strings)
       end
       ex_strings
     end
@@ -388,26 +388,26 @@ module R3EXS
       script_rb(Zlib::Inflate.inflate(script), file_path)
     end
 
-    # 将 object 序列化为 json 文件
+    # 将 obj 序列化为 json 文件
     #
-    # @param object [Object] 待序列化的对象
+    # @param obj [Object] 待序列化的对象
     # @param file_path [Pathname] 输出文件路径
     #
     # @return [void]
-    def self.object_json(object, file_path)
+    def self.object_json(obj, file_path)
       file_path.parent.mkpath unless file_path.parent.exist?
-      file_path.write(Oj.dump(object, indent: 2))
+      file_path.write(Oj.dump(obj, indent: 2))
     end
 
-    # 将 object 序列化为 rvdata2 文件
+    # 将 obj 序列化为 rvdata2 文件
     #
-    # @param object [Object] 待序列化的对象
+    # @param obj [Object] 待序列化的对象
     # @param file_path [Pathname] 输出文件路径
     #
     # @return [void]
-    def self.object_rvdata2(object, file_path)
+    def self.object_rvdata2(obj, file_path)
       file_path.parent.mkpath unless file_path.parent.exist?
-      file_path.binwrite(Marshal.dump(object))
+      file_path.binwrite(Marshal.dump(obj))
     end
   end
 end
