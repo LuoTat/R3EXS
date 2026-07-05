@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 3.0.0'
   s.add_development_dependency('rake', '~> 13.4.2')
   s.add_development_dependency('rake-compiler', '~> 1.3.1') # For building C extension
-  s.add_development_dependency('rubocop', '~> 1.87') # For code linting
+  s.add_development_dependency('rubocop', '~> 1.88') # For code linting
   s.add_development_dependency('yard', '~> 0.9.44') # For documentation
   s.add_runtime_dependency('gli', '~> 2.22.2') # For command line interface
   s.add_runtime_dependency('oj', '~> 3.17.3') # For JSON parsing
