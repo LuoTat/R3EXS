@@ -300,12 +300,7 @@ VALUE r3exs_rgss3a_rvdata2(VALUE self, VALUE target_path, VALUE output_dir, VALU
     }
     catch (const RGSS3AFileError& e)
     {
-        rb_exc_raise(rb_funcall(
-            rb_const_get(self, rb_intern("RGSS3AFileError")),
-            rb_intern("new"),
-            1,
-            rb_str_new_cstr(e.what())
-        ));
+        rb_raise(rb_const_get(self, rb_intern("RGSS3AFileError")), "%s", e.what());
     }
     catch (const std::filesystem::filesystem_error& e)
     {
