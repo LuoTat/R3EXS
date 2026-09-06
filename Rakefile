@@ -12,6 +12,7 @@ end
 desc 'Clean up generated files'
 task :clean do
   rm_rf %w[
+    ./.yardoc
     ./Data
     ./Data_NEW
     ./Graphics
